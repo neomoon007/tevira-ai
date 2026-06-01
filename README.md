@@ -7,3 +7,9 @@ Start development server:
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+Initial health-check endpoint:
+```bash
+curl http://127.0.0.1:8000/health
+```
