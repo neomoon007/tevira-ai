@@ -12,3 +12,15 @@ Initial health-check endpoint:
 ```bash
 curl http://127.0.0.1:8000/health
 ```
+
+## Example task JSON
+
+```json
+{
+    "id": "task_001",
+    "title": "My first task ever",
+    "priority": "medium",
+    "due_date": null,
+    "project_id": null
+}
+```
