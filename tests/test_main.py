@@ -10,7 +10,7 @@ def test_health():
     assert response.status_code == 200
     assert response.json() == {
         "status": "ok",
-        "service": "Tevira-AI",
+        "service": "tevira-ai",
     }
 
 def test_create_test():
