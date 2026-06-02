@@ -5,7 +5,7 @@ Tevira AI helps you organize your messy mind into actionable items. Dump your mi
 
 Start development server:
 ```bash
-uvicorn app.main:app --reload
+uvicorn src.app.main:app --reload
 ```
 
 Initial health-check endpoint:
