@@ -6,6 +6,7 @@ app = FastAPI(title="Tevira-AI")
 tasks: list[TaskRead] = []
 projects = {}
 
+# --- ENDPOINTS ---
 @app.get("/health")
 def check_health():
     return {"status": "ok", "service": "tevira-ai"}
@@ -37,7 +38,6 @@ def create_project(project: ProjectCreate) -> ProjectRead:
         id=project_id,
     )
 
-    # projects.append(new_project)
     projects[new_project.id] = new_project
 
     return new_project
