@@ -13,3 +13,11 @@ class TaskCreate(BaseModel):
 class TaskRead(TaskCreate):
     id: str
     status: Literal["open", "done"] = "open"
+
+# Create object structure for projects
+class ProjectCreate(BaseModel):
+    name: str = Field(min_length=1)
+
+# Create object structure for reading projects
+class ProjectRead(ProjectCreate):
+    id: str

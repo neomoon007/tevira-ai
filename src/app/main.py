@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from .schemas import TaskCreate, TaskRead # import classes
+from .schemas import TaskCreate, TaskRead, ProjectCreate, ProjectRead # import classes
 
 app = FastAPI(title="Tevira-AI")
 
 tasks: list[TaskRead] = []
+projects: list[ProjectRead] = []
 
 @app.get("/health")
 def check_health():
@@ -26,3 +27,16 @@ def create_task(task: TaskCreate) -> TaskRead:
 @app.get("/tasks")
 def show_tasks() -> list[TaskRead]:
     return tasks
+
+@app.post("/projects", status_code=201)
+def create_project(project: ProjectCreate) -> ProjectRead:
+    project_id = f"project_{len(projects) + 1}"
+
+    new_project = ProjectRead(
+        **project.model_dump(),
+        id=project_id,
+    )
+
+    projects.append(new_project)
+
+    return new_project
