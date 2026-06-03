@@ -41,6 +41,6 @@ def create_project(project: ProjectCreate) -> ProjectRead:
 
     return new_project
 
-@app.get("/projects"):
+@app.get("/projects")
 def show_projects() -> list[ProjectRead]:
     return projects
