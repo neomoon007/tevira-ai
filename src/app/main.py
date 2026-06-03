@@ -40,3 +40,7 @@ def create_project(project: ProjectCreate) -> ProjectRead:
     projects.append(new_project)
 
     return new_project
+
+@app.get("/projects"):
+def show_projects() -> list[ProjectRead]:
+    return projects
