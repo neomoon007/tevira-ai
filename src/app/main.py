@@ -4,7 +4,7 @@ from .schemas import TaskCreate, TaskRead, ProjectCreate, ProjectRead # import c
 app = FastAPI(title="Tevira-AI")
 
 tasks: list[TaskRead] = []
-projects: list[ProjectRead] = []
+projects = {}
 
 @app.get("/health")
 def check_health():
@@ -37,10 +37,12 @@ def create_project(project: ProjectCreate) -> ProjectRead:
         id=project_id,
     )
 
-    projects.append(new_project)
+    # projects.append(new_project)
+    projects[new_project.id] = new_project
 
     return new_project
 
 @app.get("/projects")
 def show_projects() -> list[ProjectRead]:
-    return projects
+    # turn dict into list and only output the objects without the key from the projects dict
+    return list(projects.values()) 
