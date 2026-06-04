@@ -38,5 +38,5 @@ class ProgressNoteRead(ProgressNoteCreate):
 class ContextRead(BaseModel):
     project: Optional[ProjectRead] = None
     current_state: Optional[str] = None
-    open_tasks: Optional[list[str]] = None
+    open_tasks: Optional[list[TaskRead]] = None
     next_actions: Optional[str] = None

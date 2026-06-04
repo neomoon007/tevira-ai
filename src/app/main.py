@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 from datetime import datetime, timezone
+from operator import attrgetter
 from .schemas import (
     TaskCreate, TaskRead,
     ProjectCreate, ProjectRead,
-    ProgressNoteCreate, ProgressNoteRead
+    ProgressNoteCreate, ProgressNoteRead,
+    ContextRead
 )
 
 app = FastAPI(title="Tevira-AI")
@@ -82,3 +84,24 @@ def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
 @app.get("/progress-notes")
 def show_notes(project_id: str = Depends(validate_project_id)) -> list[ProgressNoteRead]:
     return [note for note in progress_notes if note.project_id == project_id]
+
+@app.get("/resume")
+def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRead:
+    # find project name
+    project = projects[project_id]
+
+    # find all notes that belong to that project_id
+    matching_notes = [note for note in progress_notes if note.project_id == project_id]
+
+    # find all tasks that belong to that project_id && status == "open"
+    open_tasks = [task for task in tasks if task.project_id == project_id and task.status == "open"]
+
+    # output recommended next action (latest note next actions OR open tasks
+    latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)
+
+    return {
+        "project": project,
+        "current_state": latest_note.current_state if latest_note else None,
+        "open_tasks": open_tasks,
+        "next_actions": latest_note.next_actions if latest_note else None,
+    }
