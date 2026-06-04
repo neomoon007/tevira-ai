@@ -33,3 +33,10 @@ class ProgressNoteCreate(BaseModel):
 
 class ProgressNoteRead(ProgressNoteCreate):
     updated_at: datetime
+
+# --- CONTEXT ---
+class ContextRead(BaseModel):
+    project: Optional[ProjectRead] = None
+    current_state: Optional[str] = None
+    open_tasks: Optional[list[str]] = None
+    next_actions: Optional[str] = None
