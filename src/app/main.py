@@ -14,7 +14,6 @@ projects = {}
 progress_notes: list[ProgressNoteRead] = []
 
 # --- ROUTE VALIDATION ---
-# TODO: change function to compare parameter 'project_id' against the projects dict, not progress_notes list
 def validate_project_id(project_id: str):
     try:
         projects[project_id]
