@@ -14,11 +14,14 @@ projects = {}
 progress_notes: list[ProgressNoteRead] = []
 
 # --- ROUTE VALIDATION ---
+# TODO: change function to compare parameter 'project_id' against the projects dict, not progress_notes list
 def validate_project_id(project_id: str):
-    if not any(note.project_id == project_id for note in progress_notes):
-        raise HTTPException(status_code=404) 
-    else:
+    try:
+        projects[project_id]
         return project_id
+    except:
+        raise HTTPException(status_code=404)
+
 
 # --- ENDPOINTS ---
 
