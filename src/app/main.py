@@ -21,13 +21,16 @@ def validate_project_id(project_id: str):
         projects[project_id]
         return project_id
     except:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail=f"Error 404: Project '{project_id}' does not exist.")
 
 def validate_progress_note(project_id: str):
     if any(note.project_id == project_id for note in progress_notes):
         return project_id
     else:
-        raise HTTPException(status_code=404)
+        raise HTTPException(status_code=404, detail=f"Error 404: No progress note found for this project.")
+
+def get_project_tasks(project_id) -> list[TaskRead]:
+    return [task for task in tasks if task.project_id == project_id and task.status == "open"]
 
 # --- ENDPOINTS ---
 # -- "/health" --
@@ -51,8 +54,20 @@ def create_task(task: TaskCreate) -> TaskRead:
     return new_task
 
 @app.get("/tasks")
-def show_tasks() -> list[TaskRead]:
-    return tasks
+def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
+    if project_id is None and task_id is None:
+        return tasks
+
+    if project_id is not None and task_id is None:
+        validate_project_id(project_id)
+        return get_project_tasks(project_id)
+
+    if project_id is None and task_id is not None:
+        try:
+            matching_task = [task for task in tasks if task.id == task_id]
+            return matching_task
+        except:
+            raise HTTPException(status_code=404, detail=f"Error 404: Task '{task_id}' does not exist.")
 
 # -- "/projects" --
 @app.post("/projects", status_code=201)
@@ -89,7 +104,7 @@ def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
 def show_notes(project_id: str = Depends(validate_project_id)) -> list[ProgressNoteRead]:
     return [note for note in progress_notes if note.project_id == project_id]
 
-@app.get("/resume")
+@app.get("/context/{project_id}")
 def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRead:
     # find project
     project = projects[project_id]
@@ -100,7 +115,7 @@ def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRe
     matching_notes = [note for note in progress_notes if note.project_id == project_id]
 
     # find all tasks that belong to that project_id && status == "open"
-    open_tasks = [task for task in tasks if task.project_id == project_id and task.status == "open"]
+    open_tasks = get_project_tasks(project_id) 
 
     # output recommended next action (latest note next actions OR open tasks
     latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)
