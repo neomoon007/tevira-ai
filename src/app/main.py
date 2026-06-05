@@ -17,6 +17,8 @@ progress_notes: list[ProgressNoteRead] = []
 
 # --- ROUTE VALIDATION ---
 def validate_project_id(project_id: str):
+    if project_id == "":
+        raise HTTPException(status_code=400, detail="Error 400: Empty string where input is required")
     try:
         projects[project_id]
         return project_id
