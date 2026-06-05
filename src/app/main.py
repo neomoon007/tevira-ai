@@ -23,6 +23,11 @@ def validate_project_id(project_id: str):
     except:
         raise HTTPException(status_code=404)
 
+def validate_progress_note(project_id: str):
+    if any(note.project_id == project_id for note in progress_notes):
+        return project_id
+    else:
+        raise HTTPException(status_code=404)
 
 # --- ENDPOINTS ---
 # -- "/health" --
@@ -88,6 +93,8 @@ def show_notes(project_id: str = Depends(validate_project_id)) -> list[ProgressN
 def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRead:
     # find project
     project = projects[project_id]
+
+    validate_progress_note(project_id)
 
     # find all notes that belong to that project_id
     matching_notes = [note for note in progress_notes if note.project_id == project_id]
