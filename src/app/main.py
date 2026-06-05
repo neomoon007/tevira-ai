@@ -25,7 +25,6 @@ def validate_project_id(project_id: str):
 
 
 # --- ENDPOINTS ---
-
 # -- "/health" --
 @app.get("/health")
 def check_health():
@@ -87,7 +86,7 @@ def show_notes(project_id: str = Depends(validate_project_id)) -> list[ProgressN
 
 @app.get("/resume")
 def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRead:
-    # find project name
+    # find project
     project = projects[project_id]
 
     # find all notes that belong to that project_id
@@ -103,5 +102,7 @@ def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRe
         "project": project,
         "current_state": latest_note.current_state if latest_note else None,
         "open_tasks": open_tasks,
+        "open_loops": latest_note.open_loops if latest_note else None,
         "next_actions": latest_note.next_actions if latest_note else None,
+        "important_context": latest_note.important_context if latest_note else None,
     }
