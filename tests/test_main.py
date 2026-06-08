@@ -2,6 +2,7 @@ from datetime import datetime, timezone, date
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
+from pydantic import TypeAdapter
 from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.main import (
     app,
@@ -200,10 +201,9 @@ def test_get_project_tasks_returns_empty_list_for_missing_project_tasks(temp_tas
     assert len(response) == expected_num_of_tasks
 
 
-def test_health():
+def test_health_success():
     response = client.get("/health")
 
-    # tests expected behavior from server
     assert response.status_code == 200
     assert response.json() == {
         "status": "ok",
@@ -211,7 +211,7 @@ def test_health():
     }
 
 
-def test_create_task():
+def test_create_task_accepts_valid_task_object():
     tasks.clear()
 
     response = client.post(
@@ -234,15 +234,21 @@ def test_create_task():
     assert data["priority"] == "high"
     assert data["due_date"] is None
     assert data["project_id"] is None
+    tasks.clear()
 
 
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(temp_tasks):
+    expected_num_of_tasks = 4
+    response = client.get("/tasks")
+    assert response.status_code == 200
 
-# test GET "/tasks" endpoint
-# test GET "/tasks" with 0 parameters passed
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+    adapter = TypeAdapter(list[TaskRead])
+    tasks = adapter.validate_python(response.json())
+
+    assert isinstance(tasks, list)
+    assert len(tasks) == expected_num_of_tasks, f"{tasks}"
+    tasks.clear()
+
 
 # test GET "/tasks" with only 'project_id' passed
 # test normal case (should pass)
