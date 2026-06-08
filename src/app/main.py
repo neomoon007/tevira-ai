@@ -28,10 +28,10 @@ def validate_project_id(project_id: str):
     try:
         projects[project_id]
         return project_id
-    except Exception as project_id:
+    except Exception as project_missing:
         raise HTTPException(
             status_code=404,
-            detail=f"Error 404: Project '{project_id}' does not exist.",
+            detail=f"Error 404: Project '{project_missing}' does not exist.",
         )
 
 
@@ -89,9 +89,10 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
         try:
             matching_task = [task for task in tasks if task.id == task_id]
             return matching_task
-        except:
+        except Exception as task_missing:
             raise HTTPException(
-                status_code=404, detail=f"Error 404: Task '{task_id}' does not exist."
+                status_code=404,
+                detail=f"Error 404: Task '{task_missing}' does not exist.",
             )
 
 

@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
-from src.app.schemas import ProgressNoteRead, ProjectRead
+from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.main import (
     app,
     tasks,
@@ -10,45 +10,10 @@ from src.app.main import (
     progress_notes,
     validate_progress_note,
     validate_project_id,
+    get_project_tasks,
 )
 
 client = TestClient(app)  # create instance
-
-
-def test_health():
-    response = client.get("/health")
-
-    # tests expected behavior from server
-    assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "service": "tevira-ai",
-    }
-
-
-def test_create_task():
-    tasks.clear()
-
-    response = client.post(
-        "/tasks",
-        json={
-            "title": "Hello, World! This is my first task",
-            "priority": "high",
-            "due_date": None,
-            "project_id": None,
-        },
-    )
-
-    assert response.status_code == 201
-
-    data = response.json()
-
-    assert data["id"] == "task_1"
-    assert data["status"] == "open"
-    assert data["title"] == "Hello, World! This is my first task"
-    assert data["priority"] == "high"
-    assert data["due_date"] is None
-    assert data["project_id"] is None
 
 
 @pytest.fixture
@@ -110,6 +75,50 @@ def temp_notes():
     )
 
     yield progress_notes
+    progress_notes.clear()
+
+
+@pytest.fixture
+def temp_tasks():
+    tasks.extend(
+        [
+            TaskRead(
+                title="Hello World!",
+                priority="high",
+                due_date=date.today(),
+                project_id="project_1",
+                id="task_1",
+                status="open",
+            ),
+            TaskRead(
+                title="foo",
+                priority="medium",
+                due_date=date.today(),
+                project_id="project_1",
+                id="task_2",
+                status="open",
+            ),
+            TaskRead(
+                title="bar",
+                priority="low",
+                due_date=date.today(),
+                project_id="project_2",
+                id="task_3",
+                status="open",
+            ),
+            TaskRead(
+                title="bro",
+                priority="high",
+                due_date=date.today(),
+                project_id="project_2",
+                id="task_4",
+                status="done",
+            ),
+        ]
+    )
+
+    yield tasks
+    tasks.clear()
 
 
 def test_validate_project_id_accepts_existing_id(temp_projects: dict):
@@ -150,16 +159,83 @@ def test_validate_progress_note_raises_404_for_non_existing_note(
 
 
 # test get_project_tasks function works:
-def get_project_tasks_returns_all_tasks():
-    return
+def test_get_project_tasks_returns_only_open_tasks_project_1(temp_tasks):
+    mock_project_id = "project_1"
+    expected_num_of_tasks = 2
+    response = get_project_tasks(mock_project_id)
+
+    assert isinstance(response, list), "Response is not a list of TaskRead objects"
+    assert len(response) == expected_num_of_tasks
+
+    assert all(isinstance(task, TaskRead) for task in response), (
+        "Not all items are TaskRead objects"
+    )
+    assert all(task.project_id == mock_project_id for task in response), (
+        f"Not all returned tasks belong to '{mock_project_id}'"
+    )
 
 
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_get_project_tasks_returns_only_open_tasks_project_2(temp_tasks):
+    mock_project_id = "project_2"
+    expected_num_of_tasks = 1
+    response = get_project_tasks(mock_project_id)
 
-# test GET "/health" endpoint
+    assert isinstance(response, list), "Response is not a list of TaskRead objects"
+    assert len(response) == expected_num_of_tasks
 
-# test POST "/tasks" endpoint
+    assert all(isinstance(task, TaskRead) for task in response), (
+        "Not all items are TaskRead objects"
+    )
+    assert all(task.project_id == mock_project_id for task in response), (
+        f"Not all returned tasks belong to '{mock_project_id}'"
+    )
+
+
+def test_get_project_tasks_returns_empty_list_for_missing_project_tasks(temp_tasks):
+    mock_project_id = "project_42"
+    expected_num_of_tasks = 0
+    response = get_project_tasks(mock_project_id)
+
+    assert isinstance(response, list), "Response is not a list of TaskRead objects"
+    assert len(response) == expected_num_of_tasks
+
+
+def test_health():
+    response = client.get("/health")
+
+    # tests expected behavior from server
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ok",
+        "service": "tevira-ai",
+    }
+
+
+def test_create_task():
+    tasks.clear()
+
+    response = client.post(
+        "/tasks",
+        json={
+            "title": "Hello, World! This is my first task",
+            "priority": "high",
+            "due_date": None,
+            "project_id": None,
+        },
+    )
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert data["id"] == "task_1"
+    assert data["status"] == "open"
+    assert data["title"] == "Hello, World! This is my first task"
+    assert data["priority"] == "high"
+    assert data["due_date"] is None
+    assert data["project_id"] is None
+
+
 # test normal case (should pass)
 # test edge case (shouldn't pass)
 
