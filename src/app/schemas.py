@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
+
 # --- TASKS ---
 class TaskCreate(BaseModel):
     title: str = Field(min_length=1)
@@ -9,16 +10,20 @@ class TaskCreate(BaseModel):
     due_date: Optional[date] = None
     project_id: Optional[str] = None
 
+
 class TaskRead(TaskCreate):
     id: str
     status: Literal["open", "done"] = "open"
+
 
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1)
 
+
 class ProjectRead(ProjectCreate):
     id: str
+
 
 # --- PROGRESS NOTES ---
 class ProgressNoteCreate(BaseModel):
@@ -31,8 +36,10 @@ class ProgressNoteCreate(BaseModel):
     blockers: list[str] = []
     confidence: Literal["low", "medium", "high"] = "medium"
 
+
 class ProgressNoteRead(ProgressNoteCreate):
     updated_at: datetime
+
 
 # --- CONTEXT ---
 class ContextRead(BaseModel):
