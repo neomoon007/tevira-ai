@@ -142,6 +142,14 @@ def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
 
 
 @app.get("/progress-notes")
+def direct_to_notes_route() -> str:
+    raise HTTPException(
+        status_code=405,
+        detail="Error 405: Method not allowed. You meant 'progress-notes/project_1'?",
+    )
+
+
+@app.get("/progress-notes/{project_id}")
 def show_notes(
     project_id: str = Depends(validate_project_id),
 ) -> list[ProgressNoteRead]:

@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
 from pydantic import TypeAdapter
-from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
+from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead, ContextRead
 from src.app.main import (
     app,
     tasks,
@@ -375,11 +375,40 @@ def test_create_progress_note_accepts_valid_note_object():
     progress_notes.clear()
 
 
-# test GET "/progress-notes" endpoint
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_show_notes_returns_progress_notes_for_given_project(temp_notes, temp_projects):
+    lookup_project = "project_1"
+    expected_num_of_notes = 1
+    response = client.get(f"/progress-notes/{lookup_project}")
+
+    assert response.status_code == 200
+
+    adapter = TypeAdapter(list[ProgressNoteRead])
+    notes = adapter.validate_python(response.json())
+
+    assert isinstance(notes, list)
+    assert len(notes) == expected_num_of_notes, f"{notes}"
+
 
 # test GET "/context" endpoint
+def test_restore_context_accepts_valid_project_with_existing_note(
+    temp_notes, temp_projects
+):
+    lookup_project = "project_1"
+    response = client.get(f"/context/{lookup_project}")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["project"] == {"id": "project_1", "name": "foo"}
+    # TODO: uncomment the lines below, then change the "none of my business" to the real expected data
+    # assert data["current_state"] == "none of my business"
+    # assert data["open_tasks"] == "none of my business"
+    # assert data["open_loops"] == "none of my business"
+    # assert data["next_actions"] == "none of my business"
+    # assert data["important_context"] == "none of my business"
+
+
 # test normal case (should pass) - valid project_id and valid progress_note
 # test edge case (shouldn't pass) - invalid project_id
 # test edge case (shouldn't pass) - missing project_id
