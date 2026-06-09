@@ -247,7 +247,6 @@ def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(temp_tas
 
     assert isinstance(tasks, list)
     assert len(tasks) == expected_num_of_tasks, f"{tasks}"
-    tasks.clear()
 
 
 def test_show_tasks_with_project_id_returns_all_project_tasks(
@@ -265,7 +264,6 @@ def test_show_tasks_with_project_id_returns_all_project_tasks(
 
     assert isinstance(tasks, list)
     assert len(tasks) == expected_num_of_tasks, f"{tasks}"
-    tasks.clear()
 
 
 def test_show_tasks_with_non_existent_project_id_raises_404(temp_tasks, temp_projects):
@@ -291,13 +289,11 @@ def test_show_tasks_with_task_id_returns_only_one_task(temp_tasks, temp_projects
     assert tasks[0].project_id == "project_1"
     assert tasks[0].id == "task_1"
     assert tasks[0].status == "open"
-    tasks.clear()
 
 
 def test_show_tasks_with_task_id_raises_only_one_task(temp_tasks, temp_projects):
     response = client.get("/tasks", params={"task_id": "task_9999"})
     assert response.status_code == 404
-    tasks.clear()
 
 
 def test_show_tasks_with_project_and_task_id_returns_scoped_task(
@@ -321,15 +317,32 @@ def test_show_tasks_with_project_and_task_id_returns_scoped_task(
     assert tasks[0].project_id == "project_1"
     assert tasks[0].id == "task_1"
     assert tasks[0].status == "open"
-    tasks.clear()
 
 
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_show_tasks_raises_404_when_task_not_in_project_scope(
+    temp_tasks, temp_projects
+):
+    response = client.get(
+        "/tasks", params={"project_id": "project_1", "task_id": "task_4"}
+    )
+    assert response.status_code == 404
 
-# test POST "/projects" endpoint
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+
+def test_create_project_accepts_valid_project_object():
+    projects.clear()
+
+    response = client.post(
+        "/projects",
+        json={"name": "Magnum Opus"},
+    )
+
+    assert response.status_code == 201
+
+    data = response.json()
+    assert data["name"] == "Magnum Opus"
+    assert data["id"] == "project_1"
+    projects.clear()
+
 
 # test GET "/projects" endpoint
 # test normal case (should pass)
