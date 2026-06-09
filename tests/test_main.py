@@ -300,8 +300,6 @@ def test_show_tasks_with_task_id_raises_only_one_task(temp_tasks, temp_projects)
     tasks.clear()
 
 
-# test edge case (shouldn't pass)
-
 # test GET "/tasks" with both parameters passed
 # test normal case (should pass)
 # test edge case (shouldn't pass)
