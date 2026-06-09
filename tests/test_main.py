@@ -250,11 +250,34 @@ def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(temp_tas
     tasks.clear()
 
 
-# test GET "/tasks" with only 'project_id' passed
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_show_tasks_with_project_id_returns_all_project_tasks(
+    temp_tasks, temp_projects
+):
+    expected_num_of_tasks = 2
+    query_parameters = {
+        "project_id": "project_1",
+    }
+    response = client.get("/tasks", params=query_parameters)
+    assert response.status_code == 200
+
+    adapter = TypeAdapter(list[TaskRead])
+    tasks = adapter.validate_python(response.json())
+
+    assert isinstance(tasks, list)
+    assert len(tasks) == expected_num_of_tasks, f"{tasks}"
+    tasks.clear()
+
+
+def test_show_tasks_with_non_existent_project_id(temp_tasks, temp_projects):
+    response = client.get("/tasks", params={"project_id": "project_52"})
+    assert response.status_code == 404
+
 
 # test GET "/tasks" with only 'task_id' passed
+def test_show_tasks_with_task_id_returns_only_one_task(temp_tasks, temp_project):
+    return
+
+
 # test normal case (should pass)
 # test edge case (shouldn't pass)
 
