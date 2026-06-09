@@ -86,14 +86,13 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
         return get_project_tasks(project_id)
 
     if project_id is None and task_id is not None:
-        try:
-            matching_task = [task for task in tasks if task.id == task_id]
-            return matching_task
-        except Exception as task_missing:
+        matching_task = [task for task in tasks if task.id == task_id]
+        if not matching_task:
             raise HTTPException(
                 status_code=404,
-                detail=f"Error 404: Task '{task_missing}' does not exist.",
+                detail=f"Error 404: Task '{task_id}' does not exist.",
             )
+        return matching_task
 
 
 # -- "/projects" --

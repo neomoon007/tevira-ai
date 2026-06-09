@@ -268,17 +268,38 @@ def test_show_tasks_with_project_id_returns_all_project_tasks(
     tasks.clear()
 
 
-def test_show_tasks_with_non_existent_project_id(temp_tasks, temp_projects):
+def test_show_tasks_with_non_existent_project_id_raises_404(temp_tasks, temp_projects):
     response = client.get("/tasks", params={"project_id": "project_52"})
     assert response.status_code == 404
 
 
-# test GET "/tasks" with only 'task_id' passed
-def test_show_tasks_with_task_id_returns_only_one_task(temp_tasks, temp_project):
-    return
+def test_show_tasks_with_task_id_returns_only_one_task(temp_tasks, temp_projects):
+    response = client.get("/tasks", params={"task_id": "task_1"})
+    expected_num_of_tasks = 1
+
+    assert response.status_code == 200
+
+    adapter = TypeAdapter(list[TaskRead])
+    tasks = adapter.validate_python(response.json())
+
+    assert isinstance(tasks, list)
+    assert len(tasks) == expected_num_of_tasks, f"{tasks}"
+
+    assert tasks[0].title == "Hello World!"
+    assert tasks[0].priority == "high"
+    assert tasks[0].due_date == date.today()
+    assert tasks[0].project_id == "project_1"
+    assert tasks[0].id == "task_1"
+    assert tasks[0].status == "open"
+    tasks.clear()
 
 
-# test normal case (should pass)
+def test_show_tasks_with_task_id_raises_only_one_task(temp_tasks, temp_projects):
+    response = client.get("/tasks", params={"task_id": "task_9999"})
+    assert response.status_code == 404
+    tasks.clear()
+
+
 # test edge case (shouldn't pass)
 
 # test GET "/tasks" with both parameters passed
