@@ -300,7 +300,30 @@ def test_show_tasks_with_task_id_raises_only_one_task(temp_tasks, temp_projects)
     tasks.clear()
 
 
-# test GET "/tasks" with both parameters passed
+def test_show_tasks_with_project_and_task_id_returns_scoped_task(
+    temp_tasks, temp_projects
+):
+    response = client.get(
+        "/tasks", params={"project_id": "project_1", "task_id": "task_1"}
+    )
+
+    response.status_code == 200
+    adapter = TypeAdapter(list[TaskRead])
+    tasks = adapter.validate_python(response.json())
+    expected_num_of_tasks = 1
+
+    assert isinstance(tasks, list)
+    assert len(tasks) == expected_num_of_tasks, f"{tasks}"
+
+    assert tasks[0].title == "Hello World!"
+    assert tasks[0].priority == "high"
+    assert tasks[0].due_date == date.today()
+    assert tasks[0].project_id == "project_1"
+    assert tasks[0].id == "task_1"
+    assert tasks[0].status == "open"
+    tasks.clear()
+
+
 # test normal case (should pass)
 # test edge case (shouldn't pass)
 
