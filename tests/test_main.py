@@ -344,13 +344,36 @@ def test_create_project_accepts_valid_project_object():
     projects.clear()
 
 
-# test GET "/projects" endpoint
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+def test_create_progress_note_accepts_valid_note_object():
+    progress_notes.clear()
 
-# test POST "/progress-notes" endpoint
-# test normal case (should pass)
-# test edge case (shouldn't pass)
+    response = client.post(
+        "/progress-notes",
+        json={
+            "project_id": "project_1",
+            "current_state": "Just created main.py",
+            "last_session": "Created github repo",
+            "open_loops": ["Create roadmap", "Follow roadmap"],
+            "next_actions": "Create fastapi instance",
+            "important_context": "Read documentation",
+            "blockers": ["Nothing"],
+            "confidence": "high",
+        },
+    )
+
+    response.status_code == 201
+
+    data = response.json()
+    assert data["project_id"] == "project_1"
+    assert data["current_state"] == "Just created main.py"
+    assert data["last_session"] == "Created github repo"
+    assert data["open_loops"] == ["Create roadmap", "Follow roadmap"]
+    assert data["next_actions"] == "Create fastapi instance"
+    assert data["important_context"] == "Read documentation"
+    assert data["blockers"] == ["Nothing"]
+    assert data["confidence"] == "high"
+    progress_notes.clear()
+
 
 # test GET "/progress-notes" endpoint
 # test normal case (should pass)
