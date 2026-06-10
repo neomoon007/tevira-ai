@@ -425,7 +425,19 @@ def test_restore_context_accepts_valid_project_with_existing_note(
     assert data["important_context"] == "One step at a time"
 
 
-# test normal case (should pass) - valid project_id and valid progress_note
-# test edge case (shouldn't pass) - invalid project_id
-# test edge case (shouldn't pass) - missing project_id
-# test edge case (shouldn't pass) - missing progress_note
+def test_restore_context_raises_404_for_non_existent_project(
+    temp_notes, temp_projects, temp_tasks
+):
+    lookup_project = "project_42"
+    response = client.get(f"/context/{lookup_project}")
+
+    assert response.status_code == 404
+
+
+def test_restore_context_raises_404_for_missing_progress_note(
+    temp_projects, temp_tasks
+):
+    lookup_project = "project_1"
+    response = client.get(f"/context/{lookup_project}")
+
+    assert response.status_code == 404
