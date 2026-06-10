@@ -391,7 +391,7 @@ def test_show_notes_returns_progress_notes_for_given_project(temp_notes, temp_pr
 
 # test GET "/context" endpoint
 def test_restore_context_accepts_valid_project_with_existing_note(
-    temp_notes, temp_projects
+    temp_notes, temp_projects, temp_tasks
 ):
     lookup_project = "project_1"
     response = client.get(f"/context/{lookup_project}")
@@ -401,12 +401,28 @@ def test_restore_context_accepts_valid_project_with_existing_note(
     data = response.json()
 
     assert data["project"] == {"id": "project_1", "name": "foo"}
-    # TODO: uncomment the lines below, then change the "none of my business" to the real expected data
-    # assert data["current_state"] == "none of my business"
-    # assert data["open_tasks"] == "none of my business"
-    # assert data["open_loops"] == "none of my business"
-    # assert data["next_actions"] == "none of my business"
-    # assert data["important_context"] == "none of my business"
+    assert data["current_state"] == "Week 08 got to finish soon"
+    assert data["open_loops"] == ["not finished", "WIP", "TBA"]
+    assert data["open_tasks"] == [
+        {
+            "title": "Hello World!",
+            "priority": "high",
+            "due_date": str(date.today()),
+            "project_id": "project_1",
+            "id": "task_1",
+            "status": "open",
+        },
+        {
+            "title": "foo",
+            "priority": "medium",
+            "due_date": str(date.today()),
+            "project_id": "project_1",
+            "id": "task_2",
+            "status": "open",
+        },
+    ]
+    assert data["next_actions"] == "Finish week 08"
+    assert data["important_context"] == "One step at a time"
 
 
 # test normal case (should pass) - valid project_id and valid progress_note
