@@ -17,6 +17,7 @@ from src.app.main import (
 client = TestClient(app)  # create instance
 
 
+# TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
 @pytest.fixture
 def temp_projects():
     projects["project_1"] = ProjectRead(name="foo", id="project_1")
