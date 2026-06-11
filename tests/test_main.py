@@ -3,7 +3,8 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
 from pydantic import TypeAdapter
-from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead, ContextRead
+from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
+from src.app.parser import parse_note
 from src.app.main import (
     app,
     tasks,
@@ -20,10 +21,10 @@ client = TestClient(app)  # create instance
 # TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
 @pytest.fixture
 def temp_projects():
-    projects["project_1"] = ProjectRead(name="foo", id="project_1")
-    projects["project_2"] = ProjectRead(name="bar", id="project_2")
-    projects["project_3"] = ProjectRead(name="hello", id="project_3")
-    projects["project_4"] = ProjectRead(name="world", id="project_4")
+    projects["project_1"] = ProjectRead(name="SAT", id="project_1")
+    projects["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
+    projects["project_3"] = ProjectRead(name="Tech", id="project_3")
+    projects["project_4"] = ProjectRead(name="foo", id="project_4")
 
     yield projects
     projects.clear()
@@ -45,30 +46,30 @@ def temp_notes():
             ),
             ProgressNoteRead(
                 project_id="project_2",
-                current_state="foo",
-                last_session="foo",
+                current_state="SAT",
+                last_session="SAT",
                 open_loops=["not finished", "WIP", "TBA"],
-                next_actions="foo",
+                next_actions="SAT",
                 important_context="One step at a time",
                 blockers=["No blockers"],
                 updated_at=datetime.now(timezone.utc),
             ),
             ProgressNoteRead(
                 project_id="project_3",
-                current_state="bar",
-                last_session="bar",
+                current_state="Tevira-AI",
+                last_session="Tevira-AI",
                 open_loops=["not finished", "WIP", "TBA"],
-                next_actions="bar",
+                next_actions="Tevira-AI",
                 important_context="One step at a time",
                 blockers=["No blockers"],
                 updated_at=datetime.now(timezone.utc),
             ),
             ProgressNoteRead(
                 project_id="project_4",
-                current_state="hello",
-                last_session="hello",
+                current_state="Tech",
+                last_session="Tech",
                 open_loops=["not finished", "WIP", "TBA"],
-                next_actions="hello",
+                next_actions="Tech",
                 important_context="One step at a time",
                 blockers=["No blockers"],
                 updated_at=datetime.now(timezone.utc),
@@ -93,7 +94,7 @@ def temp_tasks():
                 status="open",
             ),
             TaskRead(
-                title="foo",
+                title="SAT",
                 priority="medium",
                 due_date=date.today(),
                 project_id="project_1",
@@ -101,7 +102,7 @@ def temp_tasks():
                 status="open",
             ),
             TaskRead(
-                title="bar",
+                title="Tevira-AI",
                 priority="low",
                 due_date=date.today(),
                 project_id="project_2",
@@ -218,7 +219,7 @@ def test_create_task_accepts_valid_task_object():
     response = client.post(
         "/tasks",
         json={
-            "title": "Hello, World! This is my first task",
+            "title": "Tech, foo! This is my first task",
             "priority": "high",
             "due_date": None,
             "project_id": None,
@@ -231,7 +232,7 @@ def test_create_task_accepts_valid_task_object():
 
     assert data["id"] == "task_1"
     assert data["status"] == "open"
-    assert data["title"] == "Hello, World! This is my first task"
+    assert data["title"] == "Tech, foo! This is my first task"
     assert data["priority"] == "high"
     assert data["due_date"] is None
     assert data["project_id"] is None
@@ -329,7 +330,7 @@ def test_show_tasks_raises_404_when_task_not_in_project_scope(
     assert response.status_code == 404
 
 
-def test_create_project_accepts_valid_project_object():
+def test_create_project_accepts_valid_project_object(temp_projects):
     projects.clear()
 
     response = client.post(
@@ -401,7 +402,7 @@ def test_restore_context_accepts_valid_project_with_existing_note(
 
     data = response.json()
 
-    assert data["project"] == {"id": "project_1", "name": "foo"}
+    assert data["project"] == {"id": "project_1", "name": "SAT"}
     assert data["current_state"] == "Week 08 got to finish soon"
     assert data["open_loops"] == ["not finished", "WIP", "TBA"]
     assert data["open_tasks"] == [
@@ -414,7 +415,7 @@ def test_restore_context_accepts_valid_project_with_existing_note(
             "status": "open",
         },
         {
-            "title": "foo",
+            "title": "SAT",
             "priority": "medium",
             "due_date": str(date.today()),
             "project_id": "project_1",
@@ -442,3 +443,17 @@ def test_restore_context_raises_404_for_missing_progress_note(
     response = client.get(f"/context/{lookup_project}")
 
     assert response.status_code == 404
+
+
+def test_parse_note_accepts_valid_input(temp_projects):
+    messy_note = (
+        "Need to finish the README for SAT before Friday. Next, add setup commands"
+    )
+    response = parse_note(messy_note, temp_projects)
+
+    assert response == {
+        "title": "Need to finish the README for SAT",
+        "project_hint": "SAT",
+        "due_date_hint": "Friday.",
+        "next_action_hint": "add setup commands",
+    }

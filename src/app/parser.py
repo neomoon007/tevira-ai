@@ -1,5 +1,3 @@
-from schemas import ProjectRead
-
 DEFAULT_PROJECT_FALLBACK = "Tevira-AI"
 
 # --- INPUT STRUCTURE ---
@@ -34,14 +32,3 @@ def parse_note(mind_dump_note: str, projects: dict):
         "due_date_hint": due_date,
         "next_action_hint": next_action,
     }
-
-
-my_first_messy_note = (
-    "Need to finish the README for SAT before Friday. Next, add setup commands"
-)
-
-projects = {
-    "project_1": ProjectRead(name="SAT", id="project_1"),
-    "project_2": ProjectRead(name="Tevira-AI", id="project_2"),
-    "project_3": ProjectRead(name="Tech", id="project_3"),
-}
