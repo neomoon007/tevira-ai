@@ -54,8 +54,9 @@ http://127.0.0.1:8000/docs
 ```
 
 ## 📃 Documentation
-### Endpoints
-### Schemas
+You can also check the endpoints and schemas by clicking on the badge below:
+
+[![Swagger UI](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)](https://editor.swagger.io/?url=https://raw.githubusercontent.com/neomoon007/tevira-ai/refs/heads/main/openai.json)
 
 ## 🛣 Next Steps
 I am actively developing Tevira-AI and in the near future it will have more capabilities, some of them may be found below:
