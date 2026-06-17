@@ -1,11 +1,16 @@
-DEFAULT_PROJECT_FALLBACK = "Tevira-AI"
-
 # --- INPUT STRUCTURE ---
 # "Need to X before Y. Next, Z"
 # Where X is the title, Y is the due_date and Z is the the next_action
 
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+default_project = os.getenv("DEFAULT_PROJECT")
 
 
 def find_project(projects: dict, input: str):
@@ -14,7 +19,7 @@ def find_project(projects: dict, input: str):
 
     hint = list(set(project_list) & set(input_list))
 
-    return hint[0] if hint[0] != "" else DEFAULT_PROJECT_FALLBACK
+    return hint[0] if hint and hint[0] != "" else default_project
 
 
 def parse_note(mind_dump_note: str, projects: dict):
