@@ -29,12 +29,14 @@ On Linux run:
 ```bash
 python -m venv venv
 source venv/bin/activate
+mv .env.example .env
 ```
 
 If on Windows run this instead:
 ```powershell
 python -m venv venv
 source venv\Scripts\Activate.ps1
+ren ".env.example" ".env"
 ```
 
 ### 3. Install dependencies:
