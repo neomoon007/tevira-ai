@@ -10,7 +10,7 @@ import os
 
 load_dotenv()
 
-default_project = os.getenv("DEFAULT_PROJECT")
+default_project = os.getenv("DEFAULT_PROJECT", "Inbox")
 
 
 def find_project(projects: dict, input: str):
