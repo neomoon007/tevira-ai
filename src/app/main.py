@@ -1,8 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
+from src.app.state import tasks_in_memory, projects, progress_notes
+from src.app.routers import tasks
 from datetime import datetime, timezone
 from operator import attrgetter
-from .schemas import (
-    TaskCreate,
+from src.app.schemas import (
+    # TaskCreate,
     TaskRead,
     ProjectCreate,
     ProjectRead,
@@ -13,10 +15,13 @@ from .schemas import (
 
 app = FastAPI(title="Tevira-AI")
 
+# --- ROUTERS ---
+app.include_router(tasks.router)
+
 # --- MEMORY STORAGE ---
-tasks: list[TaskRead] = []
-projects = {}
-progress_notes: list[ProgressNoteRead] = []
+# tasks_in_memory: list[TaskRead] = []
+# projects = {}
+# progress_notes: list[ProgressNoteRead] = []
 
 
 # --- ROUTE VALIDATION ---
@@ -48,7 +53,7 @@ def validate_progress_note(project_id: str):
 def get_project_tasks(project_id) -> list[TaskRead]:
     return [
         task
-        for task in tasks
+        for task in tasks_in_memory
         if task.project_id == project_id and task.status == "open"
     ]
 
@@ -61,50 +66,50 @@ def check_health():
 
 
 # -- "/tasks" --
-@app.post("/tasks", status_code=201)
-def create_task(task: TaskCreate) -> TaskRead:
-    task_id = f"task_{len(tasks) + 1}"
+# @app.post("/tasks", status_code=201)
+# def create_task(task: TaskCreate) -> TaskRead:
+#     task_id = f"task_{len(tasks) + 1}"
 
-    new_task = TaskRead(
-        **task.model_dump(),  # Dumps all `task` fields here, no need to type them manually.
-        id=task_id,
-        status="open",
-    )
+#     new_task = TaskRead(
+#         **task.model_dump(),  # Dumps all `task` fields here, no need to type them manually.
+#         id=task_id,
+#         status="open",
+#     )
 
-    tasks.append(new_task)
+#     tasks.append(new_task)
 
-    return new_task
+#     return new_task
 
 
-@app.get("/tasks")
-def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
-    if project_id is None and task_id is None:
-        return tasks
+# @app.get("/tasks")
+# def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
+#     if project_id is None and task_id is None:
+#         return tasks
 
-    if project_id is not None and task_id is None:
-        validate_project_id(project_id)
-        return get_project_tasks(project_id)
+#     if project_id is not None and task_id is None:
+#         validate_project_id(project_id)
+#         return get_project_tasks(project_id)
 
-    if project_id is None and task_id is not None:
-        matching_task = [task for task in tasks if task.id == task_id]
-        if not matching_task:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Error 404: Task {task_id} does not exist.",
-            )
-        return matching_task
+#     if project_id is None and task_id is not None:
+#         matching_task = [task for task in tasks if task.id == task_id]
+#         if not matching_task:
+#             raise HTTPException(
+#                 status_code=404,
+#                 detail=f"Error 404: Task {task_id} does not exist.",
+#             )
+#         return matching_task
 
-    if project_id is not None and task_id is not None:
-        validate_project_id(project_id)
-        project_tasks = get_project_tasks(project_id)
-        matching_task = [task for task in project_tasks if task.id == task_id]
+#     if project_id is not None and task_id is not None:
+#         validate_project_id(project_id)
+#         project_tasks = get_project_tasks(project_id)
+#         matching_task = [task for task in project_tasks if task.id == task_id]
 
-        if not matching_task:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Error 404: Task '{task_id}' does not exist inside of '{project_id}'",
-            )
-        return matching_task
+#         if not matching_task:
+#             raise HTTPException(
+#                 status_code=404,
+#                 detail=f"Error 404: Task '{task_id}' does not exist inside of '{project_id}'",
+#             )
+#         return matching_task
 
 
 # -- "/projects" --

@@ -7,7 +7,7 @@ from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.parser import parse_note
 from src.app.main import (
     app,
-    tasks,
+    tasks_in_memory,
     projects,
     progress_notes,
     validate_progress_note,
@@ -83,7 +83,7 @@ def temp_notes():
 
 @pytest.fixture
 def temp_tasks():
-    tasks.extend(
+    tasks_in_memory.extend(
         [
             TaskRead(
                 title="Hello World!",
@@ -120,8 +120,8 @@ def temp_tasks():
         ]
     )
 
-    yield tasks
-    tasks.clear()
+    yield tasks_in_memory
+    tasks_in_memory.clear()
 
 
 def test_validate_project_id_accepts_existing_id(temp_projects: dict):
@@ -214,7 +214,7 @@ def test_health_success():
 
 
 def test_create_task_accepts_valid_task_object():
-    tasks.clear()
+    tasks_in_memory.clear()
 
     response = client.post(
         "/tasks",
@@ -236,7 +236,7 @@ def test_create_task_accepts_valid_task_object():
     assert data["priority"] == "high"
     assert data["due_date"] is None
     assert data["project_id"] is None
-    tasks.clear()
+    tasks_in_memory.clear()
 
 
 def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(temp_tasks):
