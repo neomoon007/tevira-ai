@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 from src.app.state import projects, progress_notes
-from src.app.validator import (
+from src.app.validator import (  # TODO: create a separate folder for validator.py and state.py
     validate_project_id,
     validate_progress_note,
     get_project_tasks,
 )
-from src.app.routers import tasks
+from src.app.routers import tasks, health
 from datetime import datetime, timezone
 from operator import attrgetter
 from src.app.schemas import (
@@ -20,13 +20,7 @@ app = FastAPI(title="Tevira-AI")
 
 # --- ROUTERS ---
 app.include_router(tasks.router)
-
-
-# --- ENDPOINTS ---
-# -- "/health" --
-@app.get("/health")
-def check_health():
-    return {"status": "ok", "service": "tevira-ai"}
+app.include_router(health.router)
 
 
 # -- "/projects" --
