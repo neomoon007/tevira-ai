@@ -1,4 +1,4 @@
-from src.app.state import projects_in_memory, tasks_in_memory, progress_notes
+from src.app.state import projects_in_memory, tasks_in_memory, progress_notes_in_memory
 from src.app.schemas import TaskRead
 from fastapi import HTTPException
 
@@ -20,7 +20,7 @@ def validate_project_id(project_id: str):
 
 
 def validate_progress_note(project_id: str):
-    if any(note.project_id == project_id for note in progress_notes):
+    if any(note.project_id == project_id for note in progress_notes_in_memory):
         return project_id
     else:
         raise HTTPException(

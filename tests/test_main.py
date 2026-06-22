@@ -6,7 +6,7 @@ from pydantic import TypeAdapter
 from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.parser import parse_note
 from src.app.main import app
-from src.app.state import progress_notes, projects_in_memory, tasks_in_memory
+from src.app.state import progress_notes_in_memory, projects_in_memory, tasks_in_memory
 from src.app.validator import (
     get_project_tasks,
     validate_progress_note,
@@ -30,7 +30,7 @@ def temp_projects():
 
 @pytest.fixture
 def temp_notes():
-    progress_notes.extend(
+    progress_notes_in_memory.extend(
         [
             ProgressNoteRead(
                 project_id="project_1",
@@ -75,8 +75,8 @@ def temp_notes():
         ]
     )
 
-    yield progress_notes
-    progress_notes.clear()
+    yield progress_notes_in_memory
+    progress_notes_in_memory.clear()
 
 
 @pytest.fixture
@@ -345,7 +345,7 @@ def test_create_project_accepts_valid_project_object(temp_projects):
 
 
 def test_create_progress_note_accepts_valid_note_object():
-    progress_notes.clear()
+    progress_notes_in_memory.clear()
 
     response = client.post(
         "/progress-notes",
@@ -372,7 +372,7 @@ def test_create_progress_note_accepts_valid_note_object():
     assert data["important_context"] == "Read documentation"
     assert data["blockers"] == ["Nothing"]
     assert data["confidence"] == "high"
-    progress_notes.clear()
+    progress_notes_in_memory.clear()
 
 
 def test_show_notes_returns_progress_notes_for_given_project(temp_notes, temp_projects):

@@ -1,16 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException
-from src.app.state import projects_in_memory, progress_notes
+from fastapi import FastAPI, Depends
+from src.app.state import projects_in_memory, progress_notes_in_memory
 from src.app.validator import (  # TODO: create a separate folder for validator.py and state.py
     validate_project_id,
     validate_progress_note,
     get_project_tasks,
 )
-from src.app.routers import tasks, health, projects
-from datetime import datetime, timezone
+from src.app.routers import tasks, health, projects, progress_notes
 from operator import attrgetter
 from src.app.schemas import (
-    ProgressNoteCreate,
-    ProgressNoteRead,
     ContextRead,
 )
 
@@ -20,55 +17,7 @@ app = FastAPI(title="Tevira-AI")
 app.include_router(tasks.router)
 app.include_router(health.router)
 app.include_router(projects.router)
-
-
-# # -- "/projects" --
-# @app.post("/projects", status_code=201)
-# def create_project(project: ProjectCreate) -> ProjectRead:
-#     project_id = f"project_{len(projects_in_memory) + 1}"
-
-#     new_project = ProjectRead(
-#         **project.model_dump(),
-#         id=project_id,
-#     )
-
-#     projects_in_memory[new_project.id] = new_project
-
-#     return new_project
-
-
-# @app.get("/projects")
-# def show_projects() -> list[ProjectRead]:
-#     # turn dict into list and only output the objects without the key from the projects dict
-#     return list(projects_in_memory.values())
-
-
-# -- "/progress-notes" --
-@app.post("/progress-notes", status_code=201)
-def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
-    new_note = ProgressNoteRead(
-        **note.model_dump(),
-        updated_at=datetime.now(timezone.utc),
-    )
-
-    progress_notes.append(new_note)
-
-    return new_note
-
-
-@app.get("/progress-notes")
-def direct_to_notes_route() -> str:
-    raise HTTPException(
-        status_code=405,
-        detail="Error 405: Method not allowed. You meant 'progress-notes/project_1'?",
-    )
-
-
-@app.get("/progress-notes/{project_id}")
-def show_notes(
-    project_id: str = Depends(validate_project_id),
-) -> list[ProgressNoteRead]:
-    return [note for note in progress_notes if note.project_id == project_id]
+app.include_router(progress_notes.router)
 
 
 @app.get("/context/{project_id}")
@@ -79,7 +28,9 @@ def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRe
     validate_progress_note(project_id)
 
     # find all notes that belong to that project_id
-    matching_notes = [note for note in progress_notes if note.project_id == project_id]
+    matching_notes = [
+        note for note in progress_notes_in_memory if note.project_id == project_id
+    ]
 
     # find all tasks that belong to that project_id && status == "open"
     open_tasks = get_project_tasks(project_id)
