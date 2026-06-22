@@ -5,24 +5,11 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/health": {
-      "get": {
-        "summary": "Check Health",
-        "operationId": "check_health_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        }
-      }
-    },
     "/tasks": {
       "post": {
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Create Task",
         "operationId": "create_task_tasks_post",
         "requestBody": {
@@ -59,6 +46,9 @@
         }
       },
       "get": {
+        "tags": [
+          "Tasks"
+        ],
         "summary": "Show Tasks",
         "operationId": "show_tasks_tasks_get",
         "parameters": [
@@ -109,8 +99,30 @@
         }
       }
     },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Check Health",
+        "operationId": "check_health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
     "/projects": {
       "get": {
+        "tags": [
+          "Projects"
+        ],
         "summary": "Show Projects",
         "operationId": "show_projects_projects_get",
         "responses": {
@@ -131,6 +143,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Projects"
+        ],
         "summary": "Create Project",
         "operationId": "create_project_projects_post",
         "requestBody": {
@@ -169,6 +184,9 @@
     },
     "/progress-notes": {
       "get": {
+        "tags": [
+          "Progress Notes"
+        ],
         "summary": "Direct To Notes Route",
         "operationId": "direct_to_notes_route_progress_notes_get",
         "responses": {
@@ -186,6 +204,9 @@
         }
       },
       "post": {
+        "tags": [
+          "Progress Notes"
+        ],
         "summary": "Create Progress Note",
         "operationId": "create_progress_note_progress_notes_post",
         "requestBody": {
@@ -224,6 +245,9 @@
     },
     "/progress-notes/{project_id}": {
       "get": {
+        "tags": [
+          "Progress Notes"
+        ],
         "summary": "Show Notes",
         "operationId": "show_notes_progress_notes__project_id__get",
         "parameters": [
@@ -267,6 +291,9 @@
     },
     "/context/{project_id}": {
       "get": {
+        "tags": [
+          "Context"
+        ],
         "summary": "Restore Context",
         "operationId": "restore_context_context__project_id__get",
         "parameters": [
