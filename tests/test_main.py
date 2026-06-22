@@ -5,14 +5,12 @@ import pytest
 from pydantic import TypeAdapter
 from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.parser import parse_note
-from src.app.main import (
-    app,
-    tasks_in_memory,
-    projects,
-    progress_notes,
+from src.app.main import app
+from src.app.state import progress_notes, projects, tasks_in_memory
+from src.app.validator import (
+    get_project_tasks,
     validate_progress_note,
     validate_project_id,
-    get_project_tasks,
 )
 
 client = TestClient(app)  # create instance

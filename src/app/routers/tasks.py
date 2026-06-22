@@ -1,5 +1,5 @@
 from src.app.state import tasks_in_memory
-from src.app.main import validate_project_id, get_project_tasks
+from src.app.validator import validate_project_id, get_project_tasks
 from fastapi import HTTPException, APIRouter
 from src.app.schemas import (
     TaskCreate,
