@@ -1,16 +1,14 @@
 from fastapi import FastAPI, Depends, HTTPException
-from src.app.state import projects, progress_notes
+from src.app.state import projects_in_memory, progress_notes
 from src.app.validator import (  # TODO: create a separate folder for validator.py and state.py
     validate_project_id,
     validate_progress_note,
     get_project_tasks,
 )
-from src.app.routers import tasks, health
+from src.app.routers import tasks, health, projects
 from datetime import datetime, timezone
 from operator import attrgetter
 from src.app.schemas import (
-    ProjectCreate,
-    ProjectRead,
     ProgressNoteCreate,
     ProgressNoteRead,
     ContextRead,
@@ -21,27 +19,28 @@ app = FastAPI(title="Tevira-AI")
 # --- ROUTERS ---
 app.include_router(tasks.router)
 app.include_router(health.router)
+app.include_router(projects.router)
 
 
-# -- "/projects" --
-@app.post("/projects", status_code=201)
-def create_project(project: ProjectCreate) -> ProjectRead:
-    project_id = f"project_{len(projects) + 1}"
+# # -- "/projects" --
+# @app.post("/projects", status_code=201)
+# def create_project(project: ProjectCreate) -> ProjectRead:
+#     project_id = f"project_{len(projects_in_memory) + 1}"
 
-    new_project = ProjectRead(
-        **project.model_dump(),
-        id=project_id,
-    )
+#     new_project = ProjectRead(
+#         **project.model_dump(),
+#         id=project_id,
+#     )
 
-    projects[new_project.id] = new_project
+#     projects_in_memory[new_project.id] = new_project
 
-    return new_project
+#     return new_project
 
 
-@app.get("/projects")
-def show_projects() -> list[ProjectRead]:
-    # turn dict into list and only output the objects without the key from the projects dict
-    return list(projects.values())
+# @app.get("/projects")
+# def show_projects() -> list[ProjectRead]:
+#     # turn dict into list and only output the objects without the key from the projects dict
+#     return list(projects_in_memory.values())
 
 
 # -- "/progress-notes" --
@@ -75,7 +74,7 @@ def show_notes(
 @app.get("/context/{project_id}")
 def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRead:
     # find project
-    project = projects[project_id]
+    project = projects_in_memory[project_id]
 
     validate_progress_note(project_id)
 

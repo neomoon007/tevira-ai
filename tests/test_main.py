@@ -6,7 +6,7 @@ from pydantic import TypeAdapter
 from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.parser import parse_note
 from src.app.main import app
-from src.app.state import progress_notes, projects, tasks_in_memory
+from src.app.state import progress_notes, projects_in_memory, tasks_in_memory
 from src.app.validator import (
     get_project_tasks,
     validate_progress_note,
@@ -19,13 +19,13 @@ client = TestClient(app)  # create instance
 # TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
 @pytest.fixture
 def temp_projects():
-    projects["project_1"] = ProjectRead(name="SAT", id="project_1")
-    projects["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
-    projects["project_3"] = ProjectRead(name="Tech", id="project_3")
-    projects["project_4"] = ProjectRead(name="foo", id="project_4")
+    projects_in_memory["project_1"] = ProjectRead(name="SAT", id="project_1")
+    projects_in_memory["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
+    projects_in_memory["project_3"] = ProjectRead(name="Tech", id="project_3")
+    projects_in_memory["project_4"] = ProjectRead(name="foo", id="project_4")
 
-    yield projects
-    projects.clear()
+    yield projects_in_memory
+    projects_in_memory.clear()
 
 
 @pytest.fixture
@@ -329,7 +329,7 @@ def test_show_tasks_raises_404_when_task_not_in_project_scope(
 
 
 def test_create_project_accepts_valid_project_object(temp_projects):
-    projects.clear()
+    projects_in_memory.clear()
 
     response = client.post(
         "/projects",
@@ -341,7 +341,7 @@ def test_create_project_accepts_valid_project_object(temp_projects):
     data = response.json()
     assert data["name"] == "Magnum Opus"
     assert data["id"] == "project_1"
-    projects.clear()
+    projects_in_memory.clear()
 
 
 def test_create_progress_note_accepts_valid_note_object():

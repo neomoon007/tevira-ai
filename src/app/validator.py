@@ -1,4 +1,4 @@
-from src.app.state import projects, tasks_in_memory, progress_notes
+from src.app.state import projects_in_memory, tasks_in_memory, progress_notes
 from src.app.schemas import TaskRead
 from fastapi import HTTPException
 
@@ -10,7 +10,7 @@ def validate_project_id(project_id: str):
             status_code=400, detail="Error 400: Empty string where input is required"
         )
     try:
-        projects[project_id]
+        projects_in_memory[project_id]
         return project_id
     except Exception as project_missing:
         raise HTTPException(
