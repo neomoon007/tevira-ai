@@ -35,8 +35,8 @@ cp .env.example .env
 If on Windows run this instead:
 ```powershell
 python -m venv venv
-source venv\Scripts\Activate.ps1
-cp ".env.example" ".env"
+.\venv\Scripts\Activate.ps1
+Copy-Item .env.example .env
 ```
 
 ### 3. Install dependencies:
