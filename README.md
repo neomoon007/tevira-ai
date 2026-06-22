@@ -62,8 +62,8 @@ You can also check the endpoints and schemas by clicking on the badge below:
 
 ## 🛣 Next Steps
 I am actively developing Tevira-AI and in the near future it will have more capabilities, some of them may be found below:
-- Real SQL database with persistent storage, not just in memory storage.
-- Auth
+- **Real SQL database with persistent storage (PostgreSQL):** Currently using In-Memory storage to develop the core logic faster without having to deal with a real database just yet.
+- **Security and Login:** I plan to use OAuth in the future for login and security.
 
 ## License
 MIT License. See [LICENSE](LICENSE)
