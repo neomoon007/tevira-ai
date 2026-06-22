@@ -26,7 +26,7 @@ def create_task(task: TaskCreate) -> TaskRead:
 
 
 @router.get("")
-def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
+def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: # type: ignore
     if project_id is None and task_id is None:
         return tasks_in_memory
 
@@ -54,3 +54,6 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:
                 detail=f"Error 404: Task '{task_id}' does not exist inside of '{project_id}'",
             )
         return matching_task
+    
+# @router.patch("{task_id}") TODO: Finish the update task endpoint.
+# def update_task():
