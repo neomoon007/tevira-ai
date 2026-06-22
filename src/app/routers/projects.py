@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.app.schemas import ProjectCreate, ProjectRead
-from src.app.state import projects_in_memory
+from src.app.state.memory import projects_in_memory
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 

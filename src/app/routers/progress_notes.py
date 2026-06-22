@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead
-from src.app.state import progress_notes_in_memory
+from src.app.state.memory import progress_notes_in_memory
 from src.app.validator import validate_project_id
 from datetime import datetime, timezone
 

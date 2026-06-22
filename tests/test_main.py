@@ -6,7 +6,11 @@ from pydantic import TypeAdapter
 from src.app.schemas import ProgressNoteRead, ProjectRead, TaskRead
 from src.app.parser import parse_note
 from src.app.main import app
-from src.app.state import progress_notes_in_memory, projects_in_memory, tasks_in_memory
+from src.app.state.memory import (
+    progress_notes_in_memory,
+    projects_in_memory,
+    tasks_in_memory,
+)
 from src.app.validator import (
     get_project_tasks,
     validate_progress_note,

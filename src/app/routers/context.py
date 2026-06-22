@@ -4,7 +4,7 @@ from src.app.validator import (
     validate_project_id,
     get_project_tasks,
 )
-from src.app.state import projects_in_memory, progress_notes_in_memory
+from src.app.state.memory import projects_in_memory, progress_notes_in_memory
 from src.app.schemas import ContextRead
 from operator import attrgetter
 

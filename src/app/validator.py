@@ -1,4 +1,8 @@
-from src.app.state import projects_in_memory, tasks_in_memory, progress_notes_in_memory
+from src.app.state.memory import (
+    projects_in_memory,
+    tasks_in_memory,
+    progress_notes_in_memory,
+)
 from src.app.schemas import TaskRead
 from fastapi import HTTPException
 
