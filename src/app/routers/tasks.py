@@ -1,6 +1,6 @@
 from src.app.state.memory import tasks_in_memory
 from src.app.validator import validate_project_id, get_project_tasks, get_task_by_id
-from fastapi import HTTPException, APIRouter
+from fastapi import APIRouter
 from src.app.schemas import (
     TaskCreate,
     TaskRead,
@@ -25,7 +25,6 @@ def create_task(task: TaskCreate) -> TaskRead:
 
     return new_task
 
-
 @router.get("")
 def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: # type: ignore
     if project_id is None and task_id is None:
@@ -43,8 +42,12 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: #
         project_tasks = get_project_tasks(project_id)
         return [get_task_by_id(task_id, project_tasks)]
     
-# @router.patch("/{task_id}")
-# def update_task(updated_task: TaskUpdate) -> TaskRead:
-    # check if given id matched any of the IDs inside tasks dictionary.
-    # if they match, then replace that item with the new values only keeping the old ones if the new value is None.
-    # get the taskupdate fields, loop through them and extract the non none keys and value when values arent none,
+@router.patch("/{task_id}")
+def update_task(task_id: str, updated_task: TaskUpdate) -> TaskRead:
+    matching_task = get_task_by_id(task_id)
+    merged_task = {**matching_task.model_dump(), **updated_task.model_dump(exclude_none=True)}
+    
+    task_index = tasks_in_memory.index(matching_task)
+    tasks_in_memory[task_index] = TaskRead(**merged_task)
+
+    return TaskRead(**merged_task)
