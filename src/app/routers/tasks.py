@@ -55,5 +55,6 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: #
             )
         return matching_task
     
-# @router.patch("{task_id}") TODO: Finish the update task endpoint.
-# def update_task():
+# @router.patch("/{task_id}")
+# def update_task(updated_task: TaskUpdate) -> TaskRead:
+    # return TaskRead()
