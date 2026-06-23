@@ -28,12 +28,12 @@ def restore_context(project_id: str = Depends(validate_project_id)) -> ContextRe
 
     # output recommended next action (latest note next actions OR open tasks
     latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)
-
-    return {
-        "project": project,
-        "current_state": latest_note.current_state if latest_note else None,
-        "open_tasks": open_tasks,
-        "open_loops": latest_note.open_loops if latest_note else None,
-        "next_actions": latest_note.next_actions if latest_note else None,
-        "important_context": latest_note.important_context if latest_note else None,
-    }
+    
+    return ContextRead(
+        project=project,
+        current_state=latest_note.current_state if latest_note else None,
+        open_tasks=open_tasks,
+        open_loops=latest_note.open_loops if latest_note else None,
+        next_actions=latest_note.next_actions if latest_note else None,
+        important_context=latest_note.important_context if latest_note else None,
+    )
