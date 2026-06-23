@@ -1,9 +1,10 @@
 from src.app.state.memory import tasks_in_memory
-from src.app.validator import validate_project_id, get_project_tasks
+from src.app.validator import validate_project_id, get_project_tasks, get_task_by_id
 from fastapi import HTTPException, APIRouter
 from src.app.schemas import (
     TaskCreate,
     TaskRead,
+    TaskUpdate,
 )
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -35,26 +36,15 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: #
         return get_project_tasks(project_id)
 
     if project_id is None and task_id is not None:
-        matching_task = [task for task in tasks_in_memory if task.id == task_id]
-        if not matching_task:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Error 404: Task {task_id} does not exist.",
-            )
-        return matching_task
+        return [get_task_by_id(task_id)]
 
     if project_id is not None and task_id is not None:
         validate_project_id(project_id)
         project_tasks = get_project_tasks(project_id)
-        matching_task = [task for task in project_tasks if task.id == task_id]
-
-        if not matching_task:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Error 404: Task '{task_id}' does not exist inside of '{project_id}'",
-            )
-        return matching_task
+        return [get_task_by_id(task_id, project_tasks)]
     
 # @router.patch("/{task_id}")
 # def update_task(updated_task: TaskUpdate) -> TaskRead:
-    # return TaskRead()
+    # check if given id matched any of the IDs inside tasks dictionary.
+    # if they match, then replace that item with the new values only keeping the old ones if the new value is None.
+    # get the taskupdate fields, loop through them and extract the non none keys and value when values arent none,
