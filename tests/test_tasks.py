@@ -160,3 +160,4 @@ def test_show_tasks_raises_404_when_task_not_in_project_scope(
         "/tasks", params={"project_id": "project_1", "task_id": "task_4"}
     )
     assert response.status_code == 404
+
