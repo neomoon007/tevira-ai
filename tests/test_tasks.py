@@ -228,5 +228,5 @@ def test_taskupdate_accepts_valid_input():
 def test_taskupdate_raises_error_for_missing_id():
     input = {"title": "my little task", "status": None}
 
-    with pytest.raises(ValidationError) as error_info:
+    with pytest.raises(ValidationError):
         TaskUpdate(**input)
