@@ -1,8 +1,9 @@
-from src.app.schemas import TaskRead
+from src.app.schemas import TaskRead, TaskUpdate
 from src.app.validator import get_project_tasks
 from src.app.state.memory import tasks_in_memory
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, ValidationError
 from datetime import date
+import pytest
 
 # test get_project_tasks function works:
 def test_get_project_tasks_returns_only_open_tasks_project_1(temp_tasks):
@@ -161,3 +162,71 @@ def test_show_tasks_raises_404_when_task_not_in_project_scope(
     )
     assert response.status_code == 404
 
+# Whats new:
+def test_update_task_accepts_valid_taskread_object(temp_tasks, client):
+    given_task_id = "task_1"
+
+    response = client.patch(
+        f"/tasks/{given_task_id}",
+        json={
+            "id": given_task_id,
+            "priority": "low",
+            "project_id": None,
+        }
+    )
+
+    assert response.status_code == 200
+
+    adapter = TypeAdapter(TaskRead)
+    tasks = adapter.validate_python(response.json())
+
+    assert tasks.title == "Hello World!"
+    assert tasks.priority == "low"
+    assert tasks.due_date == date.today()
+    assert tasks.project_id == "project_1"
+    assert tasks.id == "task_1"
+    assert tasks.status == "open"
+    tasks_in_memory.clear()
+
+def test_update_task_raises_404_for_non_existent_task_id(temp_tasks, client):
+    given_task_id = "task_99"
+
+    response = client.patch(
+        f"/tasks/{given_task_id}",
+        json={
+            "id": given_task_id,
+            "priority": "low",
+            "project_id": None,
+        }
+    )
+
+    assert response.status_code == 404
+    tasks_in_memory.clear()
+
+def test_update_tasks_raises_422_for_missing_updatable_fields(temp_tasks, client):
+    given_task_id = "task_1"
+
+    response = client.patch(
+        f"/tasks/{given_task_id}",
+        json={
+            "id": given_task_id,
+        }
+    )
+
+    assert response.status_code == 422
+    tasks_in_memory.clear()
+
+def test_taskupdate_accepts_valid_input():
+    input = {"id": "task_1", "title": "my little task", "status": None}
+
+    object = TaskUpdate(**input)
+
+    assert object.id == "task_1"
+    assert object.title == "my little task"
+    assert object.status is None
+
+def test_taskupdate_raises_error_for_missing_id():
+    input = {"title": "my little task", "status": None}
+
+    with pytest.raises(ValidationError) as error_info:
+        TaskUpdate(**input)
