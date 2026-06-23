@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import Literal, Annotated
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
@@ -23,6 +23,19 @@ class TaskUpdate(BaseModel):
     due_date: date | None = None
     project_id: str | None = None
     status: Literal["open", "done"] | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def ensure_min_field_count(cls, data: dict) -> dict:
+        if not isinstance(data, dict):
+            raise ValueError("At least one updatable field is required to update a task")
+        
+        has_updatable_data = {item: value for item, value in data.items() if item != "id" and value is not None}
+
+        if not has_updatable_data:
+            raise ValueError("At least one updatable field is required to update a task")
+
+        return data
 
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
