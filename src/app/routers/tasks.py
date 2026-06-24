@@ -1,4 +1,4 @@
-from src.app.state.memory import tasks_in_memory
+from src.app.state.memory import tasks_in_memory, task_id_number
 from src.app.validator import validate_project_id, get_project_tasks, get_task_by_id
 from fastapi import APIRouter
 from src.app.schemas import (
@@ -13,7 +13,10 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 # -- "/tasks" --
 @router.post("", status_code=201)
 def create_task(task: TaskCreate) -> TaskRead:
-    task_id = f"task_{len(tasks_in_memory) + 1}"
+    global task_id_number
+    task_id_number += 1
+
+    task_id = f"task_{task_id_number}"
 
     new_task = TaskRead(
         **task.model_dump(),  # Dumps all `task` fields here, no need to type them manually.
