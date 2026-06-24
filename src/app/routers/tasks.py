@@ -25,8 +25,9 @@ def create_task(task: TaskCreate) -> TaskRead:
 
     return new_task
 
+
 @router.get("")
-def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: # type: ignore
+def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:  # type: ignore
     if project_id is None and task_id is None:
         return tasks_in_memory
 
@@ -41,13 +42,26 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]: #
         validate_project_id(project_id)
         project_tasks = get_project_tasks(project_id)
         return [get_task_by_id(task_id, project_tasks)]
-    
+
+
 @router.patch("/{task_id}")
 def update_task(task_id: str, updated_task: TaskUpdate) -> TaskRead:
     matching_task = get_task_by_id(task_id)
-    merged_task = {**matching_task.model_dump(), **updated_task.model_dump(exclude_none=True)}
-    
+    merged_task = {
+        **matching_task.model_dump(),
+        **updated_task.model_dump(exclude_none=True),
+    }
+
     task_index = tasks_in_memory.index(matching_task)
     tasks_in_memory[task_index] = TaskRead(**merged_task)
 
     return TaskRead(**merged_task)
+
+
+@router.delete("/{task_id}", status_code=204)
+def delete_task(task_id: str):
+    matching_task = get_task_by_id(task_id)
+    task_index = tasks_in_memory.index(matching_task)
+    del tasks_in_memory[task_index]
+
+    return
