@@ -1,7 +1,13 @@
 from src.app.schemas import TaskRead, ProgressNoteRead
 
 # --- MEMORY STORAGE ---
+# tasks
 tasks_in_memory: list[TaskRead] = []
-projects_in_memory = {}
-progress_notes_in_memory: list[ProgressNoteRead] = []
 task_id_number: int = 0
+
+# projects
+projects_in_memory = {}
+project_id_number = 0
+
+# notes
+progress_notes_in_memory: list[ProgressNoteRead] = []

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from src.app.schemas import ProjectCreate, ProjectRead
 from src.app.validator import validate_project_id
-from src.app.state.memory import projects_in_memory
+from src.app.state.memory import projects_in_memory, project_id_number
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -9,7 +9,10 @@ router = APIRouter(prefix="/projects", tags=["Projects"])
 # -- "/projects" --
 @router.post("", status_code=201)
 def create_project(project: ProjectCreate) -> ProjectRead:
-    project_id = f"project_{len(projects_in_memory) + 1}"  # TODO change from length to be like tasks (separate counter)
+    global project_id_number
+    project_id_number += 1
+
+    project_id = f"project_{project_id_number}"
 
     new_project = ProjectRead(
         **project.model_dump(),
