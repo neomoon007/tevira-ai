@@ -55,3 +55,18 @@ def test_show_project_returns_404_for_non_existing_project(temp_projects, client
     response = client.get(f"/projects/{given_project_id}")
 
     assert response.status_code == 404
+
+
+def test_rename_project_returns_200_for_valid_request(temp_projects, client):
+    given_project_id = "project_1"
+
+    response = client.patch(
+        f"/projects/{given_project_id}", json={"name": "This project name was altered"}
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["name"] == "This project name was altered"
+    assert data["id"] == "project_1"
+    projects_in_memory.clear()
