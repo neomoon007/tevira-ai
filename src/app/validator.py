@@ -40,6 +40,7 @@ def get_project_tasks(project_id) -> list[TaskRead]:
         if task.project_id == project_id and task.status == "open"
     ]
 
+
 def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
     tasks_list = database if database is not None else tasks_in_memory
 

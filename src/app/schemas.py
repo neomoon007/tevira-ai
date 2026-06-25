@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field, model_validator
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
+
 # --- TASKS ---
 class TaskCreate(BaseModel):
     title: NonEmptyString
@@ -15,6 +16,7 @@ class TaskCreate(BaseModel):
 class TaskRead(TaskCreate):
     id: str
     status: Literal["open", "done"] = "open"
+
 
 class TaskUpdate(BaseModel):
     id: NonEmptyString
@@ -28,14 +30,23 @@ class TaskUpdate(BaseModel):
     @classmethod
     def ensure_min_field_count(cls, data: dict) -> dict:
         if not isinstance(data, dict):
-            raise ValueError("At least one updatable field is required to update a task")
-        
-        has_updatable_data = {item: value for item, value in data.items() if item != "id" and value is not None}
+            raise ValueError(
+                "At least one updatable field is required to update a task"
+            )
+
+        has_updatable_data = {
+            item: value
+            for item, value in data.items()
+            if item != "id" and value is not None
+        }
 
         if not has_updatable_data:
-            raise ValueError("At least one updatable field is required to update a task")
+            raise ValueError(
+                "At least one updatable field is required to update a task"
+            )
 
         return data
+
 
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
