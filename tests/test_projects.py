@@ -39,3 +39,19 @@ def test_create_project_accepts_valid_project_object(temp_projects, client):
     assert data["name"] == "Magnum Opus"
     assert data["id"] == "project_1"
     projects_in_memory.clear()
+
+
+def test_show_project_returns_200_for_existing_project(temp_projects, client):
+    given_project_id = "project_1"
+
+    response = client.get(f"/projects/{given_project_id}")
+
+    assert response.status_code == 200
+
+
+def test_show_project_returns_404_for_non_existing_project(temp_projects, client):
+    given_project_id = "project_42"
+
+    response = client.get(f"/projects/{given_project_id}")
+
+    assert response.status_code == 404
