@@ -1,9 +1,14 @@
 from fastapi.testclient import TestClient
 from src.app.main import app
 import pytest
-from src.app.state.memory import projects_in_memory, tasks_in_memory, progress_notes_in_memory
+from src.app.state.memory import (
+    projects_in_memory,
+    tasks_in_memory,
+    progress_notes_in_memory,
+)
 from src.app.schemas import ProjectRead, ProgressNoteRead, TaskRead
 from datetime import datetime, timezone, date
+
 
 @pytest.fixture
 def client():

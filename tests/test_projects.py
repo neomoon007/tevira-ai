@@ -3,6 +3,7 @@ from src.app.state.memory import projects_in_memory
 import pytest
 from fastapi import HTTPException
 
+
 def test_validate_project_id_accepts_existing_id(temp_projects: dict):
     response = validate_project_id("project_1")
 
@@ -23,6 +24,7 @@ def test_validate_project_id_raises_404_for_non_existing_project(temp_projects: 
 
     assert exception_info.value.status_code == 404
 
+
 def test_create_project_accepts_valid_project_object(temp_projects, client):
     projects_in_memory.clear()
 
@@ -37,4 +39,3 @@ def test_create_project_accepts_valid_project_object(temp_projects, client):
     assert data["name"] == "Magnum Opus"
     assert data["id"] == "project_1"
     projects_in_memory.clear()
-
