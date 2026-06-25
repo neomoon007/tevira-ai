@@ -70,3 +70,13 @@ def test_rename_project_returns_200_for_valid_request(temp_projects, client):
     assert data["name"] == "This project name was altered"
     assert data["id"] == "project_1"
     projects_in_memory.clear()
+
+
+def test_delete_project_returns_204(temp_projects, client):
+    given_project_id = "project_1"
+    response = client.delete(f"/projects/{given_project_id}")
+
+    assert response.status_code == 204
+
+    with pytest.raises(KeyError):
+        projects_in_memory[given_project_id]

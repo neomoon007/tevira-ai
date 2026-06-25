@@ -63,6 +63,7 @@ def update_task(task_id: str, updated_task: TaskUpdate) -> TaskRead:
 
 @router.delete("/{task_id}", status_code=204)
 def delete_task(task_id: str):
+    # change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
     matching_task = get_task_by_id(task_id)
     task_index = tasks_in_memory.index(matching_task)
     del tasks_in_memory[task_index]

@@ -47,3 +47,10 @@ def rename_project(
     projects_in_memory[renamed_project.id] = renamed_project
 
     return renamed_project
+
+
+@router.delete("/{project_id}", status_code=204)
+def delete_task(project_id: str = Depends(validate_project_id)):
+    del projects_in_memory[project_id]
+
+    return
