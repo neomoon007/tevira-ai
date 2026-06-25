@@ -34,7 +34,7 @@ Important context: Late assignments will receive 50% less grade
 
 - `"/tasks"` - Full CRUD for tasks working. Currently stores tasks in memory for MVP purposes.
 
-- `"/projects"` - Creates and lists all projects through GET and POST methods. Currently stores them in memory.
+- `"/projects"` - Full CRUD for projects working. Currently stores tasks in memory for MVP purposes.
 
 - `"/progress-notes"` - Creates and lists all notes through GET and POST methods. Currently stores notes in memory.
 
