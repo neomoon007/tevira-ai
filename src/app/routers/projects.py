@@ -33,3 +33,17 @@ def list_projects() -> list[ProjectRead]:
 @router.get("/{project_id}")
 def show_project(project_id: str = Depends(validate_project_id)) -> ProjectRead:
     return projects_in_memory[project_id]
+
+
+@router.patch("/{project_id}")
+def rename_project(
+    new_title: ProjectCreate, project_id: str = Depends(validate_project_id)
+) -> ProjectRead:
+    renamed_project = ProjectRead(
+        **new_title.model_dump(),
+        id=project_id,
+    )
+
+    projects_in_memory[renamed_project.id] = renamed_project
+
+    return renamed_project
