@@ -3,7 +3,7 @@ from src.app.state.memory import (
     tasks_in_memory,
     progress_notes_in_memory,
 )
-from src.app.schemas import TaskRead
+from src.app.schemas import TaskRead, ProgressNoteRead
 from fastapi import HTTPException
 
 
@@ -51,3 +51,15 @@ def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
             detail=f"Error 404: Task '{task_id}' does not exist.",
         )
     return matching_task
+
+
+def get_note_by_id(note_id: str, database: list | None = None) -> ProgressNoteRead:
+    notes_list = database if database is not None else progress_notes_in_memory
+
+    matching_note = next((note for note in notes_list if note.id == note_id), None)
+    if not matching_note:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Error 404: Note '{note_id}' does not exist.",
+        )
+    return matching_note

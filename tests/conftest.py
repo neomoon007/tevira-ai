@@ -39,6 +39,7 @@ def temp_notes():
                 next_actions="Finish week 08",
                 important_context="One step at a time",
                 blockers=["No blockers"],
+                id="note_1",
                 updated_at=datetime.now(timezone.utc),
             ),
             ProgressNoteRead(
@@ -49,6 +50,7 @@ def temp_notes():
                 next_actions="SAT",
                 important_context="One step at a time",
                 blockers=["No blockers"],
+                id="note_2",
                 updated_at=datetime.now(timezone.utc),
             ),
             ProgressNoteRead(
@@ -59,6 +61,7 @@ def temp_notes():
                 next_actions="Tevira-AI",
                 important_context="One step at a time",
                 blockers=["No blockers"],
+                id="note_3",
                 updated_at=datetime.now(timezone.utc),
             ),
             ProgressNoteRead(
@@ -69,6 +72,7 @@ def temp_notes():
                 next_actions="Tech",
                 important_context="One step at a time",
                 blockers=["No blockers"],
+                id="note_4",
                 updated_at=datetime.now(timezone.utc),
             ),
         ]

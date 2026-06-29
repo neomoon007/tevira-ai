@@ -70,6 +70,7 @@ class ProgressNoteCreate(BaseModel):
 
 
 class ProgressNoteRead(ProgressNoteCreate):
+    id: str
     updated_at: datetime
 
 
