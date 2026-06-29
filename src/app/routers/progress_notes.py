@@ -51,7 +51,7 @@ def update_note(note_id: str, updated_note: ProgressNoteUpdate) -> ProgressNoteR
 
     merged_note = {
         **matching_note.model_dump(),
-        **merge_ready_note.model_dump(),
+        **merge_ready_note,
     }
 
     note_index = progress_notes_in_memory.index(matching_note)

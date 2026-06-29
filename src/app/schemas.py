@@ -32,7 +32,7 @@ class TaskUpdate(BaseModel):
         has_updatable_data = {
             item: value
             for item, value in data.items()
-            if item != "id" and value is not None
+            if item != "id" and item in cls.model_fields and value is not None
         }
 
         if not has_updatable_data:
@@ -87,12 +87,12 @@ class ProgressNoteUpdate(BaseModel):
         has_updatable_data = {
             item: value
             for item, value in data.items()
-            if item != "id" and value is not None
+            if item != "id" and item in cls.model_fields and value is not None
         }
 
         if not has_updatable_data:
             raise ValueError(
-                "At least one updatable field is required to update a task"
+                "At least one updatable field is required to update a progress note"
             )
 
         return data
