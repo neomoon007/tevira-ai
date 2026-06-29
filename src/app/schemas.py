@@ -29,11 +29,6 @@ class TaskUpdate(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def ensure_min_field_count(cls, data: dict) -> dict:
-        if not isinstance(data, dict):
-            raise ValueError(
-                "At least one updatable field is required to update a task"
-            )
-
         has_updatable_data = {
             item: value
             for item, value in data.items()
@@ -72,6 +67,35 @@ class ProgressNoteCreate(BaseModel):
 class ProgressNoteRead(ProgressNoteCreate):
     id: str
     updated_at: datetime
+
+
+class ProgressNoteUpdate(BaseModel):
+    project_id: str | None = None
+    current_state: NonEmptyString | None = None
+    last_session: NonEmptyString | None = None
+    open_loops: list[str] | None = None
+    next_actions: str | None = None
+    important_context: str | None = None
+    blockers: list[str] | None = None
+    confidence: Literal["low", "medium", "high"] | None = None
+    id: NonEmptyString
+    updated_at: datetime | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def ensure_min_field_count(cls, data: dict) -> dict:
+        has_updatable_data = {
+            item: value
+            for item, value in data.items()
+            if item != "id" and value is not None
+        }
+
+        if not has_updatable_data:
+            raise ValueError(
+                "At least one updatable field is required to update a task"
+            )
+
+        return data
 
 
 # --- CONTEXT ---

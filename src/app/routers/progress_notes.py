@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from src.app.schemas import ProgressNoteCreate, ProgressNoteRead
+from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
 from src.app.state.memory import progress_notes_in_memory, progress_notes_id_number
 from src.app.validator import validate_project_id, get_note_by_id
 from datetime import datetime, timezone
@@ -40,3 +40,21 @@ def show_notes(project_id: str = None) -> list[ProgressNoteRead]:
 @router.get("/{note_id}")
 def get_note(note_id: str) -> ProgressNoteRead:
     return get_note_by_id(note_id)
+
+
+@router.patch("/{note_id}")
+def update_note(note_id: str, updated_note: ProgressNoteUpdate) -> ProgressNoteRead:
+    matching_note = get_note_by_id(note_id)
+
+    merge_ready_note = updated_note.model_dump(exclude_none=True)
+    merge_ready_note["updated_at"] = datetime.now(timezone.utc)
+
+    merged_note = {
+        **matching_note.model_dump(),
+        **merge_ready_note.model_dump(),
+    }
+
+    note_index = progress_notes_in_memory.index(matching_note)
+    progress_notes_in_memory[note_index] = ProgressNoteRead(**merged_note)
+
+    return ProgressNoteRead(**merged_note)
