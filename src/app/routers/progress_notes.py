@@ -27,7 +27,7 @@ def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
 
 
 @router.get("")
-def show_notes(project_id: str = None) -> list[ProgressNoteRead]:
+def show_notes(project_id: str = "") -> list[ProgressNoteRead]:
     try:
         validate_project_id(project_id)
         return [
