@@ -113,6 +113,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "minLength": 1,
               "title": "Task Id"
             }
           }
@@ -393,26 +394,6 @@
       }
     },
     "/progress-notes": {
-      "get": {
-        "tags": [
-          "Progress Notes"
-        ],
-        "summary": "Direct To Notes Route",
-        "operationId": "direct_to_notes_route_progress_notes_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "title": "Response Direct To Notes Route Progress Notes Get"
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": [
           "Progress Notes"
@@ -420,14 +401,14 @@
         "summary": "Create Progress Note",
         "operationId": "create_progress_note_progress_notes_post",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ProgressNoteCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -451,20 +432,18 @@
             }
           }
         }
-      }
-    },
-    "/progress-notes/{project_id}": {
+      },
       "get": {
         "tags": [
           "Progress Notes"
         ],
         "summary": "Show Notes",
-        "operationId": "show_notes_progress_notes__project_id__get",
+        "operationId": "show_notes_progress_notes_get",
         "parameters": [
           {
             "name": "project_id",
-            "in": "path",
-            "required": true,
+            "in": "query",
+            "required": false,
             "schema": {
               "type": "string",
               "title": "Project Id"
@@ -481,10 +460,135 @@
                   "items": {
                     "$ref": "#/components/schemas/ProgressNoteRead"
                   },
-                  "title": "Response Show Notes Progress Notes  Project Id  Get"
+                  "title": "Response Show Notes Progress Notes Get"
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/progress-notes/{note_id}": {
+      "get": {
+        "tags": [
+          "Progress Notes"
+        ],
+        "summary": "Get Note",
+        "operationId": "get_note_progress_notes__note_id__get",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Note Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressNoteRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Progress Notes"
+        ],
+        "summary": "Update Note",
+        "operationId": "update_note_progress_notes__note_id__patch",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Note Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressNoteUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressNoteRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Progress Notes"
+        ],
+        "summary": "Delete Task",
+        "operationId": "delete_task_progress_notes__note_id__delete",
+        "parameters": [
+          {
+            "name": "note_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Note Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -771,6 +875,10 @@
             "title": "Confidence",
             "default": "medium"
           },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
           "updated_at": {
             "type": "string",
             "format": "date-time",
@@ -782,9 +890,129 @@
           "project_id",
           "current_state",
           "last_session",
+          "id",
           "updated_at"
         ],
         "title": "ProgressNoteRead"
+      },
+      "ProgressNoteUpdate": {
+        "properties": {
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id"
+          },
+          "current_state": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current State"
+          },
+          "last_session": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Session"
+          },
+          "open_loops": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Loops"
+          },
+          "next_actions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Actions"
+          },
+          "important_context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Important Context"
+          },
+          "blockers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blockers"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "title": "ProgressNoteUpdate"
       },
       "ProjectCreate": {
         "properties": {
@@ -929,11 +1157,6 @@
       },
       "TaskUpdate": {
         "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1,
-            "title": "Id"
-          },
           "title": {
             "anyOf": [
               {
@@ -1002,9 +1225,6 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
         "title": "TaskUpdate"
       },
       "ValidationError": {
