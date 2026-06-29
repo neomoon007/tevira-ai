@@ -19,7 +19,6 @@ class TaskRead(TaskCreate):
 
 
 class TaskUpdate(BaseModel):
-    id: NonEmptyString
     title: NonEmptyString | None = None
     priority: Literal["low", "medium", "high"] | None = None
     due_date: date | None = None
@@ -32,7 +31,7 @@ class TaskUpdate(BaseModel):
         has_updatable_data = {
             item: value
             for item, value in data.items()
-            if item != "id" and item in cls.model_fields and value is not None
+            if item in cls.model_fields and value is not None
         }
 
         if not has_updatable_data:
@@ -78,7 +77,6 @@ class ProgressNoteUpdate(BaseModel):
     important_context: str | None = None
     blockers: list[str] | None = None
     confidence: Literal["low", "medium", "high"] | None = None
-    id: NonEmptyString
     updated_at: datetime | None = None
 
     @model_validator(mode="before")
@@ -87,7 +85,7 @@ class ProgressNoteUpdate(BaseModel):
         has_updatable_data = {
             item: value
             for item, value in data.items()
-            if item != "id" and item in cls.model_fields and value is not None
+            if item in cls.model_fields and value is not None
         }
 
         if not has_updatable_data:
