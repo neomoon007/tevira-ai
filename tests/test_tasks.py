@@ -232,20 +232,17 @@ def test_update_tasks_raises_422_for_missing_updatable_fields(temp_tasks, client
 
 
 def test_taskupdate_accepts_valid_input():
-    input = {"id": "task_1", "title": "my little task", "status": None}
+    input = {"title": "my little task", "status": None}
 
     object = TaskUpdate(**input)
 
-    assert object.id == "task_1"
     assert object.title == "my little task"
     assert object.status is None
 
 
-def test_taskupdate_raises_error_for_missing_id():
-    input = {"title": "my little task", "status": None}
-
+def test_taskupdate_raises_error_for_empty_call():
     with pytest.raises(ValidationError):
-        TaskUpdate(**input)
+        TaskUpdate()
 
 
 def test_delete_task_returns_204(temp_tasks, client):

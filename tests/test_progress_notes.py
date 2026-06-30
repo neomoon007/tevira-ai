@@ -51,3 +51,36 @@ def test_create_progress_note_accepts_valid_note_object(client):
     assert data["blockers"] == ["Nothing"]
     assert data["confidence"] == "high"
     progress_notes_in_memory.clear()
+
+
+def test_get_progress_note_returns_given_note(client, temp_notes):
+    note_id = "note_1"
+
+    response = client.get(f"/progress-notes/{note_id}")
+
+    assert response.status_code == 200
+
+
+def test_patch_note_router_returns_accepts_valid_input(client, temp_notes):
+    note_id = "note_1"
+
+    response = client.patch(
+        f"/progress-notes/{note_id}",
+        json={"current_state": "new current state"},
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["current_state"] == "new current state"
+    progress_notes_in_memory.clear()
+
+
+# teset for delete note
+def test_delete_note_returns_204_for_existing_note_id(client, temp_notes):
+    note_id = "note_1"
+
+    response = client.delete(f"/progress-notes/{note_id}")
+
+    assert response.status_code == 204
+    progress_notes_in_memory.clear()
