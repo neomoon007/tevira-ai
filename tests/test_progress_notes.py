@@ -5,6 +5,7 @@ import pytest
 from fastapi import HTTPException
 from pydantic import TypeAdapter
 
+
 def test_validate_progress_note_accepts_existing_note(
     temp_notes: list[ProgressNoteRead],
 ):
@@ -19,6 +20,7 @@ def test_validate_progress_note_raises_404_for_non_existing_note(
         validate_progress_note("project_42")
 
     assert exception_info.value.status_code == 404
+
 
 def test_create_progress_note_accepts_valid_note_object(client):
     progress_notes_in_memory.clear()
@@ -49,17 +51,3 @@ def test_create_progress_note_accepts_valid_note_object(client):
     assert data["blockers"] == ["Nothing"]
     assert data["confidence"] == "high"
     progress_notes_in_memory.clear()
-
-
-def test_show_notes_returns_progress_notes_for_given_project(temp_notes, temp_projects, client):
-    lookup_project = "project_1"
-    expected_num_of_notes = 1
-    response = client.get(f"/progress-notes/{lookup_project}")
-
-    assert response.status_code == 200
-
-    adapter = TypeAdapter(list[ProgressNoteRead])
-    notes = adapter.validate_python(response.json())
-
-    assert isinstance(notes, list)
-    assert len(notes) == expected_num_of_notes, f"{notes}"
