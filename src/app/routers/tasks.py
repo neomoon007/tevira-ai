@@ -1,12 +1,7 @@
 from src.app.state.memory import tasks_in_memory, task_id_number
 from src.app.validator import validate_project_id, get_project_tasks, get_task_by_id
 from fastapi import APIRouter
-from src.app.schemas import (
-    TaskCreate,
-    TaskRead,
-    TaskUpdate,
-    NonEmptyString
-)
+from src.app.schemas import TaskCreate, TaskRead, TaskUpdate, NonEmptyString
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 

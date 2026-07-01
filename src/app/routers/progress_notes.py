@@ -59,6 +59,7 @@ def update_note(note_id: str, updated_note: ProgressNoteUpdate) -> ProgressNoteR
 
     return ProgressNoteRead(**merged_note)
 
+
 @router.delete("/{note_id}", status_code=204)
 def delete_task(note_id: str):
     # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
