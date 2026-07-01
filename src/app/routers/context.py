@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter
-from src.app.validator import (
+from app.utils import (
     validate_progress_note,
     validate_project_id,
     get_project_tasks,

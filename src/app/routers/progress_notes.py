@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
 from src.app.state.memory import progress_notes_in_memory, progress_notes_id_number
-from src.app.validator import validate_project_id, get_note_by_id
+from app.utils import validate_project_id, get_note_by_id
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/progress-notes", tags=["Progress Notes"])

@@ -1,4 +1,4 @@
-from src.app.validator import validate_project_id
+from app.utils import validate_project_id
 from src.app.state.memory import projects_in_memory
 import pytest
 from fastapi import HTTPException

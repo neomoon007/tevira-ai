@@ -1,9 +1,8 @@
 from src.app.schemas import ProgressNoteRead
-from src.app.validator import validate_progress_note
+from app.utils import validate_progress_note
 from src.app.state.memory import progress_notes_in_memory
 import pytest
 from fastapi import HTTPException
-from pydantic import TypeAdapter
 
 
 def test_validate_progress_note_accepts_existing_note(
