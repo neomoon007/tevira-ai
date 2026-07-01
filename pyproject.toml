@@ -3,3 +3,6 @@ pythonpath = ["."]
 
 [project]
 requires-python=">=3.9"
+
+[tool.pyright]
+extraPaths = ["./"]
