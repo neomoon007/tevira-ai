@@ -1,5 +1,5 @@
 from src.app.schemas import TaskRead, TaskUpdate
-from app.utils import get_project_tasks, get_task_by_id
+from src.app.utils import get_project_tasks, get_task_by_id
 from src.app.state.memory import tasks_in_memory
 from pydantic import TypeAdapter, ValidationError
 from datetime import date
