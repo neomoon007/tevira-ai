@@ -102,5 +102,5 @@ class ContextRead(BaseModel):
     current_state: str | None = None
     open_tasks: list[TaskRead] | None = None
     open_loops: list[str] | None = None
-    next_actions: str | None = None
+    next_actions: TaskRead | str | None = None
     important_context: str | None = None

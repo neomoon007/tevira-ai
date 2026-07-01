@@ -63,3 +63,20 @@ def get_note_by_id(note_id: str, database: list | None = None) -> ProgressNoteRe
             detail=f"Error 404: Note '{note_id}' does not exist.",
         )
     return matching_note
+
+
+def get_important_task(project_id: str) -> TaskRead | str:
+    tasks_db = get_project_tasks(project_id)
+    priority_list = ["high", "medium", "low"]
+    recommended_task: TaskRead | None = None
+
+    for p in priority_list:
+        recommended_task = next(
+            (task for task in tasks_db if task.priority == p and task.status == "open"),
+            None,
+        )
+
+        if recommended_task is not None:
+            return recommended_task
+
+    return "No open next action found."
