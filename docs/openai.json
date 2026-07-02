@@ -446,6 +446,7 @@
             "required": false,
             "schema": {
               "type": "string",
+              "default": "",
               "title": "Project Id"
             }
           }
@@ -644,6 +645,47 @@
           }
         }
       }
+    },
+    "/capture/text": {
+      "post": {
+        "tags": [
+          "Capture"
+        ],
+        "summary": "Capture Mess",
+        "operationId": "capture_mess_capture_text_post",
+        "parameters": [
+          {
+            "name": "input",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "title": "Input"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -701,6 +743,9 @@
           },
           "next_actions": {
             "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskRead"
+              },
               {
                 "type": "string"
               },
