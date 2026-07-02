@@ -78,7 +78,7 @@ def test_create_task_accepts_valid_task_object(client):
 def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(
     client, temp_tasks
 ):
-    expected_num_of_tasks = 4
+    expected_num_of_tasks = 5
     response = client.get("/tasks")
     assert response.status_code == 200
 

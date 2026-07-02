@@ -22,6 +22,7 @@ def temp_projects():
     projects_in_memory["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
     projects_in_memory["project_3"] = ProjectRead(name="Tech", id="project_3")
     projects_in_memory["project_4"] = ProjectRead(name="foo", id="project_4")
+    projects_in_memory["project_5"] = ProjectRead(name="Home", id="project_5")
 
     yield projects_in_memory
     projects_in_memory.clear()
@@ -75,6 +76,17 @@ def temp_notes():
                 id="note_4",
                 updated_at=datetime.now(timezone.utc),
             ),
+            ProgressNoteRead(
+                project_id="project_5",
+                current_state="Home",
+                last_session="Home",
+                open_loops=["not finished", "WIP", "TBA"],
+                next_actions=None,
+                important_context="One step at a time",
+                blockers=["No blockers"],
+                id="note_5",
+                updated_at=datetime.now(timezone.utc),
+            ),
         ]
     )
 
@@ -117,6 +129,14 @@ def temp_tasks():
                 project_id="project_2",
                 id="task_4",
                 status="done",
+            ),
+            TaskRead(
+                title="This is the way",
+                priority="high",
+                due_date=date.today(),
+                project_id="project_5",
+                id="task_5",
+                status="open",
             ),
         ]
     )
