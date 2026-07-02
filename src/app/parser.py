@@ -5,6 +5,7 @@
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
+from src.app.schemas import ParseNoteRead
 from dotenv import load_dotenv
 import os
 
@@ -31,9 +32,9 @@ def parse_note(mind_dump_note: str, projects: dict):
 
     project_hint = find_project(projects, title)
 
-    return {
-        "title": title,
-        "project_hint": project_hint,
-        "due_date_hint": due_date,
-        "next_action_hint": next_action,
-    }
+    return ParseNoteRead(
+        title=title,
+        project_hint=project_hint,
+        due_date_hint=due_date,
+        next_action_hint=next_action,
+    )

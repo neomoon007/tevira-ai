@@ -104,3 +104,23 @@ class ContextRead(BaseModel):
     open_loops: list[str] | None = None
     next_actions: TaskRead | str | None = None
     important_context: str | None = None
+
+
+# --- PARSER ---
+class ParseNoteRead(BaseModel):
+    title: NonEmptyString
+    project_hint: NonEmptyString
+    due_date_hint: NonEmptyString
+    next_action_hint: NonEmptyString
+
+
+class ProposedAction(BaseModel):
+    type: Literal["create_task", "create_progress_note"]
+    title: NonEmptyString
+
+
+# --- CAPTURE ---
+class CaptureRead(BaseModel):
+    raw_text: NonEmptyString
+    parsed: ParseNoteRead
+    proposed_actions: list[ProposedAction]

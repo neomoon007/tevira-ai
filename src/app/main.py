@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from src.app.routers import health, projects, progress_notes, context, tasks
+from src.app.routers import health, projects, progress_notes, context, tasks, capture
 
 app = FastAPI(title="Tevira-AI")
 
