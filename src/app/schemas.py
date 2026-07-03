@@ -113,11 +113,16 @@ class ParseNoteRead(BaseModel):
     due_date_hint: NonEmptyString
     next_action_hint: NonEmptyString
 
+class CreateTaskProposal(BaseModel):
+    title: NonEmptyString
+    due_date_hint: NonEmptyString
+
+class CreateProgressNoteProposal(BaseModel):
+    next_action: NonEmptyString
 
 class ProposedAction(BaseModel):
     type: Literal["create_task", "create_progress_note"]
-    title: NonEmptyString
-
+    data: CreateTaskProposal | CreateProgressNoteProposal
 
 # --- CAPTURE ---
 class CaptureRead(BaseModel):

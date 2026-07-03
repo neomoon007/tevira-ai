@@ -3,7 +3,8 @@ from src.app.state.memory import (
     tasks_in_memory,
     progress_notes_in_memory,
 )
-from src.app.schemas import TaskRead, ProgressNoteRead
+from src.app.schemas import TaskRead, ProgressNoteRead, CaptureRead, CreateProgressNoteProposal, CreateTaskProposal, ProposedAction
+from src.app.parser import parse_note
 from fastapi import HTTPException
 
 
@@ -80,3 +81,26 @@ def get_important_task(project_id: str) -> TaskRead | str:
             return recommended_task
 
     return "No open next action found."
+
+def capture_from_text(raw_input) -> CaptureRead:
+    parsed_input = parse_note(raw_input, projects_in_memory)
+
+    return CaptureRead(
+        raw_text=raw_input,
+        parsed=parsed_input,
+        proposed_actions=[
+            ProposedAction(
+                type="create_task",
+                data=CreateTaskProposal(
+                    title=parsed_input.title,
+                    due_date_hint=parsed_input.due_date_hint
+                    )
+            ),
+            ProposedAction(
+                type="create_progress_note",
+                data=CreateProgressNoteProposal(
+                    next_action=parsed_input.next_action_hint
+                    )
+                ),
+        ],
+    )

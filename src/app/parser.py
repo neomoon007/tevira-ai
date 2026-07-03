@@ -30,6 +30,8 @@ def parse_note(mind_dump_note: str, projects: dict):
     raw_title, next_action = mind_dump_note.split(next_action_marker)
     title, due_date = raw_title.split(due_date_marker)
 
+    title = title[8:] # extrart the "Need to" placeholder
+
     project_hint = find_project(projects, title)
 
     return ParseNoteRead(
