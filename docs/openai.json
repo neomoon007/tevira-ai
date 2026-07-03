@@ -10,8 +10,8 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Create Task",
-        "operationId": "create_task_tasks_post",
+        "summary": "Create Task Endpoint",
+        "operationId": "create_task_endpoint_tasks_post",
         "requestBody": {
           "required": true,
           "content": {
@@ -49,15 +49,22 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Show Tasks",
-        "operationId": "show_tasks_tasks_get",
+        "summary": "Show Tasks Endpoint",
+        "operationId": "show_tasks_endpoint_tasks_get",
         "parameters": [
           {
             "name": "project_id",
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Project Id"
             }
           },
@@ -66,7 +73,14 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "title": "Task Id"
             }
           }
@@ -81,7 +95,7 @@
                   "items": {
                     "$ref": "#/components/schemas/TaskRead"
                   },
-                  "title": "Response Show Tasks Tasks Get"
+                  "title": "Response Show Tasks Endpoint Tasks Get"
                 }
               }
             }
@@ -104,8 +118,8 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Update Task",
-        "operationId": "update_task_tasks__task_id__patch",
+        "summary": "Update Task Endpoint",
+        "operationId": "update_task_endpoint_tasks__task_id__patch",
         "parameters": [
           {
             "name": "task_id",
@@ -155,8 +169,8 @@
         "tags": [
           "Tasks"
         ],
-        "summary": "Delete Task",
-        "operationId": "delete_task_tasks__task_id__delete",
+        "summary": "Delete Task Endpoint",
+        "operationId": "delete_task_endpoint_tasks__task_id__delete",
         "parameters": [
           {
             "name": "task_id",
@@ -190,8 +204,8 @@
         "tags": [
           "Health"
         ],
-        "summary": "Check Health",
-        "operationId": "check_health_health_get",
+        "summary": "Check Health Endpoint",
+        "operationId": "check_health_endpoint_health_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -209,8 +223,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "List Projects",
-        "operationId": "list_projects_projects_get",
+        "summary": "List Projects Endpoint",
+        "operationId": "list_projects_endpoint_projects_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -221,7 +235,7 @@
                     "$ref": "#/components/schemas/ProjectRead"
                   },
                   "type": "array",
-                  "title": "Response List Projects Projects Get"
+                  "title": "Response List Projects Endpoint Projects Get"
                 }
               }
             }
@@ -232,8 +246,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Create Project",
-        "operationId": "create_project_projects_post",
+        "summary": "Create Project Endpoint",
+        "operationId": "create_project_endpoint_projects_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -273,8 +287,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Show Project",
-        "operationId": "show_project_projects__project_id__get",
+        "summary": "Get Project Endpoint",
+        "operationId": "get_project_endpoint_projects__project_id__get",
         "parameters": [
           {
             "name": "project_id",
@@ -313,8 +327,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Rename Project",
-        "operationId": "rename_project_projects__project_id__patch",
+        "summary": "Rename Project Endpoint",
+        "operationId": "rename_project_endpoint_projects__project_id__patch",
         "parameters": [
           {
             "name": "project_id",
@@ -363,8 +377,8 @@
         "tags": [
           "Projects"
         ],
-        "summary": "Delete Task",
-        "operationId": "delete_task_projects__project_id__delete",
+        "summary": "Delete Project Endpoint",
+        "operationId": "delete_project_endpoint_projects__project_id__delete",
         "parameters": [
           {
             "name": "project_id",
@@ -398,8 +412,8 @@
         "tags": [
           "Progress Notes"
         ],
-        "summary": "Create Progress Note",
-        "operationId": "create_progress_note_progress_notes_post",
+        "summary": "Create Progress Note Endpoint",
+        "operationId": "create_progress_note_endpoint_progress_notes_post",
         "requestBody": {
           "required": true,
           "content": {
@@ -437,8 +451,8 @@
         "tags": [
           "Progress Notes"
         ],
-        "summary": "Show Notes",
-        "operationId": "show_notes_progress_notes_get",
+        "summary": "Get Progress Notes Endpoint",
+        "operationId": "get_progress_notes_endpoint_progress_notes_get",
         "parameters": [
           {
             "name": "project_id",
@@ -461,7 +475,7 @@
                   "items": {
                     "$ref": "#/components/schemas/ProgressNoteRead"
                   },
-                  "title": "Response Show Notes Progress Notes Get"
+                  "title": "Response Get Progress Notes Endpoint Progress Notes Get"
                 }
               }
             }
@@ -484,8 +498,8 @@
         "tags": [
           "Progress Notes"
         ],
-        "summary": "Get Note",
-        "operationId": "get_note_progress_notes__note_id__get",
+        "summary": "Get Progress Note By Id Endpoint",
+        "operationId": "get_progress_note_by_id_endpoint_progress_notes__note_id__get",
         "parameters": [
           {
             "name": "note_id",
@@ -524,8 +538,8 @@
         "tags": [
           "Progress Notes"
         ],
-        "summary": "Update Note",
-        "operationId": "update_note_progress_notes__note_id__patch",
+        "summary": "Update Progress Note Endpoint",
+        "operationId": "update_progress_note_endpoint_progress_notes__note_id__patch",
         "parameters": [
           {
             "name": "note_id",
@@ -574,8 +588,8 @@
         "tags": [
           "Progress Notes"
         ],
-        "summary": "Delete Task",
-        "operationId": "delete_task_progress_notes__note_id__delete",
+        "summary": "Delete Progress Note Endpoint",
+        "operationId": "delete_progress_note_endpoint_progress_notes__note_id__delete",
         "parameters": [
           {
             "name": "note_id",
@@ -609,8 +623,8 @@
         "tags": [
           "Context"
         ],
-        "summary": "Restore Context",
-        "operationId": "restore_context_context__project_id__get",
+        "summary": "Restore Context Endpoint",
+        "operationId": "restore_context_endpoint_context__project_id__get",
         "parameters": [
           {
             "name": "project_id",
@@ -651,8 +665,8 @@
         "tags": [
           "Capture"
         ],
-        "summary": "Capture Mess",
-        "operationId": "capture_mess_capture_text_post",
+        "summary": "Capture From Text Endpoint",
+        "operationId": "capture_from_text_endpoint_capture_text_post",
         "parameters": [
           {
             "name": "input",
@@ -670,7 +684,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CaptureRead"
+                }
               }
             }
           },
@@ -690,6 +706,32 @@
   },
   "components": {
     "schemas": {
+      "CaptureRead": {
+        "properties": {
+          "raw_text": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Raw Text"
+          },
+          "parsed": {
+            "$ref": "#/components/schemas/ParseNoteRead"
+          },
+          "proposed_actions": {
+            "items": {
+              "$ref": "#/components/schemas/ProposedAction"
+            },
+            "type": "array",
+            "title": "Proposed Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "raw_text",
+          "parsed",
+          "proposed_actions"
+        ],
+        "title": "CaptureRead"
+      },
       "ContextRead": {
         "properties": {
           "project": {
@@ -770,6 +812,40 @@
         "type": "object",
         "title": "ContextRead"
       },
+      "CreateProgressNoteProposal": {
+        "properties": {
+          "next_action": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Next Action"
+          }
+        },
+        "type": "object",
+        "required": [
+          "next_action"
+        ],
+        "title": "CreateProgressNoteProposal"
+      },
+      "CreateTaskProposal": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "due_date_hint": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Due Date Hint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "due_date_hint"
+        ],
+        "title": "CreateTaskProposal"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -782,6 +858,38 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "ParseNoteRead": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "project_hint": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Project Hint"
+          },
+          "due_date_hint": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Due Date Hint"
+          },
+          "next_action_hint": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Next Action Hint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "project_hint",
+          "due_date_hint",
+          "next_action_hint"
+        ],
+        "title": "ParseNoteRead"
       },
       "ProgressNoteCreate": {
         "properties": {
@@ -1091,6 +1199,35 @@
           "id"
         ],
         "title": "ProjectRead"
+      },
+      "ProposedAction": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "create_task",
+              "create_progress_note"
+            ],
+            "title": "Type"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CreateTaskProposal"
+              },
+              {
+                "$ref": "#/components/schemas/CreateProgressNoteProposal"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "data"
+        ],
+        "title": "ProposedAction"
       },
       "TaskCreate": {
         "properties": {
