@@ -1,5 +1,5 @@
 from src.app.state.memory import tasks_in_memory, task_id_number
-from src.app.utils import validate_project_id, get_project_tasks, get_task_by_id
+from src.app.utils import get_project, get_project_tasks, get_task_by_id
 from fastapi import APIRouter
 from src.app.schemas import TaskCreate, TaskRead, TaskUpdate, NonEmptyString
 
@@ -31,14 +31,14 @@ def show_tasks(project_id: str = None, task_id: str = None) -> list[TaskRead]:  
         return tasks_in_memory
 
     if project_id is not None and task_id is None:
-        validate_project_id(project_id)
+        get_project(project_id)
         return get_project_tasks(project_id)
 
     if project_id is None and task_id is not None:
         return [get_task_by_id(task_id)]
 
     if project_id is not None and task_id is not None:
-        validate_project_id(project_id)
+        get_project(project_id)
         project_tasks = get_project_tasks(project_id)
         return [get_task_by_id(task_id, project_tasks)]
 
