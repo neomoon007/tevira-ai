@@ -1,6 +1,6 @@
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
 from src.app.state.memory import progress_notes_id_number, progress_notes_in_memory
-from src.app.utils import get_project
+from src.app.services.projects import get_project
 from fastapi import HTTPException
 from datetime import datetime, timezone
 

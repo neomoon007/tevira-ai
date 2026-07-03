@@ -1,5 +1,5 @@
 from src.app.state.memory import projects_in_memory, progress_notes_in_memory
-from src.app.utils import get_important_task, get_project_tasks
+from src.app.services.tasks import get_important_task, get_project_tasks
 from src.app.schemas import ContextRead, NonEmptyString
 from operator import attrgetter
 from fastapi import HTTPException

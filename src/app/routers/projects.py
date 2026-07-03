@@ -24,15 +24,15 @@ def list_projects_endpoint() -> list[ProjectRead]:
 
 
 @router.get("/{project_id}")
-def get_project_endpoint(project_id: str = Depends(get_project)) -> ProjectRead:
-    return get_project_by_id(project_id)
+def get_project_endpoint(project: ProjectRead = Depends(get_project)) -> ProjectRead:
+    return get_project_by_id(project.id)
 
 @router.patch("/{project_id}")
 def rename_project_endpoint(
-    new_title: ProjectCreate, project_id: str = Depends(get_project)
+    new_title: ProjectCreate, project_id: ProjectRead = Depends(get_project)
 ) -> ProjectRead:
-    return rename_project(new_title, project_id)
+    return rename_project(new_title, project_id.id)
 
 @router.delete("/{project_id}", status_code=204)
-def delete_project_endpoint(project_id: str = Depends(get_project)) -> None:
-    delete_project(project_id)
+def delete_project_endpoint(project_id: ProjectRead = Depends(get_project)) -> None:
+    delete_project(project_id.id)
