@@ -7,12 +7,12 @@ from src.app.state.memory import (
     progress_notes_in_memory,
 )
 from src.app.schemas import ProjectRead, ProgressNoteRead, TaskRead
-from datetime import datetime, timezone, date
+from datetime import date, timezone, datetime
 
 
 @pytest.fixture
 def client():
-    return TestClient(app)  # create instance
+    return TestClient(app)
 
 
 # TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
