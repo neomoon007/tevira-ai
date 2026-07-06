@@ -7,7 +7,7 @@ def test_parse_note_accepts_valid_input(temp_projects):
     )
     response = parse_note(messy_note, temp_projects)
 
-    assert response.title == "Need to finish the README for SAT"
+    assert response.title == "finish the README for SAT"
     assert response.project_hint == "SAT"
     assert response.due_date_hint == "Friday."
     assert response.next_action_hint == "add setup commands"

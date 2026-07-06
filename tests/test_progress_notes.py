@@ -1,5 +1,5 @@
 from src.app.schemas import ProgressNoteRead
-from src.app.utils import validate_progress_note
+from src.app.services.context import validate_progress_note
 from src.app.state.memory import progress_notes_in_memory
 import pytest
 from fastapi import HTTPException

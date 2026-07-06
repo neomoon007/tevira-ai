@@ -1,6 +1,7 @@
 from datetime import date
-from src.app.utils import get_important_task
+from src.app.services.tasks import get_important_task
 from src.app.state.memory import tasks_in_memory
+
 
 def test_restore_context_accepts_valid_project_with_existing_note(
     temp_notes, temp_projects, temp_tasks, client
@@ -54,12 +55,16 @@ def test_restore_context_raises_404_for_missing_progress_note(
 
     assert response.status_code == 404
 
+
 def test_get_important_task_returns_highest_priority_task(temp_projects, temp_tasks):
     project_id = "project_1"
     response = get_important_task(project_id)
     assert response == tasks_in_memory[0]
 
-def test_restore_context_returns_task_when_missing_next_action(temp_notes, temp_projects, temp_tasks, client):
+
+def test_restore_context_returns_task_when_missing_next_action(
+    temp_notes, temp_projects, temp_tasks, client
+):
     project_id = "project_5"
     response = client.get(f"/context/{project_id}")
 
@@ -68,10 +73,10 @@ def test_restore_context_returns_task_when_missing_next_action(temp_notes, temp_
     data = response.json()
 
     assert data["next_actions"] == {
-            "title": "This is the way",
-            "priority": "high",
-            "due_date": str(date.today()),
-            "project_id": "project_5",
-            "id": "task_5",
-            "status": "open",
-        }
+        "title": "This is the way",
+        "priority": "high",
+        "due_date": str(date.today()),
+        "project_id": "project_5",
+        "id": "task_5",
+        "status": "open",
+    }

@@ -1,4 +1,4 @@
-from src.app.utils import get_project
+from src.app.services.projects import get_project
 from src.app.state.memory import projects_in_memory
 import pytest
 from fastapi import HTTPException
@@ -7,7 +7,7 @@ from fastapi import HTTPException
 def test_validate_project_id_accepts_existing_id(temp_projects: dict):
     response = get_project("project_1")
 
-    assert response == "project_1"
+    assert response.id == "project_1"
     assert "project_1" in temp_projects
 
 
