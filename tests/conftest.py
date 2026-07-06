@@ -16,6 +16,8 @@ def client():
 
 
 # TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
+
+
 @pytest.fixture
 def temp_projects():
     projects_in_memory["project_1"] = ProjectRead(name="SAT", id="project_1")
