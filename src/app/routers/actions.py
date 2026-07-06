@@ -1,0 +1,14 @@
+from fastapi import APIRouter
+from src.app.schemas import (
+    ProposedAction,
+    ApplyActionResponse,
+)
+from src.app.services.actions import apply_action
+# from src.app.services.actions
+
+router = APIRouter(prefix="/actions", tags=["Actions"])
+
+
+@router.post("/apply")
+def apply_action_endpoint(action: ProposedAction) -> ApplyActionResponse:
+    return apply_action(action)

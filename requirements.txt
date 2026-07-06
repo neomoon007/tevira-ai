@@ -3,7 +3,7 @@ annotated-types==0.7.0
 anyio==4.13.0
 certifi==2026.5.20
 click==8.4.1
-dotenv==0.9.9
+dateparser==1.4.1
 fastapi==0.136.3
 h11==0.16.0
 httpcore==1.0.9
@@ -18,9 +18,15 @@ pydantic==2.13.4
 pydantic_core==2.46.4
 Pygments==2.20.0
 pytest==9.0.3
+python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
+pytz==2026.2
+regex==2026.6.28
+six==1.17.0
 starlette==1.2.1
 truststore==0.10.4
 typing-inspection==0.4.2
 typing_extensions==4.15.0
+tzlocal==5.4.4
 uvicorn==0.48.0
+vermin==1.8.0
