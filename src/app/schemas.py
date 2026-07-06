@@ -54,8 +54,8 @@ class ProjectRead(ProjectCreate):
 # --- PROGRESS NOTES ---
 class ProgressNoteCreate(BaseModel):
     project_id: str
-    current_state: NonEmptyString
-    last_session: NonEmptyString
+    current_state: NonEmptyString | None = None
+    last_session: NonEmptyString | None = None
     open_loops: list[str] = []
     next_actions: str | None = None
     important_context: str | None = None
@@ -120,12 +120,20 @@ class CreateTaskProposal(BaseModel):
 
 
 class CreateProgressNoteProposal(BaseModel):
-    next_action: NonEmptyString
+    next_action: str | None = None
 
 
-class ProposedAction(BaseModel):
-    type: Literal["create_task", "create_progress_note"]
-    data: CreateTaskProposal | CreateProgressNoteProposal
+class CreateTaskAction(BaseModel):
+    type: Literal["create_task"]
+    data: CreateTaskProposal
+
+
+class CreateProgressNoteAction(BaseModel):
+    type: Literal["create_progress_note"]
+    data: CreateProgressNoteProposal
+
+
+ProposedAction = CreateTaskAction | CreateProgressNoteAction
 
 
 # --- CAPTURE ---

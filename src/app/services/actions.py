@@ -1,20 +1,46 @@
 from src.app.schemas import (
+    TaskCreate,
+    ProgressNoteCreate,
+    CreateTaskProposal,
+    CreateProgressNoteProposal,
+    CreateTaskAction,
+    CreateProgressNoteAction,
     ProposedAction,
     ApplyActionResponse,
-    CreateTaskProposal,
-    TaskRead,
 )
+from src.app.services.tasks import create_task
+from src.app.services.progress_notes import create_progress_note
 
 
 def apply_action(action: ProposedAction) -> ApplyActionResponse:
-    return ApplyActionResponse(
-        status="applied",
-        action=ProposedAction(
-            type="create_task",
-            data=CreateTaskProposal(
-                title="My first task",
-                due_date_hint="Friday",
+    if action.type == "create_task":
+        # due_date = due_date_parser(action.data.due_date_hint)
+        task = create_task(TaskCreate(title=action.data.title))
+
+        return ApplyActionResponse(
+            status="applied",
+            action=CreateTaskAction(
+                type="create_task",
+                data=CreateTaskProposal(
+                    title=task.title, due_date_hint=action.data.due_date_hint
+                ),
             ),
-        ),
-        result=TaskRead(id="task_1", title="My first task"),
-    )
+            result=task,
+        )
+
+    elif action.type == "create_progress_note":
+        project_id = "project_1"  # Project 1 should always be the Inbox
+        note = create_progress_note(
+            ProgressNoteCreate(
+                project_id=project_id, next_actions=action.data.next_action
+            )
+        )
+
+        return ApplyActionResponse(
+            status="applied",
+            action=CreateProgressNoteAction(
+                type="create_progress_note",
+                data=CreateProgressNoteProposal(next_action=note.next_actions),
+            ),
+            result=note,
+        )
