@@ -14,10 +14,9 @@ from src.app.services.date_parser import parse_date
 
 
 def apply_action(action: ProposedAction) -> ApplyActionResponse:
-    project_id = "project_1"
-
     if action.type == "create_task":
         due_date = parse_date(action.data.due_date_hint)
+        project_id = action.data.project_hint
 
         task = create_task(
             TaskCreate(
@@ -30,7 +29,9 @@ def apply_action(action: ProposedAction) -> ApplyActionResponse:
             action=CreateTaskAction(
                 type="create_task",
                 data=CreateTaskProposal(
-                    title=task.title, due_date_hint=action.data.due_date_hint
+                    title=task.title,
+                    due_date_hint=action.data.due_date_hint,
+                    project_hint=project_id,
                 ),
             ),
             result=task,

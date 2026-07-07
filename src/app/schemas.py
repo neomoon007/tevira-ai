@@ -117,6 +117,7 @@ class ParseNoteRead(BaseModel):
 class CreateTaskProposal(BaseModel):
     title: NonEmptyString
     due_date_hint: NonEmptyString
+    project_hint: NonEmptyString
 
 
 class CreateProgressNoteProposal(BaseModel):

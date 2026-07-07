@@ -702,10 +702,97 @@
           }
         }
       }
+    },
+    "/actions/apply": {
+      "post": {
+        "tags": [
+          "Actions"
+        ],
+        "summary": "Apply Action Endpoint",
+        "operationId": "apply_action_endpoint_actions_apply_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CreateTaskAction"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CreateProgressNoteAction"
+                  }
+                ],
+                "title": "Action"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplyActionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ApplyActionResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "applied",
+            "title": "Status"
+          },
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CreateTaskAction"
+              },
+              {
+                "$ref": "#/components/schemas/CreateProgressNoteAction"
+              }
+            ],
+            "title": "Action"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TaskRead"
+              },
+              {
+                "$ref": "#/components/schemas/ProgressNoteRead"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "action",
+          "result"
+        ],
+        "title": "ApplyActionResponse"
+      },
       "CaptureRead": {
         "properties": {
           "raw_text": {
@@ -718,7 +805,14 @@
           },
           "proposed_actions": {
             "items": {
-              "$ref": "#/components/schemas/ProposedAction"
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CreateTaskAction"
+                },
+                {
+                  "$ref": "#/components/schemas/CreateProgressNoteAction"
+                }
+              ]
             },
             "type": "array",
             "title": "Proposed Actions"
@@ -812,19 +906,58 @@
         "type": "object",
         "title": "ContextRead"
       },
-      "CreateProgressNoteProposal": {
+      "CreateProgressNoteAction": {
         "properties": {
-          "next_action": {
+          "type": {
             "type": "string",
-            "minLength": 1,
-            "title": "Next Action"
+            "const": "create_progress_note",
+            "title": "Type"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateProgressNoteProposal"
           }
         },
         "type": "object",
         "required": [
-          "next_action"
+          "type",
+          "data"
         ],
+        "title": "CreateProgressNoteAction"
+      },
+      "CreateProgressNoteProposal": {
+        "properties": {
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          }
+        },
+        "type": "object",
         "title": "CreateProgressNoteProposal"
+      },
+      "CreateTaskAction": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "const": "create_task",
+            "title": "Type"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CreateTaskProposal"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "data"
+        ],
+        "title": "CreateTaskAction"
       },
       "CreateTaskProposal": {
         "properties": {
@@ -837,12 +970,18 @@
             "type": "string",
             "minLength": 1,
             "title": "Due Date Hint"
+          },
+          "project_hint": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Project Hint"
           }
         },
         "type": "object",
         "required": [
           "title",
-          "due_date_hint"
+          "due_date_hint",
+          "project_hint"
         ],
         "title": "CreateTaskProposal"
       },
@@ -898,13 +1037,27 @@
             "title": "Project Id"
           },
           "current_state": {
-            "type": "string",
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Current State"
           },
           "last_session": {
-            "type": "string",
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Last Session"
           },
           "open_loops": {
@@ -958,9 +1111,7 @@
         },
         "type": "object",
         "required": [
-          "project_id",
-          "current_state",
-          "last_session"
+          "project_id"
         ],
         "title": "ProgressNoteCreate"
       },
@@ -971,13 +1122,27 @@
             "title": "Project Id"
           },
           "current_state": {
-            "type": "string",
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Current State"
           },
           "last_session": {
-            "type": "string",
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Last Session"
           },
           "open_loops": {
@@ -1041,8 +1206,6 @@
         "type": "object",
         "required": [
           "project_id",
-          "current_state",
-          "last_session",
           "id",
           "updated_at"
         ],
@@ -1199,35 +1362,6 @@
           "id"
         ],
         "title": "ProjectRead"
-      },
-      "ProposedAction": {
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "create_task",
-              "create_progress_note"
-            ],
-            "title": "Type"
-          },
-          "data": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CreateTaskProposal"
-              },
-              {
-                "$ref": "#/components/schemas/CreateProgressNoteProposal"
-              }
-            ],
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "type",
-          "data"
-        ],
-        "title": "ProposedAction"
       },
       "TaskCreate": {
         "properties": {
