@@ -1,3 +1,6 @@
+from datetime import date
+
+
 def test_actions_accepts_valid_create_task_object(client):
     title = "finish tests for tevira-ai"
     due_date_hint = "today."
@@ -16,3 +19,8 @@ def test_actions_accepts_valid_create_task_object(client):
     )
 
     assert response.status_code == 201
+
+    data = response.json()
+
+    assert data["status"] == "applied"
+    assert data["result"]["due_date"] == date.today().strftime("%Y-%m-%d")
