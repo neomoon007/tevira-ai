@@ -1,21 +1,22 @@
 from fastapi.testclient import TestClient
-from src.app.main import app
 import pytest
 from src.app.state.memory import (
     projects_in_memory,
     tasks_in_memory,
     progress_notes_in_memory,
 )
+import src.app.state.memory as memory
 from src.app.schemas import ProjectRead, ProgressNoteRead, TaskRead
 from datetime import date, timezone, datetime
+
+# TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
 
 
 @pytest.fixture
 def client():
+    from src.app.main import app
+
     return TestClient(app)
-
-
-# TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
 
 
 @pytest.fixture
@@ -98,6 +99,10 @@ def temp_notes():
 
 @pytest.fixture
 def temp_tasks():
+    tasks_in_memory.clear()
+
+    memory.task_id_number = 0
+
     tasks_in_memory.extend(
         [
             TaskRead(
@@ -145,3 +150,4 @@ def temp_tasks():
 
     yield tasks_in_memory
     tasks_in_memory.clear()
+    memory.task_id_number = 0

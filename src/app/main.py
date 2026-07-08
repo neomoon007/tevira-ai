@@ -9,13 +9,19 @@ from src.app.routers import (
     actions,
 )
 
-app = FastAPI(title="Tevira-AI")
 
-# --- ROUTERS ---
-app.include_router(tasks.router)
-app.include_router(health.router)
-app.include_router(projects.router)
-app.include_router(progress_notes.router)
-app.include_router(context.router)
-app.include_router(capture.router)
-app.include_router(actions.router)
+def create_app():
+    app = FastAPI(title="Tevira-AI")
+
+    # --- ROUTERS ---
+    app.include_router(tasks.router)
+    app.include_router(health.router)
+    app.include_router(projects.router)
+    app.include_router(progress_notes.router)
+    app.include_router(context.router)
+    app.include_router(capture.router)
+    app.include_router(actions.router)
+    return app
+
+
+app = create_app()

@@ -1,6 +1,6 @@
 from src.app.schemas import TaskRead, TaskUpdate
 from src.app.services.tasks import get_project_tasks, get_task_by_id
-from src.app.state.memory import tasks_in_memory
+from src.app.state.memory import tasks_in_memory, task_id_number
 from pydantic import TypeAdapter, ValidationError
 from datetime import date
 from fastapi import HTTPException
@@ -49,8 +49,8 @@ def test_get_project_tasks_returns_empty_list_for_missing_project_tasks(temp_tas
     assert len(response) == expected_num_of_tasks
 
 
-def test_create_task_accepts_valid_task_object(client):
-    tasks_in_memory.clear()
+def test_create_task_accepts_valid_task_object(client, temp_tasks):
+    num_of_tasks_before = len(tasks_in_memory)
 
     response = client.post(
         "/tasks",
@@ -63,16 +63,16 @@ def test_create_task_accepts_valid_task_object(client):
     )
 
     assert response.status_code == 201
+    num_of_tasks_after = len(tasks_in_memory)
 
     data = response.json()
 
-    assert data["id"] == "task_1"
+    assert num_of_tasks_after == num_of_tasks_before + 1
     assert data["status"] == "open"
     assert data["title"] == "Tech, foo! This is my first task"
     assert data["priority"] == "high"
     assert data["due_date"] is None
     assert data["project_id"] is None
-    tasks_in_memory.clear()
 
 
 def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(

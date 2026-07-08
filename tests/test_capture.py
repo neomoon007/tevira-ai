@@ -9,6 +9,8 @@ def test_capture_accepts_valid_input(temp_projects, client):
         params={"input": f"Need to {task} before {due_date} Next, {next_action}"},
     )
 
+    assert response.status_code == 200
+
     data = response.json()
 
     assert data["proposed_actions"][0]["data"]["title"] == task
