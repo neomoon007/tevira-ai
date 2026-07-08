@@ -1,39 +1,21 @@
-from fastapi.testclient import TestClient
 import pytest
-from src.app.state.memory import (
-    projects_in_memory,
-    tasks_in_memory,
-    progress_notes_in_memory,
-)
 import src.app.state.memory as memory
 from src.app.schemas import ProjectRead, ProgressNoteRead, TaskRead
 from datetime import date, timezone, datetime
-
-# TODO: change from global variable to yield one dictionary that has ProjectRead objects in it
-
-
-@pytest.fixture
-def client():
-    from src.app.main import app
-
-    return TestClient(app)
+from fastapi.testclient import TestClient
+from src.app.main import app
 
 
-@pytest.fixture
-def temp_projects():  # TODO: change 'project_1' to be 'Inbox'
-    projects_in_memory["project_1"] = ProjectRead(name="SAT", id="project_1")
-    projects_in_memory["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
-    projects_in_memory["project_3"] = ProjectRead(name="Tech", id="project_3")
-    projects_in_memory["project_4"] = ProjectRead(name="foo", id="project_4")
-    projects_in_memory["project_5"] = ProjectRead(name="Home", id="project_5")
+@pytest.fixture(autouse=True)
+def reset_state():
+    memory.progress_notes_id_number = 0
+    memory.progress_notes_in_memory.clear()
+    memory.project_id_number = 0
+    memory.projects_in_memory.clear()
+    memory.task_id_number = 0
+    memory.tasks_in_memory.clear()
 
-    yield projects_in_memory
-    projects_in_memory.clear()
-
-
-@pytest.fixture
-def temp_notes():
-    progress_notes_in_memory.extend(
+    memory.progress_notes_in_memory.extend(
         [
             ProgressNoteRead(
                 project_id="project_1",
@@ -93,17 +75,15 @@ def temp_notes():
         ]
     )
 
-    yield progress_notes_in_memory
-    progress_notes_in_memory.clear()
+    memory.projects_in_memory["project_1"] = ProjectRead(name="SAT", id="project_1")
+    memory.projects_in_memory["project_2"] = ProjectRead(
+        name="Tevira-AI", id="project_2"
+    )
+    memory.projects_in_memory["project_3"] = ProjectRead(name="Tech", id="project_3")
+    memory.projects_in_memory["project_4"] = ProjectRead(name="foo", id="project_4")
+    memory.projects_in_memory["project_5"] = ProjectRead(name="Home", id="project_5")
 
-
-@pytest.fixture
-def temp_tasks():
-    tasks_in_memory.clear()
-
-    memory.task_id_number = 0
-
-    tasks_in_memory.extend(
+    memory.tasks_in_memory.extend(
         [
             TaskRead(
                 title="Hello World!",
@@ -147,7 +127,9 @@ def temp_tasks():
             ),
         ]
     )
+    yield
 
-    yield tasks_in_memory
-    tasks_in_memory.clear()
-    memory.task_id_number = 0
+
+@pytest.fixture(scope="session")
+def client():
+    return TestClient(app)

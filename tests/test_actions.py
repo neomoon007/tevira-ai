@@ -1,4 +1,4 @@
-def test_actions_accepts_valid_create_task_object(client, temp_tasks):
+def test_actions_accepts_valid_create_task_object(client):
     title = "finish tests for tevira-ai"
     due_date_hint = "today."
     project_id_hint = "project_2"

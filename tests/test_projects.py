@@ -4,30 +4,28 @@ import pytest
 from fastapi import HTTPException
 
 
-def test_validate_project_id_accepts_existing_id(temp_projects: dict):
+def test_validate_project_id_accepts_existing_id():
     response = get_project("project_1")
 
     assert response.id == "project_1"
-    assert "project_1" in temp_projects
+    assert "project_1" in projects_in_memory
 
 
-def test_validate_project_id_raises_400_for_empty_string(temp_projects: dict):
+def test_validate_project_id_raises_400_for_empty_string():
     with pytest.raises(HTTPException) as exception_info:
         get_project("")
 
     assert exception_info.value.status_code == 400
 
 
-def test_validate_project_id_raises_404_for_non_existing_project(temp_projects: dict):
+def test_validate_project_id_raises_404_for_non_existing_project():
     with pytest.raises(HTTPException) as exception_info:
         get_project("project_42")
 
     assert exception_info.value.status_code == 404
 
 
-def test_create_project_accepts_valid_project_object(temp_projects, client):
-    projects_in_memory.clear()
-
+def test_create_project_accepts_valid_project_object(client):
     response = client.post(
         "/projects",
         json={"name": "Magnum Opus"},
@@ -38,10 +36,9 @@ def test_create_project_accepts_valid_project_object(temp_projects, client):
     data = response.json()
     assert data["name"] == "Magnum Opus"
     assert data["id"] == "project_1"
-    projects_in_memory.clear()
 
 
-def test_show_project_returns_200_for_existing_project(temp_projects, client):
+def test_show_project_returns_200_for_existing_project(client):
     given_project_id = "project_1"
 
     response = client.get(f"/projects/{given_project_id}")
@@ -49,7 +46,7 @@ def test_show_project_returns_200_for_existing_project(temp_projects, client):
     assert response.status_code == 200
 
 
-def test_show_project_returns_404_for_non_existing_project(temp_projects, client):
+def test_show_project_returns_404_for_non_existing_project(client):
     given_project_id = "project_42"
 
     response = client.get(f"/projects/{given_project_id}")
@@ -57,7 +54,7 @@ def test_show_project_returns_404_for_non_existing_project(temp_projects, client
     assert response.status_code == 404
 
 
-def test_rename_project_returns_200_for_valid_request(temp_projects, client):
+def test_rename_project_returns_200_for_valid_request(client):
     given_project_id = "project_1"
 
     response = client.patch(
@@ -72,7 +69,7 @@ def test_rename_project_returns_200_for_valid_request(temp_projects, client):
     projects_in_memory.clear()
 
 
-def test_delete_project_returns_204(temp_projects, client):
+def test_delete_project_returns_204(client):
     given_project_id = "project_1"
     response = client.delete(f"/projects/{given_project_id}")
 

@@ -1,14 +1,13 @@
 from src.app.schemas import TaskRead, TaskUpdate
 from src.app.services.tasks import get_project_tasks, get_task_by_id
-from src.app.state.memory import tasks_in_memory, task_id_number
+from src.app.state.memory import tasks_in_memory
 from pydantic import TypeAdapter, ValidationError
 from datetime import date
 from fastapi import HTTPException
 import pytest
 
 
-# test get_project_tasks function works:
-def test_get_project_tasks_returns_only_open_tasks_project_1(temp_tasks):
+def test_get_project_tasks_returns_only_open_tasks_project_1():
     mock_project_id = "project_1"
     expected_num_of_tasks = 2
     response = get_project_tasks(mock_project_id)
@@ -24,7 +23,7 @@ def test_get_project_tasks_returns_only_open_tasks_project_1(temp_tasks):
     )
 
 
-def test_get_project_tasks_returns_only_open_tasks_project_2(temp_tasks):
+def test_get_project_tasks_returns_only_open_tasks_project_2():
     mock_project_id = "project_2"
     expected_num_of_tasks = 1
     response = get_project_tasks(mock_project_id)
@@ -40,7 +39,7 @@ def test_get_project_tasks_returns_only_open_tasks_project_2(temp_tasks):
     )
 
 
-def test_get_project_tasks_returns_empty_list_for_missing_project_tasks(temp_tasks):
+def test_get_project_tasks_returns_empty_list_for_missing_project_tasks():
     mock_project_id = "project_42"
     expected_num_of_tasks = 0
     response = get_project_tasks(mock_project_id)
@@ -49,7 +48,7 @@ def test_get_project_tasks_returns_empty_list_for_missing_project_tasks(temp_tas
     assert len(response) == expected_num_of_tasks
 
 
-def test_create_task_accepts_valid_task_object(client, temp_tasks):
+def test_create_task_accepts_valid_task_object(client):
     num_of_tasks_before = len(tasks_in_memory)
 
     response = client.post(
@@ -75,9 +74,7 @@ def test_create_task_accepts_valid_task_object(client, temp_tasks):
     assert data["project_id"] is None
 
 
-def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(
-    client, temp_tasks
-):
+def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(client):
     expected_num_of_tasks = 5
     response = client.get("/tasks")
     assert response.status_code == 200
@@ -89,9 +86,7 @@ def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(
     assert len(tasks) == expected_num_of_tasks, f"{tasks}"
 
 
-def test_show_tasks_with_project_id_returns_all_project_tasks(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_with_project_id_returns_all_project_tasks(client):
     expected_num_of_tasks = 2
     query_parameters = {
         "project_id": "project_1",
@@ -106,16 +101,12 @@ def test_show_tasks_with_project_id_returns_all_project_tasks(
     assert len(tasks) == expected_num_of_tasks, f"{tasks}"
 
 
-def test_show_tasks_with_non_existent_project_id_raises_404(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_with_non_existent_project_id_raises_404(client):
     response = client.get("/tasks", params={"project_id": "project_52"})
     assert response.status_code == 404
 
 
-def test_show_tasks_with_task_id_returns_only_one_task(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_with_task_id_returns_only_one_task(client):
     response = client.get("/tasks", params={"task_id": "task_1"})
     expected_num_of_tasks = 1
 
@@ -135,16 +126,12 @@ def test_show_tasks_with_task_id_returns_only_one_task(
     assert tasks[0].status == "open"
 
 
-def test_show_tasks_with_task_id_raises_only_one_task(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_with_task_id_raises_only_one_task(client):
     response = client.get("/tasks", params={"task_id": "task_9999"})
     assert response.status_code == 404
 
 
-def test_show_tasks_with_project_and_task_id_returns_scoped_task(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_with_project_and_task_id_returns_scoped_task(client):
     response = client.get(
         "/tasks", params={"project_id": "project_1", "task_id": "task_1"}
     )
@@ -165,17 +152,14 @@ def test_show_tasks_with_project_and_task_id_returns_scoped_task(
     assert tasks[0].status == "open"
 
 
-def test_show_tasks_raises_404_when_task_not_in_project_scope(
-    temp_tasks, temp_projects, client
-):
+def test_show_tasks_raises_404_when_task_not_in_project_scope(client):
     response = client.get(
         "/tasks", params={"project_id": "project_1", "task_id": "task_4"}
     )
     assert response.status_code == 404
 
 
-# Whats new:
-def test_update_task_accepts_valid_taskread_object(temp_tasks, client):
+def test_update_task_accepts_valid_taskread_object(client):
     given_task_id = "task_1"
 
     response = client.patch(
@@ -198,10 +182,9 @@ def test_update_task_accepts_valid_taskread_object(temp_tasks, client):
     assert tasks.project_id == "project_1"
     assert tasks.id == "task_1"
     assert tasks.status == "open"
-    tasks_in_memory.clear()
 
 
-def test_update_task_raises_404_for_non_existent_task_id(temp_tasks, client):
+def test_update_task_raises_404_for_non_existent_task_id(client):
     given_task_id = "task_99"
 
     response = client.patch(
@@ -214,10 +197,9 @@ def test_update_task_raises_404_for_non_existent_task_id(temp_tasks, client):
     )
 
     assert response.status_code == 404
-    tasks_in_memory.clear()
 
 
-def test_update_tasks_raises_422_for_missing_updatable_fields(temp_tasks, client):
+def test_update_tasks_raises_422_for_missing_updatable_fields(client):
     given_task_id = "task_1"
 
     response = client.patch(
@@ -228,7 +210,6 @@ def test_update_tasks_raises_422_for_missing_updatable_fields(temp_tasks, client
     )
 
     assert response.status_code == 422
-    tasks_in_memory.clear()
 
 
 def test_taskupdate_accepts_valid_input():
@@ -245,7 +226,7 @@ def test_taskupdate_raises_error_for_empty_call():
         TaskUpdate()
 
 
-def test_delete_task_returns_204(temp_tasks, client):
+def test_delete_task_returns_204(client):
     given_task_id = "task_1"
     response = client.delete(f"/tasks/{given_task_id}")
 

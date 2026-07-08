@@ -1,4 +1,4 @@
-def test_capture_accepts_valid_input(temp_projects, client):
+def test_capture_accepts_valid_input(client):
     task = "finish tests for Tevira-AI"
     due_date = "today."
     next_action = "deploy app."
