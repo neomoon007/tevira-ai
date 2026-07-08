@@ -22,7 +22,7 @@ def capture_from_text(raw_input: NonEmptyString) -> CaptureRead:
                 data=CreateTaskProposal(
                     title=parsed_input.title,
                     due_date_hint=parsed_input.due_date_hint,
-                    project_hint=parsed_input.project_hint,
+                    project_hint=parsed_input.project_id_hint,
                 ),
             ),
             CreateProgressNoteAction(

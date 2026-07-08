@@ -19,7 +19,7 @@ def client():
 
 
 @pytest.fixture
-def temp_projects():
+def temp_projects():  # TODO: change 'project_1' to be 'Inbox'
     projects_in_memory["project_1"] = ProjectRead(name="SAT", id="project_1")
     projects_in_memory["project_2"] = ProjectRead(name="Tevira-AI", id="project_2")
     projects_in_memory["project_3"] = ProjectRead(name="Tech", id="project_3")

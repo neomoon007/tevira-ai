@@ -53,7 +53,7 @@ def parse_note(mind_dump_note: str, projects: dict) -> ParseNoteRead:
 
     return ParseNoteRead(
         title=title,
-        project_hint=project_hint,
+        project_id_hint=project_hint,
         due_date_hint=due_date,
         next_action_hint=next_action,
     )

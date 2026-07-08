@@ -109,7 +109,7 @@ class ContextRead(BaseModel):
 # --- PARSER ---
 class ParseNoteRead(BaseModel):
     title: NonEmptyString
-    project_hint: NonEmptyString
+    project_id_hint: NonEmptyString
     due_date_hint: NonEmptyString
     next_action_hint: NonEmptyString
 
