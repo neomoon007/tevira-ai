@@ -1005,10 +1005,10 @@
             "minLength": 1,
             "title": "Title"
           },
-          "project_hint": {
+          "project_id_hint": {
             "type": "string",
             "minLength": 1,
-            "title": "Project Hint"
+            "title": "Project Id Hint"
           },
           "due_date_hint": {
             "type": "string",
@@ -1024,7 +1024,7 @@
         "type": "object",
         "required": [
           "title",
-          "project_hint",
+          "project_id_hint",
           "due_date_hint",
           "next_action_hint"
         ],
