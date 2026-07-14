@@ -5,6 +5,8 @@ certifi==2026.5.20
 click==8.4.1
 dateparser==1.4.1
 fastapi==0.136.3
+freezegun==1.5.5
+greenlet==3.5.3
 h11==0.16.0
 httpcore==1.0.9
 httpcore2==2.3.0
@@ -14,6 +16,9 @@ idna==3.17
 iniconfig==2.3.0
 packaging==26.2
 pluggy==1.6.0
+psycopg==3.3.4
+psycopg-binary==3.3.4
+psycopg-pool==3.3.1
 pydantic==2.13.4
 pydantic_core==2.46.4
 Pygments==2.20.0
@@ -23,6 +28,7 @@ python-dotenv==1.2.2
 pytz==2026.2
 regex==2026.6.28
 six==1.17.0
+SQLAlchemy==2.0.51
 starlette==1.2.1
 truststore==0.10.4
 typing-inspection==0.4.2
