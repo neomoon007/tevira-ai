@@ -16,6 +16,7 @@ class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[str] = mapped_column(primary_key=True)
+    owner_id: Mapped[str]
     title: Mapped[str]
 
 
@@ -23,6 +24,7 @@ class Task(Base):
     __tablename__ = "tasks"
 
     id: Mapped[str] = mapped_column(primary_key=True)
+    owner_id: Mapped[str]
     title: Mapped[str]
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"))
     priority: Mapped[str]
@@ -34,6 +36,7 @@ class ProgressNote(Base):
     __tablename__ = "progress_notes"
 
     id: Mapped[str] = mapped_column(primary_key=True)
+    owner_id: Mapped[str]
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"))
     current_state: Mapped[str | None]
     last_session: Mapped[str | None]
@@ -42,4 +45,4 @@ class ProgressNote(Base):
     important_context: Mapped[str | None]
     blockers: Mapped[list[str] | None]
     confidence: Mapped[str]
-    updated_at: Mapped[datetime] = mapped_column(default=datetime.now())
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.now)
