@@ -3,12 +3,14 @@ from src.app.state.memory import task_id_number, tasks_in_memory
 from src.app.services.projects import get_project
 from fastapi import HTTPException
 
+
 def get_project_tasks(project_id) -> list[TaskRead]:
     return [
         task
         for task in tasks_in_memory
         if task.project_id == project_id and task.status == "open"
     ]
+
 
 def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
     tasks_list = database if database is not None else tasks_in_memory
@@ -20,6 +22,7 @@ def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
             detail=f"Error 404: Task '{task_id}' does not exist.",
         )
     return matching_task
+
 
 def get_important_task(project_id: str) -> TaskRead | str:
     tasks_db = get_project_tasks(project_id)
@@ -36,6 +39,7 @@ def get_important_task(project_id: str) -> TaskRead | str:
             return recommended_task
 
     return "No open next action found."
+
 
 def create_task(task: TaskCreate) -> TaskRead:
     global task_id_number
@@ -54,7 +58,9 @@ def create_task(task: TaskCreate) -> TaskRead:
     return new_task
 
 
-def show_tasks(project_id: str | None = None, task_id: str | None = None) -> list[TaskRead]:  # type: ignore
+def show_tasks(
+    project_id: str | None = None, task_id: str | None = None
+) -> list[TaskRead]:  # type: ignore
     if project_id is None and task_id is None:
         return tasks_in_memory
 
@@ -69,7 +75,7 @@ def show_tasks(project_id: str | None = None, task_id: str | None = None) -> lis
         get_project(project_id)
         project_tasks = get_project_tasks(project_id)
         return [get_task_by_id(task_id, project_tasks)]
-    
+
 
 def update_task(task_id: NonEmptyString, updated_task: TaskUpdate) -> TaskRead:
     matching_task = get_task_by_id(task_id)
@@ -82,6 +88,7 @@ def update_task(task_id: NonEmptyString, updated_task: TaskUpdate) -> TaskRead:
     tasks_in_memory[task_index] = TaskRead(**merged_task)
 
     return TaskRead(**merged_task)
+
 
 def delete_task(task_id: NonEmptyString) -> None:
     matching_task = get_task_by_id(task_id)
