@@ -143,7 +143,7 @@ cd tevira-ai
 ```
 
 ### 2. Setup environment:
-Make sure you have Python 3.10+ installed.
+Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integration if using WSL).
 
 On Linux run:
 ```bash
@@ -166,6 +166,7 @@ pip install -r requirements.txt
 
 ### 4. Start the API locally:
 ```bash
+docker compose up -d
 uvicorn src.app.main:app --reload
 ```
 
@@ -173,6 +174,13 @@ uvicorn src.app.main:app --reload
 Open `/docs` on your browser. FastAPI uses Swagger UI so you can test the endpoints manually.
 ```bash
 http://127.0.0.1:8000/docs
+```
+
+### 6. Stop the application
+On your terminal inside the repo directory run
+```
+<Ctrl+C> # This stops the uvicorn application
+docker compose down
 ```
 
 ## 📃 Documentation
