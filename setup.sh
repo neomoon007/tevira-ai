@@ -15,5 +15,5 @@ cp .env.example .env
 # Install python dependencies
 pip3 install -r requirements.txt
 
-echo "\n${GREEN}[Setup completed successfully! Your environment is ready.]${RESET_COLOR}"
-echo "\n${GREEN}Remember to change .env variables to customize your settings.]${RESET_COLOR}"
+echo "\n${GREEN}Setup completed successfully! Your environment is ready.${RESET_COLOR}"
+echo "\n${GREEN}Remember to change .env variables to customize your settings.${RESET_COLOR}"
