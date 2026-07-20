@@ -1,26 +1,32 @@
 #!/usr/bin/env bash
 
-# colors
+# Colors
 RESET_COLOR="\033[0m"
+# RED="\033[0;31m"
 GREEN="\033[0;32m"
-RED="\033[0;31m"
+# YELLOW="\033[0;33m"
 
-echo "${GREEN}INFO: ${RESET_COLOR}Creating python virtual environment..."
+# Log functions
+log_info() { echo -e "${GREEN}INFO: ${RC}"; }
+# log_warn() { echo -e "${YELLOW}WARN: ${RC}"; }
+# log_error() { echo -e "${RED}ERROR: ${RC}"; }
+
+log_info "Creating python virtual environment..."
 python3 -m venv .venv
-echo "${GREEN}INFO: ${RESET_COLOR}Python virtual environment created successfully!"
+log_info "Python virtual environment created successfully!"
 
 
-echo "${GREEN}INFO: ${RESET_COLOR}Activating python virtual environment..."
+log_info "Activating python virtual environment..."
 source .venv/bin/activate
-echo "${GREEN}INFO: ${RESET_COLOR}Python virtual environment activated successfully!"
+log_info "Python virtual environment activated successfully!"
 
-echo "${GREEN}INFO: ${RESET_COLOR}Setting up intial .env file..."
+log_info "Setting up intial .env file..."
 cp .env.example .env
 
-echo "${GREEN}INFO: ${RESET_COLOR}Installing python dependencies..."
+log_info "Installing python dependencies..."
 pip3 install -r requirements.txt
-echo "${GREEN}INFO: ${RESET_COLOR}Python dependencies installed successfully!"
+log_info "Python dependencies installed successfully!"
 
 
-echo "${GREEN}INFO: ${RESET_COLOR}Setup completed successfully! Your environment is ready."
-echo "\n${GREEN}INFO: ${RESET_COLOR}Remember to change .env variables to customize your settings."
+log_info "Setup completed successfully! Your environment is ready."
+log_info "Remember to change .env variables to customize your settings."
