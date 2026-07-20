@@ -5,15 +5,15 @@ RESET_COLOR="\033[0m"
 GREEN="\033[0;32m"
 RED="\033[0;31m"
 
-# Create and activate python's virtual environment
+echo "${GREEN}Create and activate python virtual environment${RESET_COLOR}"
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Setup intial .env file
+echo "${GREEN}Setup intial .env file${RESET_COLOR}"
 cp .env.example .env
 
-# Install python dependencies
+echo "${GREEN}Install python dependencies${RESET_COLOR}"
 pip3 install -r requirements.txt
 
-echo "\n${GREEN}Setup completed successfully! Your environment is ready.${RESET_COLOR}"
+echo "${GREEN}Setup completed successfully! Your environment is ready.${RESET_COLOR}"
 echo "\n${GREEN}Remember to change .env variables to customize your settings.${RESET_COLOR}"
