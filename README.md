@@ -143,25 +143,16 @@ cd tevira-ai
 ```
 
 ### 2. Setup environment:
-Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integration if using WSL).
+> Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integration if using WSL).
 > Development is currently supported on Linux/WSL only. The app hasn't been tested on natively on Windows yet.
 
-On Linux run:
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-cp .env.example .env
-```
-
-### 3. Install dependencies:
-```bash
-pip3 install -r requirements.txt
+source setup.sh
 ```
 
 ### 4. Start the API locally:
 ```bash
-docker compose up -d
-uvicorn src.app.main:app --reload
+./run.sh
 ```
 
 ### 5. Test the application:
