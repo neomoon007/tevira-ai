@@ -148,14 +148,14 @@ Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integrati
 
 On Linux run:
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 cp .env.example .env
 ```
 
 ### 3. Install dependencies:
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### 4. Start the API locally:
