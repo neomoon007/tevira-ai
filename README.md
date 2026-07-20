@@ -144,19 +144,13 @@ cd tevira-ai
 
 ### 2. Setup environment:
 Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integration if using WSL).
+> Development is currently supported on Linux/WSL only. The app hasn't been tested on natively on Windows yet.
 
 On Linux run:
 ```bash
 python -m venv venv
 source venv/bin/activate
 cp .env.example .env
-```
-
-If on Windows run this instead:
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-Copy-Item .env.example .env
 ```
 
 ### 3. Install dependencies:
