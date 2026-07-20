@@ -7,9 +7,9 @@ GREEN="\033[0;32m"
 # YELLOW="\033[0;33m"
 
 # Log functions
-log_info() { echo -e "${GREEN}INFO: ${RC}"; }
-# log_warn() { echo -e "${YELLOW}WARN: ${RC}"; }
-# log_error() { echo -e "${RED}ERROR: ${RC}"; }
+log_info() { echo -e "${GREEN}INFO:${RC} $*"; }
+# log_warn() { echo -e "${YELLOW}WARN:${RC}  $*"; }
+# log_error() { echo -e "${RED}ERROR:${RC} $*"; }
 
 log_info "Creating python virtual environment..."
 python3 -m venv .venv
