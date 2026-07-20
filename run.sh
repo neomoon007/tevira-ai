@@ -14,6 +14,9 @@ log_info() { echo -e "${GREEN}INFO${RESET_COLOR}:     $*"; }
 log_info "Initializing docker containers..."
 docker compose up -d
 
+log_info "Running alembic migrations..."
+alembic upgrade head
+
 log_info "Initializing uvicorn server..."
 uvicorn src.app.main:app --reload
 
