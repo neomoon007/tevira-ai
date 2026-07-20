@@ -1,6 +1,4 @@
 from fastapi import FastAPI
-from src.app.db.models import Base, Project, Task, ProgressNote
-from src.app.db.database import engine
 from src.app.routers import (
     health,
     projects,
@@ -10,13 +8,6 @@ from src.app.routers import (
     capture,
     actions,
 )
-
-
-def init_db():
-    print("Creating tables...")
-    Base.metadata.create_all(engine)
-    print("Database ready!")
-    return
 
 
 def create_app():
@@ -33,5 +24,4 @@ def create_app():
     return app
 
 
-init_db()
 app = create_app()
