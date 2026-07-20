@@ -148,8 +148,8 @@ Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integrati
 
 On Linux run:
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 cp .env.example .env
 ```
 
