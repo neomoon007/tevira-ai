@@ -1,4 +1,7 @@
 from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
+from src.app.db.models import Task
+from src.app.db.database import SessionLocal
+from src.app.repository.tasks import TaskRepository
 from src.app.state.memory import task_id_number, tasks_in_memory
 from src.app.services.projects import get_project
 from fastapi import HTTPException
@@ -47,15 +50,24 @@ def create_task(task: TaskCreate) -> TaskRead:
 
     task_id = f"task_{task_id_number}"
 
-    new_task = TaskRead(
-        **task.model_dump(),  # Dumps all `task` fields here, no need to type them manually.
-        id=task_id,
-        status="open",
-    )
+    db = SessionLocal()
+    try:
+        repository = TaskRepository(db)
 
-    tasks_in_memory.append(new_task)
+        task_in = Task(
+            **task.model_dump(),
+            id=task_id,
+            status="open",
+            owner_id="local_user",  # TODO: Change from hardcoded to actual owner_id once authentication exists
+        )
 
-    return new_task
+        task_out = repository.create(
+            task_in
+        )  # WIP: So far only accepts "project_1 as project_id"
+    finally:
+        db.close()
+
+    return TaskRead.model_validate(task_out)
 
 
 def show_tasks(

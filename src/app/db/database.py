@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
@@ -16,3 +17,9 @@ if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is missing")
 
 engine = create_engine(DATABASE_URL, echo=True)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    expire_on_commit=False,
+)

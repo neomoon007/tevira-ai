@@ -2,6 +2,7 @@ from sqlalchemy import String, ForeignKey, Date, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import ARRAY
 from datetime import date, datetime
+from typing import Literal
 
 
 class Base(DeclarativeBase):
@@ -27,9 +28,9 @@ class Task(Base):
     owner_id: Mapped[str]
     title: Mapped[str]
     project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"))
-    priority: Mapped[str]
+    priority: Mapped[Literal["low", "medium", "high"]]
     due_date: Mapped[date | None]
-    status: Mapped[str]
+    status: Mapped[Literal["open", "done"]]
 
 
 class ProgressNote(Base):

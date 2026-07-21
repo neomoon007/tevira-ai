@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import Literal, Annotated
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
@@ -16,6 +16,8 @@ class TaskCreate(BaseModel):
 class TaskRead(TaskCreate):
     id: str
     status: Literal["open", "done"] = "open"
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUpdate(BaseModel):
