@@ -1,7 +1,7 @@
-from src.app.state.memory import projects_in_memory
 from src.app.schemas import ProjectCreate, ProjectRead
 from src.app.db.database import SessionLocal
 from src.app.repository.projects import ProjectRepository, Project
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 
 OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
@@ -87,4 +87,16 @@ def rename_project(new_title: ProjectCreate, project_id: str) -> ProjectRead:
 
 
 def delete_project(project_id: str) -> None:
-    del projects_in_memory[project_id]
+    db = SessionLocal()
+
+    try:
+        repository = ProjectRepository(db)
+
+        repository.delete(OWNER_ID, project_id)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Project: {project_id} is currently linked to other resources such as notes or tasks.",
+        )
+    finally:
+        db.close()

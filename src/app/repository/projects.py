@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func, desc, cast, Integer
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select, func, delete, desc, cast, Integer
 from src.app.db.models import Project
 from src.app.schemas import ProjectRead
 
@@ -61,3 +62,16 @@ class ProjectRepository:
             self.session.refresh(project)
 
             return project
+
+    def delete(self, owner_id: str, project_id: str):
+        try:
+            self.session.execute(
+                delete(Project).where(
+                    Project.owner_id == owner_id, Project.id == project_id
+                )
+            )
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+
+            raise

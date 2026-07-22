@@ -108,4 +108,3 @@ def delete_task(task_id: NonEmptyString) -> None:
     matching_task = get_task_by_id(task_id)
     task_index = tasks_in_memory.index(matching_task)
     del tasks_in_memory[task_index]
-    # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
