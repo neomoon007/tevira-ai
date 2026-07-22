@@ -2,7 +2,7 @@ from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
 from src.app.db.models import Task
 from src.app.db.database import SessionLocal
 from src.app.repository.tasks import TaskRepository
-from src.app.state.memory import task_id_number, tasks_in_memory
+from src.app.state.memory import tasks_in_memory
 from src.app.services.projects import get_project
 from fastapi import HTTPException
 
@@ -45,20 +45,21 @@ def get_important_task(project_id: str) -> TaskRead | str:
 
 
 def create_task(task: TaskCreate) -> TaskRead:
-    global task_id_number
-    task_id_number += 1
-
-    task_id = f"task_{task_id_number}"
-
     db = SessionLocal()
+
     try:
+        owner_id = "local_user"
         repository = TaskRepository(db)
+
+        id_num_from_db = repository.get_highest_id(owner_id)
+
+        task_id = f"task_{id_num_from_db + 1}"
 
         task_in = Task(
             **task.model_dump(),
             id=task_id,
             status="open",
-            owner_id="local_user",  # TODO: Change from hardcoded to actual owner_id once authentication exists
+            owner_id=owner_id,  # TODO: Change from hardcoded to actual owner_id once authentication exists
         )
 
         task_out = repository.create(
