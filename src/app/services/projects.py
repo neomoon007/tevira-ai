@@ -1,4 +1,4 @@
-from src.app.state.memory import project_id_number, projects_in_memory
+from src.app.state.memory import projects_in_memory
 from src.app.schemas import ProjectCreate, ProjectRead
 from src.app.db.database import SessionLocal
 from src.app.repository.projects import ProjectRepository, Project
