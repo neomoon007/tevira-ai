@@ -74,9 +74,16 @@ def rename_project(new_title: ProjectCreate, project_id: str) -> ProjectRead:
         id=project_id,
     )
 
-    projects_in_memory[renamed_project.id] = renamed_project
+    db = SessionLocal()
 
-    return renamed_project
+    try:
+        repository = ProjectRepository(db)
+
+        project_result = repository.rename(OWNER_ID, renamed_project)
+    finally:
+        db.close()
+
+    return ProjectRead.model_validate(project_result)
 
 
 def delete_project(project_id: str) -> None:
