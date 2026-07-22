@@ -27,3 +27,21 @@ class ProjectRepository:
         highest_project_id = self.session.scalars(query).first()
 
         return highest_project_id if highest_project_id is not None else 0
+
+    def get_by_id(self, owner_id: str, project_id: str) -> Project | None:
+        query_result = self.session.scalars(
+            select(Project)
+            .where(Project.owner_id == owner_id, Project.id == project_id)
+            .limit(1)
+        ).first()
+
+        return query_result
+
+    def get_all(self, owner_id: str) -> list[Project]:
+        query_result = list(
+            self.session.scalars(
+                select(Project).where(Project.owner_id == owner_id)
+            ).all()
+        )
+
+        return query_result

@@ -6,6 +6,8 @@ from src.app.state.memory import tasks_in_memory
 from src.app.services.projects import get_project
 from fastapi import HTTPException
 
+OWNER_ID = "local_user"
+
 
 def get_project_tasks(project_id) -> list[TaskRead]:
     return [
@@ -48,10 +50,9 @@ def create_task(task: TaskCreate) -> TaskRead:
     db = SessionLocal()
 
     try:
-        owner_id = "local_user"
         repository = TaskRepository(db)
 
-        id_num_from_db = repository.get_highest_id(owner_id)
+        id_num_from_db = repository.get_highest_id(OWNER_ID)
 
         task_id = f"task_{id_num_from_db + 1}"
 
@@ -59,7 +60,7 @@ def create_task(task: TaskCreate) -> TaskRead:
             **task.model_dump(),
             id=task_id,
             status="open",
-            owner_id=owner_id,  # TODO: Change from hardcoded to actual owner_id once authentication exists
+            owner_id=OWNER_ID,  # TODO: Change from hardcoded to actual owner_id once authentication exists
         )
 
         task_out = repository.create(
