@@ -46,11 +46,13 @@ class TaskUpdate(BaseModel):
 
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
-    name: NonEmptyString
+    title: NonEmptyString
 
 
 class ProjectRead(ProjectCreate):
     id: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- PROGRESS NOTES ---
