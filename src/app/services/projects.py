@@ -49,19 +49,6 @@ def create_project(project: ProjectCreate) -> ProjectRead:
         db.close()
 
     return ProjectRead.model_validate(project_out)
-    # global project_id_number
-    # project_id_number += 1
-
-    # project_id = f"project_{project_id_number}"
-
-    # new_project = ProjectRead(
-    #     **project.model_dump(),
-    #     id=project_id,
-    # )
-
-    # projects_in_memory[new_project.id] = new_project
-
-    # return new_project
 
 
 def list_projects() -> list[ProjectRead]:
