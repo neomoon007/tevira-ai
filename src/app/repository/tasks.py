@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func, desc, cast, Integer
+from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy import select, func, desc, cast, Integer, update, delete
 from src.app.db.models import Task
 
 
@@ -34,3 +35,47 @@ class TaskRepository:
         highest_task_id = self.session.scalars(query).first()
 
         return highest_task_id if highest_task_id is not None else 0
+
+    def get_by_project(self, owner_id: str, project_id: str) -> list[Task]:
+        tasks_list = list(
+            self.session.scalars(
+                select(Task).where(
+                    Task.owner_id == owner_id, Task.project_id == project_id
+                )
+            ).all()
+        )
+
+        return tasks_list
+
+    def get_by_id(self, owner_id: str, task_id: str) -> Task | None:
+        task_result = self.session.scalars(
+            select(Task).where(Task.owner_id == owner_id, Task.id == task_id)
+        ).first()
+
+        return task_result
+
+    def update(self, owner_id: str, task_id: str, task_obj: dict) -> Task:
+        try:
+            updated_task = self.session.execute(
+                update(Task)
+                .where(Task.owner_id == owner_id, Task.id == task_id)
+                .values(**task_obj)
+                .returning(Task)
+            ).scalar_one()
+
+            self.session.commit()
+            return updated_task
+        except NoResultFound:
+            self.session.rollback()
+            raise
+
+    def delete(self, owner_id: str, task_id: str):
+        try:
+            self.session.execute(
+                delete(Task).where(Task.owner_id == owner_id, Task.id == task_id)
+            )
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+
+            raise

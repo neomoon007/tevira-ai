@@ -2,31 +2,41 @@ from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
 from src.app.db.models import Task
 from src.app.db.database import SessionLocal
 from src.app.repository.tasks import TaskRepository
-from src.app.state.memory import tasks_in_memory
-from src.app.services.projects import get_project
+from sqlalchemy.exc import NoResultFound, IntegrityError
 from fastapi import HTTPException
 
 OWNER_ID = "local_user"
 
 
-def get_tasks_by_project(project_id) -> list[TaskRead]:
-    return [
-        task
-        for task in tasks_in_memory
-        if task.project_id == project_id and task.status == "open"
-    ]
+def get_tasks_by_project(project_id: str) -> list[TaskRead]:
+    db = SessionLocal()
+
+    try:
+        repository = TaskRepository(db)
+
+        tasks_from_db = repository.get_by_project(OWNER_ID, project_id)
+    finally:
+        db.close()
+
+    return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
-def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
-    tasks_list = database if database is not None else tasks_in_memory
+def get_task_by_id(task_id: str) -> TaskRead:
+    db = SessionLocal()
 
-    matching_task = next((task for task in tasks_list if task.id == task_id), None)
-    if not matching_task:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Error 404: Task '{task_id}' does not exist.",
-        )
-    return matching_task
+    try:
+        repository = TaskRepository(db)
+
+        task_from_db = repository.get_by_id(OWNER_ID, task_id)
+
+        if not task_from_db:
+            raise HTTPException(
+                status_code=404, detail=f"Task: {task_id} does not exist."
+            )
+    finally:
+        db.close()
+
+    return TaskRead.model_validate(task_from_db)
 
 
 def get_important_task(project_id: str) -> TaskRead | str:
@@ -60,51 +70,69 @@ def create_task(task: TaskCreate) -> TaskRead:
             **task.model_dump(),
             id=task_id,
             status="open",
-            owner_id=OWNER_ID,  # TODO: Change from hardcoded to actual owner_id once authentication exists
+            owner_id=OWNER_ID,
         )
 
-        task_out = repository.create(
-            task_in
-        )  # WIP: So far only accepts "project_1 as project_id"
+        task_out = repository.create(task_in)
     finally:
         db.close()
 
     return TaskRead.model_validate(task_out)
 
 
+def get_all_tasks() -> list[TaskRead]:
+    db = SessionLocal()
+
+    try:
+        repository = TaskRepository(db)
+
+        tasks_from_db = repository.get_all(OWNER_ID)
+    finally:
+        db.close()
+
+    return [TaskRead.model_validate(task) for task in tasks_from_db]
+
+
 def show_tasks(
     project_id: str | None = None, task_id: str | None = None
 ) -> list[TaskRead]:  # type: ignore
     if project_id is None and task_id is None:
-        return tasks_in_memory
+        return get_all_tasks()
 
     if project_id is not None and task_id is None:
-        get_project(project_id)
         return get_tasks_by_project(project_id)
 
-    if project_id is None and task_id is not None:
+    if (
+        project_id is None
+        and task_id is not None
+        or project_id is not None
+        and task_id is not None
+    ):
         return [get_task_by_id(task_id)]
-
-    if project_id is not None and task_id is not None:
-        get_project(project_id)
-        project_tasks = get_tasks_by_project(project_id)
-        return [get_task_by_id(task_id, project_tasks)]
 
 
 def update_task(task_id: NonEmptyString, updated_task: TaskUpdate) -> TaskRead:
-    matching_task = get_task_by_id(task_id)
-    merged_task = {
-        **matching_task.model_dump(),
-        **updated_task.model_dump(exclude_none=True),
-    }
+    db = SessionLocal()
+    update_data = updated_task.model_dump(exclude_unset=True)
 
-    task_index = tasks_in_memory.index(matching_task)
-    tasks_in_memory[task_index] = TaskRead(**merged_task)
+    try:
+        repository = TaskRepository(db)
 
-    return TaskRead(**merged_task)
+        task_from_db = repository.update(OWNER_ID, task_id, update_data)
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail=f"Task: {task_id} does not exist.")
+    finally:
+        db.close()
+
+    return TaskRead.model_validate(task_from_db)
 
 
 def delete_task(task_id: NonEmptyString) -> None:
-    matching_task = get_task_by_id(task_id)
-    task_index = tasks_in_memory.index(matching_task)
-    del tasks_in_memory[task_index]
+    db = SessionLocal()
+
+    try:
+        repository = TaskRepository(db)
+
+        repository.delete(OWNER_ID, task_id)
+    finally:
+        db.close()
