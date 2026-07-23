@@ -1,5 +1,5 @@
 from src.app.schemas import TaskRead, TaskUpdate
-from src.app.services.tasks import get_project_tasks, get_task_by_id
+from src.app.services.tasks import get_tasks_by_project, get_task_by_id
 from src.app.state.memory import tasks_in_memory
 from pydantic import TypeAdapter, ValidationError
 from datetime import date
@@ -10,7 +10,7 @@ import pytest
 def test_get_project_tasks_returns_only_open_tasks_project_1():
     mock_project_id = "project_1"
     expected_num_of_tasks = 2
-    response = get_project_tasks(mock_project_id)
+    response = get_tasks_by_project(mock_project_id)
 
     assert isinstance(response, list), "Response is not a list of TaskRead objects"
     assert len(response) == expected_num_of_tasks
@@ -26,7 +26,7 @@ def test_get_project_tasks_returns_only_open_tasks_project_1():
 def test_get_project_tasks_returns_only_open_tasks_project_2():
     mock_project_id = "project_2"
     expected_num_of_tasks = 1
-    response = get_project_tasks(mock_project_id)
+    response = get_tasks_by_project(mock_project_id)
 
     assert isinstance(response, list), "Response is not a list of TaskRead objects"
     assert len(response) == expected_num_of_tasks
@@ -42,7 +42,7 @@ def test_get_project_tasks_returns_only_open_tasks_project_2():
 def test_get_project_tasks_returns_empty_list_for_missing_project_tasks():
     mock_project_id = "project_42"
     expected_num_of_tasks = 0
-    response = get_project_tasks(mock_project_id)
+    response = get_tasks_by_project(mock_project_id)
 
     assert isinstance(response, list), "Response is not a list of TaskRead objects"
     assert len(response) == expected_num_of_tasks

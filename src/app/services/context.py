@@ -1,8 +1,9 @@
 from src.app.state.memory import projects_in_memory, progress_notes_in_memory
-from src.app.services.tasks import get_important_task, get_project_tasks
+from src.app.services.tasks import get_important_task, get_tasks_by_project
 from src.app.schemas import ContextRead, NonEmptyString
 from operator import attrgetter
 from fastapi import HTTPException
+
 
 def validate_progress_note(project_id: str):
     if any(note.project_id == project_id for note in progress_notes_in_memory):
@@ -12,6 +13,7 @@ def validate_progress_note(project_id: str):
             status_code=404,
             detail="Error 404: No progress note found for this project.",
         )
+
 
 def restore_context(project_id: NonEmptyString) -> ContextRead:
     # find project
@@ -25,7 +27,7 @@ def restore_context(project_id: NonEmptyString) -> ContextRead:
     ]
 
     # find all tasks that belong to that project_id && status == "open"
-    open_tasks = get_project_tasks(project_id)
+    open_tasks = get_tasks_by_project(project_id)
 
     # output recommended next action (latest note next actions OR open tasks
     latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)

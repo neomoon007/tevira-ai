@@ -9,7 +9,7 @@ from fastapi import HTTPException
 OWNER_ID = "local_user"
 
 
-def get_project_tasks(project_id) -> list[TaskRead]:
+def get_tasks_by_project(project_id) -> list[TaskRead]:
     return [
         task
         for task in tasks_in_memory
@@ -30,7 +30,7 @@ def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
 
 
 def get_important_task(project_id: str) -> TaskRead | str:
-    tasks_db = get_project_tasks(project_id)
+    tasks_db = get_tasks_by_project(project_id)
     priority_list = ["high", "medium", "low"]
     recommended_task: TaskRead | None = None
 
@@ -80,14 +80,14 @@ def show_tasks(
 
     if project_id is not None and task_id is None:
         get_project(project_id)
-        return get_project_tasks(project_id)
+        return get_tasks_by_project(project_id)
 
     if project_id is None and task_id is not None:
         return [get_task_by_id(task_id)]
 
     if project_id is not None and task_id is not None:
         get_project(project_id)
-        project_tasks = get_project_tasks(project_id)
+        project_tasks = get_tasks_by_project(project_id)
         return [get_task_by_id(task_id, project_tasks)]
 
 
