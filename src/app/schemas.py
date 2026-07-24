@@ -71,6 +71,8 @@ class ProgressNoteRead(ProgressNoteCreate):
     id: str
     updated_at: datetime
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class ProgressNoteUpdate(BaseModel):
     project_id: str | None = None

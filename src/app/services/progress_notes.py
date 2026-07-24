@@ -1,63 +1,98 @@
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
-from src.app.state.memory import progress_notes_id_number, progress_notes_in_memory
-from src.app.services.projects import get_project
+from src.app.db.database import SessionLocal
+from src.app.db.models import ProgressNote
+from src.app.repository.progress_notes import ProgressNoteRepository
+from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
-from datetime import datetime, timezone
+
+OWNER_ID = "local_user"
+
 
 def create_progress_note(note: ProgressNoteCreate) -> ProgressNoteRead:
-    global progress_notes_id_number
-    progress_notes_id_number += 1
+    db = SessionLocal()
 
-    note_id = f"note_{progress_notes_id_number}"
-
-    new_note = ProgressNoteRead(
-        **note.model_dump(),
-        id=note_id,
-        updated_at=datetime.now(timezone.utc),
-    )
-
-    progress_notes_in_memory.append(new_note)
-
-    return new_note
-
-def get_progress_note_by_id(note_id: str, database: list | None = None) -> ProgressNoteRead:
-    notes_list = database if database is not None else progress_notes_in_memory
-
-    matching_note = next((note for note in notes_list if note.id == note_id), None)
-    if not matching_note:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Error 404: Note '{note_id}' does not exist.",
-        )
-    return matching_note
-
-def get_progress_notes(project_id: str) -> list[ProgressNoteRead]:
     try:
-        get_project(project_id)
-        return [
-            note for note in progress_notes_in_memory if note.project_id == project_id
-        ]
-    except HTTPException:
-        return progress_notes_in_memory
+        repository = ProgressNoteRepository(db)
 
-def update_progress_note(note_id: str, updated_note: ProgressNoteUpdate) -> ProgressNoteRead:
-    matching_note = get_progress_note_by_id(note_id)
+        id_num_from_db = repository.get_highest_id(OWNER_ID)
 
-    merge_ready_note = updated_note.model_dump(exclude_none=True)
-    merge_ready_note["updated_at"] = datetime.now(timezone.utc)
+        note_id = f"note_{id_num_from_db + 1}"
 
-    merged_note = {
-        **matching_note.model_dump(),
-        **merge_ready_note,
-    }
+        note_in = ProgressNote(
+            **note.model_dump(),
+            id=note_id,
+            owner_id=OWNER_ID,
+        )
 
-    note_index = progress_notes_in_memory.index(matching_note)
-    progress_notes_in_memory[note_index] = ProgressNoteRead(**merged_note)
+        note_out = repository.create(note_in)
+    finally:
+        db.close()
 
-    return ProgressNoteRead(**merged_note)
+    return ProgressNoteRead.model_validate(note_out)
 
-def delete_progress_note(note_id: str) -> None:
-    matching_note = get_progress_note_by_id(note_id)
-    note_index = progress_notes_in_memory.index(matching_note)
-    del progress_notes_in_memory[note_index]
-    # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
+
+def get_progress_note_by_id(note_id: str) -> ProgressNoteRead:
+    db = SessionLocal()
+
+    try:
+        repository = ProgressNoteRepository(db)
+
+        note_from_db = repository.get_by_id(OWNER_ID, note_id)
+
+        if not note_from_db:
+            raise HTTPException(
+                status_code=404, detail=f"Error 404: {note_id} does not exist."
+            )
+    finally:
+        db.close()
+
+    return ProgressNoteRead.model_validate(note_from_db)
+
+
+def get_notes_by_project(project_id: str) -> list[ProgressNoteRead]:
+    db = SessionLocal()
+
+    try:
+        repository = ProgressNoteRepository(db)
+
+        if project_id:
+            notes_from_db = repository.get_by_project(OWNER_ID, project_id)
+        else:
+            notes_from_db = repository.get_all(OWNER_ID)
+    finally:
+        db.close()
+
+    return [ProgressNoteRead.model_validate(note) for note in notes_from_db]
+
+
+def update_progress_note(
+    note_id: str, updated_note: ProgressNoteUpdate
+) -> ProgressNoteRead:
+    db = SessionLocal()
+    update_data = updated_note.model_dump(exclude_unset=True)
+
+    try:
+        repository = ProgressNoteRepository(db)
+
+        note_from_db = repository.update(OWNER_ID, note_id, update_data)
+    except NoResultFound:
+        raise HTTPException(
+            status_code=404, detail=f"Error 404: {note_id} does not exist."
+        )
+    finally:
+        db.close()
+
+    return ProgressNoteRead.model_validate(note_from_db)
+
+
+def delete_progress_note(
+    note_id: str,
+) -> None:  # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
+    db = SessionLocal()
+
+    try:
+        repository = ProgressNoteRepository(db)
+
+        repository.delete(OWNER_ID, note_id)
+    finally:
+        db.close()

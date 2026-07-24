@@ -2,7 +2,7 @@ from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
 from src.app.db.models import Task
 from src.app.db.database import SessionLocal
 from src.app.repository.tasks import TaskRepository
-from sqlalchemy.exc import NoResultFound, IntegrityError
+from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
 
 OWNER_ID = "local_user"
@@ -31,7 +31,7 @@ def get_task_by_id(task_id: str) -> TaskRead:
 
         if not task_from_db:
             raise HTTPException(
-                status_code=404, detail=f"Task: {task_id} does not exist."
+                status_code=404, detail=f"Error 404: {task_id} does not exist."
             )
     finally:
         db.close()

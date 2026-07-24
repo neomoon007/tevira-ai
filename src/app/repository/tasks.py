@@ -79,3 +79,6 @@ class TaskRepository:
             self.session.rollback()
 
             raise
+
+
+# TODO: missing except statement for NoResultFound exception, also there is no error handling on the service layer yet!!!
