@@ -1,8 +1,9 @@
-from src.app.schemas import ProjectCreate, ProjectRead
-from src.app.db.database import SessionLocal
-from src.app.repository.projects import ProjectRepository, Project
-from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+
+from src.app.db.database import SessionLocal
+from src.app.repository.projects import Project, ProjectRepository
+from src.app.schemas import ProjectCreate, ProjectRead
 
 OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
 

@@ -1,6 +1,7 @@
 from datetime import date, datetime
-from typing import Literal, Annotated
-from pydantic import BaseModel, Field, model_validator, ConfigDict
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 

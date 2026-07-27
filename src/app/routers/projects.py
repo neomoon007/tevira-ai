@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends
+
 from src.app.schemas import ProjectCreate, ProjectRead
 from src.app.services.projects import (
     create_project,
-    list_projects,
-    get_project,
-    rename_project,
     delete_project,
+    get_project,
+    list_projects,
+    rename_project,
 )
 
 router = APIRouter(prefix="/projects", tags=["Projects"])

@@ -1,7 +1,8 @@
 from fastapi import APIRouter
+
 from src.app.schemas import (
-    ProposedAction,
     ApplyActionResponse,
+    ProposedAction,
 )
 from src.app.services.actions import apply_action
 

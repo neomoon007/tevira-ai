@@ -1,8 +1,9 @@
-from sqlalchemy import String, ForeignKey, Date, DateTime
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import ARRAY
 from datetime import date, datetime
 from typing import Literal
+
+from sqlalchemy import Date, DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):

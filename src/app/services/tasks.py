@@ -1,9 +1,10 @@
-from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
-from src.app.db.models import Task
-from src.app.db.database import SessionLocal
-from src.app.repository.tasks import TaskRepository
-from sqlalchemy.exc import NoResultFound
 from fastapi import HTTPException
+from sqlalchemy.exc import NoResultFound
+
+from src.app.db.database import SessionLocal
+from src.app.db.models import Task
+from src.app.repository.tasks import TaskRepository
+from src.app.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
 
 OWNER_ID = "local_user"
 

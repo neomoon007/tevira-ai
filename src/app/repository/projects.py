@@ -1,6 +1,7 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import Integer, cast, delete, desc, func, select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select, func, delete, desc, cast, Integer
+from sqlalchemy.orm import Session
+
 from src.app.db.models import Project
 from src.app.schemas import ProjectRead
 

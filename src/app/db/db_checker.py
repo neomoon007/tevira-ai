@@ -1,5 +1,6 @@
-from src.app.db.database import engine
 from sqlalchemy import text
+
+from src.app.db.database import engine
 
 
 def check_db_health():

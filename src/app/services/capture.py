@@ -1,12 +1,12 @@
+from src.app.parser import parse_note
 from src.app.schemas import (
     CaptureRead,
-    CreateTaskProposal,
-    CreateProgressNoteProposal,
-    NonEmptyString,
-    CreateTaskAction,
     CreateProgressNoteAction,
+    CreateProgressNoteProposal,
+    CreateTaskAction,
+    CreateTaskProposal,
+    NonEmptyString,
 )
-from src.app.parser import parse_note
 from src.app.state.memory import projects_in_memory
 
 

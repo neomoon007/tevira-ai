@@ -1,11 +1,12 @@
 from fastapi import APIRouter
+
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
 from src.app.services.progress_notes import (
     create_progress_note,
+    delete_progress_note,
     get_notes_by_project,
     get_progress_note_by_id,
     update_progress_note,
-    delete_progress_note,
 )
 
 router = APIRouter(prefix="/progress-notes", tags=["Progress Notes"])

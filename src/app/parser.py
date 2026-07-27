@@ -5,9 +5,11 @@
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
-from src.app.schemas import ParseNoteRead
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+
+from src.app.schemas import ParseNoteRead
 
 load_dotenv()
 

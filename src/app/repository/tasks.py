@@ -1,6 +1,7 @@
+from sqlalchemy import Integer, cast, delete, desc, func, select, update
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import NoResultFound, IntegrityError
-from sqlalchemy import select, func, desc, cast, Integer, update, delete
+
 from src.app.db.models import Task
 
 

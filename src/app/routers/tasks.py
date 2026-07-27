@@ -1,16 +1,17 @@
-from src.app.services.tasks import (
-    create_task,
-    show_tasks,
-    update_task,
-    delete_task,
-    get_task_by_id,
-)
 from fastapi import APIRouter, Depends
+
 from src.app.schemas import (
+    NonEmptyString,
     TaskCreate,
     TaskRead,
     TaskUpdate,
-    NonEmptyString,
+)
+from src.app.services.tasks import (
+    create_task,
+    delete_task,
+    get_task_by_id,
+    show_tasks,
+    update_task,
 )
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
