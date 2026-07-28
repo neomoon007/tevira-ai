@@ -7,11 +7,10 @@ from src.app.schemas import (
     CreateTaskProposal,
     NonEmptyString,
 )
-from src.app.state.memory import projects_in_memory
 
 
 def capture_from_text(raw_input: NonEmptyString) -> CaptureRead:
-    parsed_input = parse_note(raw_input, projects_in_memory)
+    parsed_input = parse_note(raw_input)
 
     return CaptureRead(
         raw_text=raw_input,
