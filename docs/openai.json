@@ -1332,24 +1332,24 @@
       },
       "ProjectCreate": {
         "properties": {
-          "name": {
+          "title": {
             "type": "string",
             "minLength": 1,
-            "title": "Name"
+            "title": "Title"
           }
         },
         "type": "object",
         "required": [
-          "name"
+          "title"
         ],
         "title": "ProjectCreate"
       },
       "ProjectRead": {
         "properties": {
-          "name": {
+          "title": {
             "type": "string",
             "minLength": 1,
-            "title": "Name"
+            "title": "Title"
           },
           "id": {
             "type": "string",
@@ -1358,7 +1358,7 @@
         },
         "type": "object",
         "required": [
-          "name",
+          "title",
           "id"
         ],
         "title": "ProjectRead"
