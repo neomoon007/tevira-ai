@@ -1,5 +1,4 @@
 from src.app.services.projects import get_project
-from src.app.state.memory import projects_in_memory
 import pytest
 from fastapi import HTTPException
 

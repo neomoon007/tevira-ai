@@ -1,4 +1,3 @@
-from src.app.services.context import validate_progress_note
 import pytest
 from fastapi import HTTPException
 

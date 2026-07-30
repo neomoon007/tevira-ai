@@ -1,6 +1,5 @@
 from datetime import date
 from src.app.services.tasks import get_important_task
-from src.app.state.memory import tasks_in_memory
 
 
 def test_restore_context_accepts_valid_project_with_existing_note(client):

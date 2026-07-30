@@ -1,5 +1,4 @@
 from src.app.parser import parse_note
-import src.app.state.memory as memory
 
 
 def test_parse_note_accepts_valid_input():
