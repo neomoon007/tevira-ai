@@ -1,4 +1,4 @@
-from src.app.parser import parse_note
+from src.app.services.parser import parse_note
 
 
 def test_parse_note_accepts_valid_input():

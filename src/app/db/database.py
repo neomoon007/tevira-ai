@@ -17,10 +17,17 @@ DATABASE_URL = (
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is missing")
 
-engine = create_engine(DATABASE_URL, echo=True)
 
-SessionLocal = sessionmaker(
-    bind=engine,
-    autoflush=False,
-    expire_on_commit=False,
-)
+def create_session(database_url: str):
+    engine = create_engine(database_url, echo=True)
+
+    SessionLocal = sessionmaker(
+        bind=engine,
+        autoflush=False,
+        expire_on_commit=False,
+    )
+
+    return engine, SessionLocal
+
+
+engine, SessionLocal = create_session(DATABASE_URL)

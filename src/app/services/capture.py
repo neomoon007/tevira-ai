@@ -1,4 +1,3 @@
-from src.app.parser import parse_note
 from src.app.schemas import (
     CaptureRead,
     CreateProgressNoteAction,
@@ -7,6 +6,7 @@ from src.app.schemas import (
     CreateTaskProposal,
     NonEmptyString,
 )
+from src.app.services.parser import parse_note
 
 
 def capture_from_text(raw_input: NonEmptyString) -> CaptureRead:
