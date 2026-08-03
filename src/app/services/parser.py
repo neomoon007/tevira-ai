@@ -8,6 +8,7 @@
 import os
 
 from dotenv import load_dotenv
+from sqlalchemy.orm import Session
 
 from src.app.schemas import ParseNoteRead
 from src.app.services.projects import list_projects
@@ -18,19 +19,9 @@ default_project = os.getenv("DEFAULT_PROJECT", "Inbox")
 default_project_id = "project_1"  # TODO: Change from hardcoded default project to .env file based project config
 
 
-def find_project(input: str) -> str:
-    projects = list_projects()
-    project_list = [project_obj.title for project_obj in projects]
-    input_list = input.split(" ")
-
-    hint = list(set(project_list) & set(input_list))
-
-    return hint[0] if hint and hint[0] != "" else default_project
-
-
 # Currently only supports projects that don't have spaces inside of its name, meaning it supports one word names and names separated by -
-def find_project_id_by_name(input: str) -> str:
-    projects = list_projects()
+def find_project_id_by_name(db: Session, input: str) -> str:
+    projects = list_projects(db)
     input_list = input.split(" ")
 
     for input_item in input_list:
@@ -49,7 +40,7 @@ def find_project_id_by_name(input: str) -> str:
     return default_project_id
 
 
-def parse_note(mind_dump_note: str) -> ParseNoteRead:
+def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
     next_action_marker = " Next, "
     due_date_marker = " before "
 
@@ -58,7 +49,7 @@ def parse_note(mind_dump_note: str) -> ParseNoteRead:
 
     title = title[8:]  # extrart the "Need to" placeholder
 
-    project_hint = find_project_id_by_name(title)
+    project_hint = find_project_id_by_name(db, title)
 
     return ParseNoteRead(
         title=title,

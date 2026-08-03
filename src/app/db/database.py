@@ -1,8 +1,9 @@
 import os
+from collections.abc import Iterator
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 load_dotenv()
 
@@ -31,3 +32,12 @@ def create_session(database_url: str):
 
 
 engine, SessionLocal = create_session(DATABASE_URL)
+
+
+def get_db() -> Iterator[Session]:
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()

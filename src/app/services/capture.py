@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Session
+
 from src.app.schemas import (
     CaptureRead,
     CreateProgressNoteAction,
@@ -9,8 +11,8 @@ from src.app.schemas import (
 from src.app.services.parser import parse_note
 
 
-def capture_from_text(raw_input: NonEmptyString) -> CaptureRead:
-    parsed_input = parse_note(raw_input)
+def capture_from_text(db: Session, raw_input: NonEmptyString) -> CaptureRead:
+    parsed_input = parse_note(db, raw_input)
 
     return CaptureRead(
         raw_text=raw_input,
