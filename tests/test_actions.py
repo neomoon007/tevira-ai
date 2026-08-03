@@ -1,7 +1,7 @@
 from datetime import date
 
 
-def test_actions_accepts_valid_create_task_object(client):
+def test_actions_accepts_valid_create_task_object(client, test_project):
     title = "finish tests for portfolio project"
     due_date_hint = "today."
     project_id_hint = "project_1"

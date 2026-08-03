@@ -20,7 +20,7 @@ if not DATABASE_URL:
 
 
 def create_session(database_url: str):
-    engine = create_engine(database_url, echo=True)
+    engine = create_engine(database_url, echo=False)
 
     SessionLocal = sessionmaker(
         bind=engine,
