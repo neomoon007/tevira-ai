@@ -1,12 +1,13 @@
 from fastapi import FastAPI
+
 from src.app.routers import (
-    health,
-    projects,
-    progress_notes,
-    context,
-    tasks,
-    capture,
     actions,
+    capture,
+    context,
+    health,
+    progress_notes,
+    projects,
+    tasks,
 )
 
 

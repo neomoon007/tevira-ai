@@ -5,9 +5,13 @@
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
-from src.app.schemas import ParseNoteRead
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+
+from src.app.schemas import ParseNoteRead
+from src.app.services.projects import list_projects
 
 load_dotenv()
 
@@ -15,22 +19,18 @@ default_project = os.getenv("DEFAULT_PROJECT", "Inbox")
 default_project_id = "project_1"  # TODO: Change from hardcoded default project to .env file based project config
 
 
-def find_project(projects: dict, input: str) -> str:
-    project_list = [project_loop.name for project_loop in projects.values()]
-    input_list = input.split(" ")
-
-    hint = list(set(project_list) & set(input_list))
-
-    return hint[0] if hint and hint[0] != "" else default_project
-
-
 # Currently only supports projects that don't have spaces inside of its name, meaning it supports one word names and names separated by -
-def find_project_id_by_name(projects: dict, input: str) -> str:
+def find_project_id_by_name(db: Session, input: str) -> str:
+    projects = list_projects(db)
     input_list = input.split(" ")
 
     for input_item in input_list:
         project_id = next(
-            (project.id for project in projects.values() if project.name == input_item),
+            (
+                project_obj.id
+                for project_obj in projects
+                if project_obj.title == input_item
+            ),
             None,
         )
 
@@ -40,7 +40,7 @@ def find_project_id_by_name(projects: dict, input: str) -> str:
     return default_project_id
 
 
-def parse_note(mind_dump_note: str, projects: dict) -> ParseNoteRead:
+def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
     next_action_marker = " Next, "
     due_date_marker = " before "
 
@@ -49,7 +49,7 @@ def parse_note(mind_dump_note: str, projects: dict) -> ParseNoteRead:
 
     title = title[8:]  # extrart the "Need to" placeholder
 
-    project_hint = find_project_id_by_name(projects, title)
+    project_hint = find_project_id_by_name(db, title)
 
     return ParseNoteRead(
         title=title,

@@ -1,22 +1,4 @@
-from src.app.services.context import validate_progress_note
-import pytest
-from fastapi import HTTPException
-
-
-def test_validate_progress_note_accepts_existing_note():
-
-    response = validate_progress_note("project_1")
-    assert response == "project_1"
-
-
-def test_validate_progress_note_raises_404_for_non_existing_note():
-    with pytest.raises(HTTPException) as exception_info:
-        validate_progress_note("project_42")
-
-    assert exception_info.value.status_code == 404
-
-
-def test_create_progress_note_accepts_valid_note_object(client):
+def test_create_progress_note_accepts_valid_note_obj(client, test_project):
     response = client.post(
         "/progress-notes",
         json={
@@ -44,29 +26,41 @@ def test_create_progress_note_accepts_valid_note_object(client):
     assert data["confidence"] == "high"
 
 
-def test_get_progress_note_returns_given_note(client):
+def test_get_progress_note_returns_existing_note(client, test_project, test_note):
     note_id = "note_1"
 
     response = client.get(f"/progress-notes/{note_id}")
 
     assert response.status_code == 200
 
+    data = response.json()
 
-def test_patch_note_router_returns_accepts_valid_input(client):
+    assert data["id"] == "note_1"
+    assert data["project_id"] == "project_1"
+    assert data["current_state"] == "test state"
+    assert data["last_session"] == "last session log"
+    assert data["open_loops"] == ["first open loop", "second open loop"]
+    assert data["next_actions"] == "build more, build faster"
+    assert data["important_context"] == "this is important"
+    assert data["blockers"] == ["bugs"]
+    assert data["confidence"] == "medium"
+
+
+def test_patch_note_router_returns_accepts_valid_input(client, test_project, test_note):
     note_id = "note_1"
 
     response = client.patch(
-        f"/progress-notes/{note_id}",
-        json={"current_state": "new current state"},
+        f"/progress-notes/{note_id}", json={"current_state": "new current state"}
     )
 
     assert response.status_code == 200
 
     data = response.json()
+
     assert data["current_state"] == "new current state"
 
 
-def test_delete_note_returns_204_for_existing_note_id(client):
+def test_delete_note_returns_204_for_existing_note_id(client, test_project, test_note):
     note_id = "note_1"
 
     response = client.delete(f"/progress-notes/{note_id}")

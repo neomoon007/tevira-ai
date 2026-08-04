@@ -1,17 +1,18 @@
+from sqlalchemy.orm import Session
+
 from src.app.schemas import (
     CaptureRead,
-    CreateTaskProposal,
-    CreateProgressNoteProposal,
-    NonEmptyString,
-    CreateTaskAction,
     CreateProgressNoteAction,
+    CreateProgressNoteProposal,
+    CreateTaskAction,
+    CreateTaskProposal,
+    NonEmptyString,
 )
-from src.app.parser import parse_note
-from src.app.state.memory import projects_in_memory
+from src.app.services.parser import parse_note
 
 
-def capture_from_text(raw_input: NonEmptyString) -> CaptureRead:
-    parsed_input = parse_note(raw_input, projects_in_memory)
+def capture_from_text(db: Session, raw_input: NonEmptyString) -> CaptureRead:
+    parsed_input = parse_note(db, raw_input)
 
     return CaptureRead(
         raw_text=raw_input,

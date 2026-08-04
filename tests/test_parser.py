@@ -1,14 +1,14 @@
-from src.app.parser import parse_note
-import src.app.state.memory as memory
+from src.app.services.parser import parse_note
 
 
-def test_parse_note_accepts_valid_input():
+def test_parse_note_accepts_valid_input(db_session):
     messy_note = (
-        "Need to finish the README for SAT before Friday. Next, add setup commands"
+        "Need to finish the README for SAT before Friday. Next, add setup commands."
     )
-    response = parse_note(messy_note, memory.projects_in_memory)
+
+    response = parse_note(db_session, messy_note)
 
     assert response.title == "finish the README for SAT"
     assert response.project_id_hint == "project_1"
     assert response.due_date_hint == "Friday."
-    assert response.next_action_hint == "add setup commands"
+    assert response.next_action_hint == "add setup commands."

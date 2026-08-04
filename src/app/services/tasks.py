@@ -1,31 +1,38 @@
-from src.app.schemas import TaskCreate, TaskRead, NonEmptyString, TaskUpdate
-from src.app.state.memory import task_id_number, tasks_in_memory
-from src.app.services.projects import get_project
 from fastapi import HTTPException
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import Session
+
+from src.app.db.models import Task
+from src.app.repository.tasks import TaskRepository
+from src.app.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
+from src.app.services.projects import get_project
+
+OWNER_ID = "local_user"
 
 
-def get_project_tasks(project_id) -> list[TaskRead]:
-    return [
-        task
-        for task in tasks_in_memory
-        if task.project_id == project_id and task.status == "open"
-    ]
+def get_tasks_by_project(db: Session, project_id: str) -> list[TaskRead]:
+    repository = TaskRepository(db)
+
+    tasks_from_db = repository.get_by_project(OWNER_ID, project_id)
+
+    return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
-def get_task_by_id(task_id: str, database: list | None = None) -> TaskRead:
-    tasks_list = database if database is not None else tasks_in_memory
+def get_task_by_id(db: Session, task_id: str) -> TaskRead:
+    repository = TaskRepository(db)
 
-    matching_task = next((task for task in tasks_list if task.id == task_id), None)
-    if not matching_task:
+    task_from_db = repository.get_by_id(OWNER_ID, task_id)
+
+    if not task_from_db:
         raise HTTPException(
-            status_code=404,
-            detail=f"Error 404: Task '{task_id}' does not exist.",
+            status_code=404, detail=f"Error 404: {task_id} does not exist."
         )
-    return matching_task
+
+    return TaskRead.model_validate(task_from_db)
 
 
-def get_important_task(project_id: str) -> TaskRead | str:
-    tasks_db = get_project_tasks(project_id)
+def get_important_task(db: Session, project_id: str) -> TaskRead | str:
+    tasks_db = get_tasks_by_project(db, project_id)
     priority_list = ["high", "medium", "low"]
     recommended_task: TaskRead | None = None
 
@@ -41,57 +48,71 @@ def get_important_task(project_id: str) -> TaskRead | str:
     return "No open next action found."
 
 
-def create_task(task: TaskCreate) -> TaskRead:
-    global task_id_number
-    task_id_number += 1
+def create_task(db: Session, task: TaskCreate) -> TaskRead:
+    repository = TaskRepository(db)
 
-    task_id = f"task_{task_id_number}"
+    id_num_from_db = repository.get_highest_id(OWNER_ID)
 
-    new_task = TaskRead(
-        **task.model_dump(),  # Dumps all `task` fields here, no need to type them manually.
+    task_id = f"task_{id_num_from_db + 1}"
+
+    task_in = Task(
+        **task.model_dump(),
         id=task_id,
         status="open",
+        owner_id=OWNER_ID,
     )
 
-    tasks_in_memory.append(new_task)
+    task_out = repository.create(task_in)
 
-    return new_task
+    return TaskRead.model_validate(task_out)
+
+
+def get_all_tasks(db: Session) -> list[TaskRead]:
+    repository = TaskRepository(db)
+
+    tasks_from_db = repository.get_all(OWNER_ID)
+
+    return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
 def show_tasks(
-    project_id: str | None = None, task_id: str | None = None
+    db: Session, project_id: str | None = None, task_id: str | None = None
 ) -> list[TaskRead]:  # type: ignore
     if project_id is None and task_id is None:
-        return tasks_in_memory
+        return get_all_tasks(db)
 
     if project_id is not None and task_id is None:
-        get_project(project_id)
-        return get_project_tasks(project_id)
+        if not get_project(db, project_id):
+            raise HTTPException(
+                status_code=404, detail=f"Project '{project_id}' does not exist."
+            )
+        return get_tasks_by_project(db, project_id)
 
-    if project_id is None and task_id is not None:
-        return [get_task_by_id(task_id)]
-
-    if project_id is not None and task_id is not None:
-        get_project(project_id)
-        project_tasks = get_project_tasks(project_id)
-        return [get_task_by_id(task_id, project_tasks)]
-
-
-def update_task(task_id: NonEmptyString, updated_task: TaskUpdate) -> TaskRead:
-    matching_task = get_task_by_id(task_id)
-    merged_task = {
-        **matching_task.model_dump(),
-        **updated_task.model_dump(exclude_none=True),
-    }
-
-    task_index = tasks_in_memory.index(matching_task)
-    tasks_in_memory[task_index] = TaskRead(**merged_task)
-
-    return TaskRead(**merged_task)
+    if (
+        project_id is None
+        and task_id is not None
+        or project_id is not None
+        and task_id is not None
+    ):
+        return [get_task_by_id(db, task_id)]
 
 
-def delete_task(task_id: NonEmptyString) -> None:
-    matching_task = get_task_by_id(task_id)
-    task_index = tasks_in_memory.index(matching_task)
-    del tasks_in_memory[task_index]
-    # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
+def update_task(
+    db: Session, task_id: NonEmptyString, updated_task: TaskUpdate
+) -> TaskRead:
+    update_data = updated_task.model_dump(exclude_unset=True)
+
+    try:
+        repository = TaskRepository(db)
+
+        task_from_db = repository.update(OWNER_ID, task_id, update_data)
+    except NoResultFound:
+        raise HTTPException(status_code=404, detail=f"Task: {task_id} does not exist.")
+
+    return TaskRead.model_validate(task_from_db)
+
+
+def delete_task(db: Session, task_id: NonEmptyString) -> None:
+    repository = TaskRepository(db)
+
+    repository.delete(OWNER_ID, task_id)

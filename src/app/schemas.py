@@ -1,6 +1,7 @@
 from datetime import date, datetime
-from typing import Literal, Annotated
-from pydantic import BaseModel, Field, model_validator
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
@@ -16,6 +17,8 @@ class TaskCreate(BaseModel):
 class TaskRead(TaskCreate):
     id: str
     status: Literal["open", "done"] = "open"
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class TaskUpdate(BaseModel):
@@ -44,11 +47,13 @@ class TaskUpdate(BaseModel):
 
 # --- PROJECTS ---
 class ProjectCreate(BaseModel):
-    name: NonEmptyString
+    title: NonEmptyString
 
 
 class ProjectRead(ProjectCreate):
     id: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 # --- PROGRESS NOTES ---
@@ -66,6 +71,8 @@ class ProgressNoteCreate(BaseModel):
 class ProgressNoteRead(ProgressNoteCreate):
     id: str
     updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProgressNoteUpdate(BaseModel):

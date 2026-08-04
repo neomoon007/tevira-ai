@@ -1,39 +1,30 @@
-from src.app.state.memory import projects_in_memory, progress_notes_in_memory
-from src.app.services.tasks import get_important_task, get_project_tasks
-from src.app.schemas import ContextRead, NonEmptyString
 from operator import attrgetter
-from fastapi import HTTPException
 
-def validate_progress_note(project_id: str):
-    if any(note.project_id == project_id for note in progress_notes_in_memory):
-        return project_id
-    else:
-        raise HTTPException(
-            status_code=404,
-            detail="Error 404: No progress note found for this project.",
-        )
+from sqlalchemy.orm import Session
 
-def restore_context(project_id: NonEmptyString) -> ContextRead:
+from src.app.schemas import ContextRead, NonEmptyString
+from src.app.services.progress_notes import get_notes_by_project
+from src.app.services.projects import get_project
+from src.app.services.tasks import get_important_task, get_tasks_by_project
+
+
+def restore_context(db: Session, project_id: NonEmptyString) -> ContextRead:
     # find project
-    project = projects_in_memory[project_id]
+    project = get_project(db, project_id)
 
-    validate_progress_note(project_id)
-
-    # find all notes that belong to that project_id
-    matching_notes = [
-        note for note in progress_notes_in_memory if note.project_id == project_id
-    ]
+    # find all notes that belong in that project
+    matching_notes = get_notes_by_project(db, project_id)
 
     # find all tasks that belong to that project_id && status == "open"
-    open_tasks = get_project_tasks(project_id)
+    open_tasks = get_tasks_by_project(db, project_id)
 
-    # output recommended next action (latest note next actions OR open tasks
+    # output recommended next action (latest note next actions OR open tasks)
     latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)
 
     next_actions = (
         latest_note.next_actions
         if latest_note and latest_note.next_actions
-        else get_important_task(project_id)
+        else get_important_task(db, project_id)
     )
 
     return ContextRead(

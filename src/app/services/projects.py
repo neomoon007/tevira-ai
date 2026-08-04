@@ -1,52 +1,80 @@
-from src.app.state.memory import project_id_number, projects_in_memory
-from src.app.schemas import ProjectCreate, ProjectRead
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-def get_project_by_id(project_id: str) -> ProjectRead:
-    return projects_in_memory[project_id]
+from src.app.repository.projects import Project, ProjectRepository
+from src.app.schemas import ProjectCreate, ProjectRead
 
-def get_project(project_id: str) -> ProjectRead:
+OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
+
+
+def get_project(db: Session, project_id: str) -> ProjectRead:
     if project_id == "":
         raise HTTPException(
             status_code=400, detail="Error 400: Empty string where input is required"
         )
 
-    try:
-        project = projects_in_memory[project_id]
-        return project
-    except KeyError as project_missing:
+    repository = ProjectRepository(db)
+
+    project_from_db = repository.get_by_id(OWNER_ID, project_id)
+
+    if not project_from_db:
         raise HTTPException(
             status_code=404,
-            detail=f"Error 404: Project {project_missing} does not exist.",
+            detail=f"Error 404: Project {project_id} does not exist.",
         )
 
-def create_project(project: ProjectCreate) -> ProjectRead:
-    global project_id_number
-    project_id_number += 1
+    return ProjectRead.model_validate(project_from_db)
 
-    project_id = f"project_{project_id_number}"
 
-    new_project = ProjectRead(
+def create_project(db: Session, project: ProjectCreate) -> ProjectRead:
+    repository = ProjectRepository(db)
+
+    id_num_from_db = repository.get_highest_id(OWNER_ID)
+
+    project_id = f"project_{id_num_from_db + 1}"
+
+    project_in = Project(
         **project.model_dump(),
         id=project_id,
+        owner_id=OWNER_ID,
     )
 
-    projects_in_memory[new_project.id] = new_project
+    project_out = repository.create(project_in)
 
-    return new_project
+    return ProjectRead.model_validate(project_out)
 
-def list_projects() -> list[ProjectRead]:
-    return list(projects_in_memory.values())
 
-def rename_project(new_title: ProjectCreate, project_id: str) -> ProjectRead:
+def list_projects(db: Session) -> list[ProjectRead]:
+    repository = ProjectRepository(db)
+
+    projects_from_db = repository.get_all(OWNER_ID)
+
+    return [ProjectRead.model_validate(project) for project in projects_from_db]
+
+
+def rename_project(
+    db: Session, new_title: ProjectCreate, project_id: str
+) -> ProjectRead:
     renamed_project = ProjectRead(
         **new_title.model_dump(),
         id=project_id,
     )
 
-    projects_in_memory[renamed_project.id] = renamed_project
+    repository = ProjectRepository(db)
 
-    return renamed_project
+    project_result = repository.rename(OWNER_ID, renamed_project)
 
-def delete_project(project_id: str) -> None:
-    del projects_in_memory[project_id]
+    return ProjectRead.model_validate(project_result)
+
+
+def delete_project(db: Session, project_id: str) -> None:
+    try:
+        repository = ProjectRepository(db)
+
+        repository.delete(OWNER_ID, project_id)
+    except IntegrityError:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Project: {project_id} is currently linked to other resources such as notes or tasks.",
+        )

@@ -1,6 +1,9 @@
-from sqlalchemy import create_engine
-from dotenv import load_dotenv
 import os
+from collections.abc import Iterator
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 load_dotenv()
 
@@ -15,4 +18,26 @@ DATABASE_URL = (
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable is missing")
 
-engine = create_engine(DATABASE_URL, echo=True)
+
+def create_session(database_url: str):
+    engine = create_engine(database_url, echo=False)
+
+    SessionLocal = sessionmaker(
+        bind=engine,
+        autoflush=False,
+        expire_on_commit=False,
+    )
+
+    return engine, SessionLocal
+
+
+engine, SessionLocal = create_session(DATABASE_URL)
+
+
+def get_db() -> Iterator[Session]:
+    db = SessionLocal()
+
+    try:
+        yield db
+    finally:
+        db.close()
