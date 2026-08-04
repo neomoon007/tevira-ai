@@ -178,5 +178,6 @@ I am actively developing Tevira-AI and in the near future it will have more capa
 - **Real SQL database with persistent storage (PostgreSQL):** Currently using In-Memory storage to develop the core logic faster without having to deal with a real database just yet. This is what I'll be working on the next few days it's going to be the next feature added.
 - **Security and Login:** I plan to use OAuth in the future for login and security.
 
+
 ## License
 MIT License. See [LICENSE](LICENSE)
