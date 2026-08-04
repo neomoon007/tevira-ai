@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.app.db.database import get_db
@@ -43,4 +43,7 @@ def rename_project_endpoint(
 
 @router.delete("/{project_id}", status_code=204)
 def delete_project_endpoint(project_id: str, db: Session = Depends(get_db)) -> None:
+    if not get_project(db, project_id):
+        raise HTTPException(status_code=404)
+
     delete_project(db, project_id)

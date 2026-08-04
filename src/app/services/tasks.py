@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from src.app.db.models import Task
 from src.app.repository.tasks import TaskRepository
 from src.app.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
+from src.app.services.projects import get_project
 
 OWNER_ID = "local_user"
 
@@ -81,6 +82,10 @@ def show_tasks(
         return get_all_tasks(db)
 
     if project_id is not None and task_id is None:
+        if not get_project(db, project_id):
+            raise HTTPException(
+                status_code=404, detail=f"Project '{project_id}' does not exist."
+            )
         return get_tasks_by_project(db, project_id)
 
     if (
