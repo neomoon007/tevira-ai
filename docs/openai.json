@@ -127,7 +127,6 @@
             "required": true,
             "schema": {
               "type": "string",
-              "minLength": 1,
               "title": "Task Id"
             }
           }
