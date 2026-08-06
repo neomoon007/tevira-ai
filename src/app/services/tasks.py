@@ -49,6 +49,8 @@ def get_important_task(db: Session, project_id: str) -> TaskRead | str:
 
 
 def create_task(db: Session, task: TaskCreate) -> TaskRead:
+    get_project(db, task.project_id)
+
     repository = TaskRepository(db)
 
     id_num_from_db = repository.get_highest_id(OWNER_ID)
@@ -100,6 +102,9 @@ def show_tasks(
 def update_task(
     db: Session, task_id: NonEmptyString, updated_task: TaskUpdate
 ) -> TaskRead:
+    if updated_task.project_id:
+        get_project(db, updated_task.project_id)
+
     update_data = updated_task.model_dump(exclude_unset=True)
 
     try:

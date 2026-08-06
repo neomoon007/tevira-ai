@@ -3,6 +3,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from src.app.db.models import ProgressNote
+from src.app.services.projects import get_project
 from src.app.repository.progress_notes import ProgressNoteRepository
 from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
 
@@ -10,6 +11,8 @@ OWNER_ID = "local_user"
 
 
 def create_progress_note(db: Session, note: ProgressNoteCreate) -> ProgressNoteRead:
+    get_project(db, note.project_id)
+
     repository = ProgressNoteRepository(db)
 
     id_num_from_db = repository.get_highest_id(OWNER_ID)

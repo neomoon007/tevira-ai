@@ -11,7 +11,7 @@ class TaskCreate(BaseModel):
     title: NonEmptyString
     priority: Literal["low", "medium", "high"] = "medium"
     due_date: date | None = None
-    project_id: str | None = None
+    project_id: str
 
 
 class TaskRead(TaskCreate):

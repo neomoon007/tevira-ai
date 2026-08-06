@@ -56,6 +56,8 @@ def list_projects(db: Session) -> list[ProjectRead]:
 def rename_project(
     db: Session, new_title: ProjectCreate, project_id: str
 ) -> ProjectRead:
+    get_project(db, project_id)
+
     renamed_project = ProjectRead(
         **new_title.model_dump(),
         id=project_id,
