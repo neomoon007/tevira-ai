@@ -9,6 +9,9 @@
 
 A python API that stores your tasks, notes, projects and restores context for each of your projects so you can switch back to where you left it off without ever feeling lost again.
 
+<video src="https://github.com/user-attachments/assets/8fe6e6c0-2a4d-4d97-80dc-1860a5f800fe" controls="controls" width="100%">
+</video>
+
 ## 📃 Documentation
 You can check the endpoints and schemas by clicking on the badge below:
 
