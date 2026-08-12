@@ -3,8 +3,8 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from src.app.db.database import DATABASE_URL
-from src.app.db.models import Base
+from src.tevira_ai.db.database import DATABASE_URL
+from src.tevira_ai.db.models import Base
 
 config = context.config
 

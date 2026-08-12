@@ -2,7 +2,7 @@ from sqlalchemy import Integer, cast, delete, desc, func, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import Session
 
-from src.app.db.models import ProgressNote
+from src.tevira_ai.db.models import ProgressNote
 
 
 class ProgressNoteRepository:

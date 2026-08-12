@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from src.app.db.database import get_db
-from src.app.schemas import ContextRead
-from src.app.services.context import restore_context
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.schemas import ContextRead
+from src.tevira_ai.services.context import restore_context
 
 router = APIRouter(prefix="/context", tags=["Context"])
 

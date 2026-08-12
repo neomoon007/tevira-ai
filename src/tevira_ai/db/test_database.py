@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from src.app.db.database import create_session
+from src.tevira_ai.db.database import create_session
 
 load_dotenv()
 

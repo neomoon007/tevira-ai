@@ -2,8 +2,8 @@ from sqlalchemy import Integer, cast, delete, desc, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from src.app.db.models import Project
-from src.app.schemas import ProjectRead
+from src.tevira_ai.db.models import Project
+from src.tevira_ai.schemas import ProjectRead
 
 
 class ProjectRepository:

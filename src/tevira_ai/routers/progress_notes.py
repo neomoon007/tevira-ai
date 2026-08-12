@@ -1,9 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from src.app.db.database import get_db
-from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
-from src.app.services.progress_notes import (
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.schemas import (
+    ProgressNoteCreate,
+    ProgressNoteRead,
+    ProgressNoteUpdate,
+)
+from src.tevira_ai.services.progress_notes import (
     create_progress_note,
     delete_progress_note,
     get_notes_by_project,

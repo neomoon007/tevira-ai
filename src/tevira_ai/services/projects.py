@@ -2,8 +2,8 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from src.app.repository.projects import Project, ProjectRepository
-from src.app.schemas import ProjectCreate, ProjectRead
+from src.tevira_ai.repository.projects import Project, ProjectRepository
+from src.tevira_ai.schemas import ProjectCreate, ProjectRead
 
 OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
 

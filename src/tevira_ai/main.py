@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.app.routers import (
+from src.tevira_ai.routers import (
     actions,
     capture,
     context,

@@ -39,5 +39,5 @@ alembic upgrade head
 log_info "Database is up to date."
 
 log_info "Initializing uvicorn server..."
-uvicorn src.app.main:app --reload
+uvicorn src.tevira_ai.main:app --reload
 

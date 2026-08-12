@@ -215,7 +215,7 @@ alembic upgrade head
 
 #### 3.4 - Start Uvicorn server
 ```bash
-uvicorn src.app.main:app --reload
+uvicorn src.tevira_ai.main:app --reload
 ```
 
 ### 4. Test the application:

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from src.app.db.database import get_db
-from src.app.schemas import ProjectCreate, ProjectRead
-from src.app.services.projects import (
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.schemas import ProjectCreate, ProjectRead
+from src.tevira_ai.services.projects import (
     create_project,
     delete_project,
     get_project,

@@ -2,10 +2,10 @@ from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
-from src.app.db.models import Task
-from src.app.repository.tasks import TaskRepository
-from src.app.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
-from src.app.services.projects import get_project
+from src.tevira_ai.db.models import Task
+from src.tevira_ai.repository.tasks import TaskRepository
+from src.tevira_ai.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
+from src.tevira_ai.services.projects import get_project
 
 OWNER_ID = "local_user"
 

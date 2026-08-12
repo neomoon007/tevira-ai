@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from src.app.db.database import get_db
-from src.app.schemas import CaptureRead, NonEmptyString
-from src.app.services.capture import capture_from_text
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.schemas import CaptureRead, NonEmptyString
+from src.tevira_ai.services.capture import capture_from_text
 
 router = APIRouter(prefix="/capture", tags=["Capture"])
 

@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from src.app.db.database import get_db
-from src.app.schemas import (
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.schemas import (
     TaskCreate,
     TaskRead,
     TaskUpdate,
 )
-from src.app.services.tasks import (
+from src.tevira_ai.services.tasks import (
     create_task,
     delete_task,
     get_task_by_id,

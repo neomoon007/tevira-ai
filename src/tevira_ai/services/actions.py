@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.app.schemas import (
+from src.tevira_ai.schemas import (
     ApplyActionResponse,
     CreateProgressNoteAction,
     CreateProgressNoteProposal,
@@ -10,9 +10,9 @@ from src.app.schemas import (
     ProposedAction,
     TaskCreate,
 )
-from src.app.services.date_parser import parse_date
-from src.app.services.progress_notes import create_progress_note
-from src.app.services.tasks import create_task
+from src.tevira_ai.services.date_parser import parse_date
+from src.tevira_ai.services.progress_notes import create_progress_note
+from src.tevira_ai.services.tasks import create_task
 
 
 def apply_action(db: Session, action: ProposedAction) -> ApplyActionResponse:

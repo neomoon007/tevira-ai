@@ -2,10 +2,14 @@ from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
-from src.app.db.models import ProgressNote
-from src.app.services.projects import get_project
-from src.app.repository.progress_notes import ProgressNoteRepository
-from src.app.schemas import ProgressNoteCreate, ProgressNoteRead, ProgressNoteUpdate
+from src.tevira_ai.db.models import ProgressNote
+from src.tevira_ai.services.projects import get_project
+from src.tevira_ai.repository.progress_notes import ProgressNoteRepository
+from src.tevira_ai.schemas import (
+    ProgressNoteCreate,
+    ProgressNoteRead,
+    ProgressNoteUpdate,
+)
 
 OWNER_ID = "local_user"
 

@@ -2,8 +2,8 @@ import pytest
 from fastapi import HTTPException
 from sqlalchemy import select
 
-from src.app.db.models import Project
-from src.app.services.projects import get_project
+from src.tevira_ai.db.models import Project
+from src.tevira_ai.services.projects import get_project
 
 
 def test_can_insert_project(db_session):

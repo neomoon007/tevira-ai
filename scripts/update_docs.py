@@ -1,9 +1,9 @@
 import sys
 
-sys.path.append(".")
+sys.path.tevira_aiend(".")
 
 import json
-from src.app.main import app
+from src.tevira_ai.main import app
 
 with open("docs/openai.json", "w") as docs_file:
     json.dump(app.openapi(), docs_file, indent=2)

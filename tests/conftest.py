@@ -2,10 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker
 
-from src.app.db.database import get_db
-from src.app.db.models import ProgressNote, Project, Task
-from src.app.db.test_database import engine
-from src.app.main import app
+from src.tevira_ai.db.database import get_db
+from src.tevira_ai.db.models import ProgressNote, Project, Task
+from src.tevira_ai.db.test_database import engine
+from src.tevira_ai.main import app
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.app.schemas import (
+from src.tevira_ai.schemas import (
     CaptureRead,
     CreateProgressNoteAction,
     CreateProgressNoteProposal,
@@ -8,7 +8,7 @@ from src.app.schemas import (
     CreateTaskProposal,
     NonEmptyString,
 )
-from src.app.services.parser import parse_note
+from src.tevira_ai.services.parser import parse_note
 
 
 def capture_from_text(db: Session, raw_input: NonEmptyString) -> CaptureRead:

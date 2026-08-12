@@ -10,8 +10,8 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
-from src.app.schemas import ParseNoteRead
-from src.app.services.projects import list_projects
+from src.tevira_ai.schemas import ParseNoteRead
+from src.tevira_ai.services.projects import list_projects
 
 load_dotenv()
 

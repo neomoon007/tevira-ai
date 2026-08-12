@@ -1,7 +1,7 @@
 from pydantic import TypeAdapter
 
-from src.app.schemas import TaskRead
-from src.app.services.tasks import get_important_task, get_tasks_by_project
+from src.tevira_ai.schemas import TaskRead
+from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project
 
 
 def test_get_important_task_returns_highest_priority_task(
