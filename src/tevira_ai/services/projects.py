@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -8,12 +10,7 @@ from src.tevira_ai.schemas import ProjectCreate, ProjectRead
 OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
 
 
-def get_project(db: Session, project_id: str) -> ProjectRead:
-    if project_id == "":
-        raise HTTPException(
-            status_code=400, detail="Error 400: Empty string where input is required"
-        )
-
+def get_project(db: Session, project_id: uuid.UUID) -> ProjectRead:
     repository = ProjectRepository(db)
 
     project_from_db = repository.get_by_id(OWNER_ID, project_id)
@@ -30,13 +27,8 @@ def get_project(db: Session, project_id: str) -> ProjectRead:
 def create_project(db: Session, project: ProjectCreate) -> ProjectRead:
     repository = ProjectRepository(db)
 
-    id_num_from_db = repository.get_highest_id(OWNER_ID)
-
-    project_id = f"project_{id_num_from_db + 1}"
-
     project_in = Project(
         **project.model_dump(),
-        id=project_id,
         owner_id=OWNER_ID,
     )
 
@@ -54,7 +46,7 @@ def list_projects(db: Session) -> list[ProjectRead]:
 
 
 def rename_project(
-    db: Session, new_title: ProjectCreate, project_id: str
+    db: Session, new_title: ProjectCreate, project_id: uuid.UUID
 ) -> ProjectRead:
     get_project(db, project_id)
 
@@ -70,7 +62,7 @@ def rename_project(
     return ProjectRead.model_validate(project_result)
 
 
-def delete_project(db: Session, project_id: str) -> None:
+def delete_project(db: Session, project_id: uuid.UUID) -> None:
     try:
         repository = ProjectRepository(db)
 

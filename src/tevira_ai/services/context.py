@@ -1,3 +1,5 @@
+import uuid
+
 from operator import attrgetter
 
 from sqlalchemy.orm import Session
@@ -8,7 +10,7 @@ from src.tevira_ai.services.projects import get_project
 from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project
 
 
-def restore_context(db: Session, project_id: NonEmptyString) -> ContextRead:
+def restore_context(db: Session, project_id: uuid.UUID) -> ContextRead:
     # find project
     project = get_project(db, project_id)
 

@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -10,6 +12,6 @@ router = APIRouter(prefix="/context", tags=["Context"])
 
 @router.get("/{project_id}")
 def restore_context_endpoint(
-    project_id: str, db: Session = Depends(get_db)
+    project_id: uuid.UUID, db: Session = Depends(get_db)
 ) -> ContextRead:
     return restore_context(db, project_id)

@@ -1,4 +1,6 @@
-from sqlalchemy import Integer, cast, delete, desc, func, select, update
+import uuid
+
+from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import Session
 
@@ -25,21 +27,9 @@ class ProgressNoteRepository:
 
         return tasks_list
 
-    def get_highest_id(self, owner_id: str) -> int:
-        clean_number = func.regexp_replace(ProgressNote.id, r"\D", "", "g")
-        num_only_from_id = cast(clean_number, Integer)
-        query = (
-            select(num_only_from_id)
-            .where(ProgressNote.owner_id == owner_id)
-            .order_by(desc(num_only_from_id))
-            .limit(1)
-        )
-
-        highest_task_id = self.session.scalars(query).first()
-
-        return highest_task_id if highest_task_id is not None else 0
-
-    def get_by_project(self, owner_id: str, project_id: str) -> list[ProgressNote]:
+    def get_by_project(
+        self, owner_id: str, project_id: uuid.UUID
+    ) -> list[ProgressNote]:
         notes_list = list(
             self.session.scalars(
                 select(ProgressNote).where(
@@ -51,7 +41,7 @@ class ProgressNoteRepository:
 
         return notes_list
 
-    def get_by_id(self, owner_id: str, note_id: str) -> ProgressNote | None:
+    def get_by_id(self, owner_id: str, note_id: uuid.UUID) -> ProgressNote | None:
         note_result = self.session.scalars(
             select(ProgressNote).where(
                 ProgressNote.owner_id == owner_id, ProgressNote.id == note_id
@@ -60,7 +50,7 @@ class ProgressNoteRepository:
 
         return note_result
 
-    def update(self, owner_id: str, note_id: str, note_obj: dict) -> ProgressNote:
+    def update(self, owner_id: str, note_id: uuid.UUID, note_obj: dict) -> ProgressNote:
         try:
             updated_note = self.session.execute(
                 update(ProgressNote)
@@ -75,7 +65,7 @@ class ProgressNoteRepository:
             self.session.rollback()
             raise
 
-    def delete(self, owner_id: str, note_id: str):
+    def delete(self, owner_id: str, note_id: uuid.UUID):
         try:
             self.session.execute(
                 delete(ProgressNote).where(

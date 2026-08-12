@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -27,21 +29,21 @@ def create_task_endpoint(task: TaskCreate, db: Session = Depends(get_db)) -> Tas
 @router.get("")
 def show_tasks_endpoint(
     db: Session = Depends(get_db),
-    project_id: str | None = None,
-    task_id: str | None = None,
+    project_id: uuid.UUID | None = None,
+    task_id: uuid.UUID | None = None,
 ) -> list[TaskRead]:
     return show_tasks(db, project_id, task_id)
 
 
 @router.patch("/{task_id}")
 def update_task_endpoint(
-    task_id: str, updated_task: TaskUpdate, db: Session = Depends(get_db)
+    task_id: uuid.UUID, updated_task: TaskUpdate, db: Session = Depends(get_db)
 ) -> TaskRead:
     return update_task(db, task_id, updated_task)
 
 
 @router.delete("/{task_id}", status_code=204)
-def delete_task_endpoint(task_id: str, db: Session = Depends(get_db)) -> None:
+def delete_task_endpoint(task_id: uuid.UUID, db: Session = Depends(get_db)) -> None:
     if not get_task_by_id(db, task_id):
         raise HTTPException(status_code=404, detail=f"Task '{task_id}' does not exist.")
     delete_task(db, task_id)

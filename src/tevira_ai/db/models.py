@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, datetime
 from typing import Literal
 
@@ -17,7 +18,7 @@ class Base(DeclarativeBase):
 class Project(Base):
     __tablename__ = "projects"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
     owner_id: Mapped[str]
     title: Mapped[str]
 
@@ -25,10 +26,10 @@ class Project(Base):
 class Task(Base):
     __tablename__ = "tasks"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
     owner_id: Mapped[str]
     title: Mapped[str]
-    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"))
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"))
     priority: Mapped[Literal["low", "medium", "high"]]
     due_date: Mapped[date | None]
     status: Mapped[Literal["open", "done"]]
@@ -37,9 +38,9 @@ class Task(Base):
 class ProgressNote(Base):
     __tablename__ = "progress_notes"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
     owner_id: Mapped[str]
-    project_id: Mapped[str] = mapped_column(ForeignKey("projects.id"))
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"))
     current_state: Mapped[str | None]
     last_session: Mapped[str | None]
     open_loops: Mapped[list[str] | None]

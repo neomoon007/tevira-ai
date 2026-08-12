@@ -1,4 +1,6 @@
-from sqlalchemy import Integer, cast, delete, desc, func, select
+import uuid
+
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -17,21 +19,7 @@ class ProjectRepository:
 
         return project
 
-    def get_highest_id(self, owner_id: str) -> int:
-        clean_number = func.regexp_replace(Project.id, r"\D", "", "g")
-        num_only_from_id = cast(clean_number, Integer)
-        query = (
-            select(num_only_from_id)
-            .where(Project.owner_id == owner_id)
-            .order_by(desc(num_only_from_id))
-            .limit(1)
-        )
-
-        highest_project_id = self.session.scalars(query).first()
-
-        return highest_project_id if highest_project_id is not None else 0
-
-    def get_by_id(self, owner_id: str, project_id: str) -> Project | None:
+    def get_by_id(self, owner_id: str, project_id: uuid.UUID) -> Project | None:
         query_result = self.session.scalars(
             select(Project).where(
                 Project.owner_id == owner_id, Project.id == project_id
@@ -64,7 +52,7 @@ class ProjectRepository:
 
             return project
 
-    def delete(self, owner_id: str, project_id: str):
+    def delete(self, owner_id: str, project_id: uuid.UUID):
         try:
             self.session.execute(
                 delete(Project).where(

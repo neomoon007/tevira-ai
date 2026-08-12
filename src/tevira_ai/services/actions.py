@@ -41,11 +41,11 @@ def apply_action(db: Session, action: ProposedAction) -> ApplyActionResponse:
         )
 
     elif action.type == "create_progress_note":
-        project_id = "project_1"  # Project 1 should always be the Inbox
         note = create_progress_note(
             db,
             ProgressNoteCreate(
-                project_id=project_id, next_actions=action.data.next_action
+                project_id=action.data.project_hint,
+                next_actions=action.data.next_action,
             ),
         )
 
@@ -53,7 +53,9 @@ def apply_action(db: Session, action: ProposedAction) -> ApplyActionResponse:
             status="applied",
             action=CreateProgressNoteAction(
                 type="create_progress_note",
-                data=CreateProgressNoteProposal(next_action=note.next_actions),
+                data=CreateProgressNoteProposal(
+                    next_action=note.next_actions, project_hint=action.data.project_hint
+                ),
             ),
             result=note,
         )

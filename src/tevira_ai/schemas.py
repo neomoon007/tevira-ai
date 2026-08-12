@@ -1,3 +1,4 @@
+import uuid
 from datetime import date, datetime
 from typing import Annotated, Literal
 
@@ -11,11 +12,11 @@ class TaskCreate(BaseModel):
     title: NonEmptyString
     priority: Literal["low", "medium", "high"] = "medium"
     due_date: date | None = None
-    project_id: str
+    project_id: uuid.UUID
 
 
 class TaskRead(TaskCreate):
-    id: str
+    id: uuid.UUID | None = None
     status: Literal["open", "done"] = "open"
 
     model_config = ConfigDict(from_attributes=True)
@@ -25,7 +26,7 @@ class TaskUpdate(BaseModel):
     title: NonEmptyString | None = None
     priority: Literal["low", "medium", "high"] | None = None
     due_date: date | None = None
-    project_id: str | None = None
+    project_id: uuid.UUID | None = None
     status: Literal["open", "done"] | None = None
 
     @model_validator(mode="before")
@@ -51,14 +52,14 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectRead(ProjectCreate):
-    id: str
+    id: uuid.UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
 # --- PROGRESS NOTES ---
 class ProgressNoteCreate(BaseModel):
-    project_id: str
+    project_id: uuid.UUID
     current_state: NonEmptyString | None = None
     last_session: NonEmptyString | None = None
     open_loops: list[str] = []
@@ -69,14 +70,14 @@ class ProgressNoteCreate(BaseModel):
 
 
 class ProgressNoteRead(ProgressNoteCreate):
-    id: str
+    id: uuid.UUID | None = None
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class ProgressNoteUpdate(BaseModel):
-    project_id: str | None = None
+    project_id: uuid.UUID | None = None
     current_state: NonEmptyString | None = None
     last_session: NonEmptyString | None = None
     open_loops: list[str] | None = None
@@ -116,7 +117,7 @@ class ContextRead(BaseModel):
 # --- PARSER ---
 class ParseNoteRead(BaseModel):
     title: NonEmptyString
-    project_id_hint: NonEmptyString
+    project_id_hint: uuid.UUID
     due_date_hint: NonEmptyString
     next_action_hint: NonEmptyString
 
@@ -124,11 +125,12 @@ class ParseNoteRead(BaseModel):
 class CreateTaskProposal(BaseModel):
     title: NonEmptyString
     due_date_hint: NonEmptyString
-    project_hint: NonEmptyString
+    project_hint: uuid.UUID
 
 
 class CreateProgressNoteProposal(BaseModel):
     next_action: str | None = None
+    project_hint: uuid.UUID
 
 
 class CreateTaskAction(BaseModel):

@@ -29,7 +29,8 @@ def capture_from_text(db: Session, raw_input: NonEmptyString) -> CaptureRead:
             CreateProgressNoteAction(
                 type="create_progress_note",
                 data=CreateProgressNoteProposal(
-                    next_action=parsed_input.next_action_hint
+                    next_action=parsed_input.next_action_hint,
+                    project_hint=parsed_input.project_id_hint,
                 ),
             ),
         ],

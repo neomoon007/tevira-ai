@@ -1,16 +1,18 @@
+import uuid
+
 from fastapi import HTTPException
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import Task
 from src.tevira_ai.repository.tasks import TaskRepository
-from src.tevira_ai.schemas import NonEmptyString, TaskCreate, TaskRead, TaskUpdate
+from src.tevira_ai.schemas import TaskCreate, TaskRead, TaskUpdate
 from src.tevira_ai.services.projects import get_project
 
 OWNER_ID = "local_user"
 
 
-def get_tasks_by_project(db: Session, project_id: str) -> list[TaskRead]:
+def get_tasks_by_project(db: Session, project_id: uuid.UUID) -> list[TaskRead]:
     repository = TaskRepository(db)
 
     tasks_from_db = repository.get_by_project(OWNER_ID, project_id)
@@ -18,7 +20,7 @@ def get_tasks_by_project(db: Session, project_id: str) -> list[TaskRead]:
     return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
-def get_task_by_id(db: Session, task_id: str) -> TaskRead:
+def get_task_by_id(db: Session, task_id: uuid.UUID) -> TaskRead:
     repository = TaskRepository(db)
 
     task_from_db = repository.get_by_id(OWNER_ID, task_id)
@@ -31,7 +33,7 @@ def get_task_by_id(db: Session, task_id: str) -> TaskRead:
     return TaskRead.model_validate(task_from_db)
 
 
-def get_important_task(db: Session, project_id: str) -> TaskRead | str:
+def get_important_task(db: Session, project_id: uuid.UUID) -> TaskRead | str:
     tasks_db = get_tasks_by_project(db, project_id)
     priority_list = ["high", "medium", "low"]
     recommended_task: TaskRead | None = None
@@ -53,13 +55,8 @@ def create_task(db: Session, task: TaskCreate) -> TaskRead:
 
     repository = TaskRepository(db)
 
-    id_num_from_db = repository.get_highest_id(OWNER_ID)
-
-    task_id = f"task_{id_num_from_db + 1}"
-
     task_in = Task(
         **task.model_dump(),
-        id=task_id,
         status="open",
         owner_id=OWNER_ID,
     )
@@ -78,7 +75,7 @@ def get_all_tasks(db: Session) -> list[TaskRead]:
 
 
 def show_tasks(
-    db: Session, project_id: str | None = None, task_id: str | None = None
+    db: Session, project_id: uuid.UUID | None = None, task_id: uuid.UUID | None = None
 ) -> list[TaskRead]:  # type: ignore
     if project_id is None and task_id is None:
         return get_all_tasks(db)
@@ -99,9 +96,7 @@ def show_tasks(
         return [get_task_by_id(db, task_id)]
 
 
-def update_task(
-    db: Session, task_id: NonEmptyString, updated_task: TaskUpdate
-) -> TaskRead:
+def update_task(db: Session, task_id: uuid.UUID, updated_task: TaskUpdate) -> TaskRead:
     if updated_task.project_id:
         get_project(db, updated_task.project_id)
 
@@ -117,7 +112,7 @@ def update_task(
     return TaskRead.model_validate(task_from_db)
 
 
-def delete_task(db: Session, task_id: NonEmptyString) -> None:
+def delete_task(db: Session, task_id: uuid.UUID) -> None:
     repository = TaskRepository(db)
 
     repository.delete(OWNER_ID, task_id)

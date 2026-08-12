@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -28,27 +30,29 @@ def create_progress_note_endpoint(
 
 @router.get("")
 def get_progress_notes_endpoint(
-    project_id: str = "", db: Session = Depends(get_db)
+    project_id: uuid.UUID, db: Session = Depends(get_db)
 ) -> list[ProgressNoteRead]:
     return get_notes_by_project(db, project_id)
 
 
 @router.get("/{note_id}")
 def get_progress_note_by_id_endpoint(
-    note_id: str, db: Session = Depends(get_db)
+    note_id: uuid.UUID, db: Session = Depends(get_db)
 ) -> ProgressNoteRead:
     return get_progress_note_by_id(db, note_id)
 
 
 @router.patch("/{note_id}")
 def update_progress_note_endpoint(
-    note_id: str, updated_note: ProgressNoteUpdate, db: Session = Depends(get_db)
+    note_id: uuid.UUID, updated_note: ProgressNoteUpdate, db: Session = Depends(get_db)
 ) -> ProgressNoteRead:
     return update_progress_note(db, note_id, updated_note)
 
 
 @router.delete("/{note_id}", status_code=204)
-def delete_progress_note_endpoint(note_id: str, db: Session = Depends(get_db)) -> None:
+def delete_progress_note_endpoint(
+    note_id: uuid.UUID, db: Session = Depends(get_db)
+) -> None:
     if not get_progress_note_by_id(db, note_id):
         raise HTTPException(status_code=404, detail=f"Note '{note_id}' does not exist.")
     delete_progress_note(db, note_id)

@@ -6,6 +6,7 @@
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
 import os
+import uuid
 
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
@@ -15,12 +16,11 @@ from src.tevira_ai.services.projects import list_projects
 
 load_dotenv()
 
-default_project = os.getenv("DEFAULT_PROJECT", "Inbox")
-default_project_id = "project_1"  # TODO: Change from hardcoded default project to .env file based project config
+default_project = uuid.UUID(os.getenv("DEFAULT_PROJECT"))
 
 
 # Currently only supports projects that don't have spaces inside of its name, meaning it supports one word names and names separated by -
-def find_project_id_by_name(db: Session, input: str) -> str:
+def find_project_id_by_name(db: Session, input: str) -> uuid.UUID:
     projects = list_projects(db)
     input_list = input.split(" ")
 
@@ -37,7 +37,7 @@ def find_project_id_by_name(db: Session, input: str) -> str:
         if project_id is not None:
             return project_id
 
-    return default_project_id
+    return default_project
 
 
 def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
