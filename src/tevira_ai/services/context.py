@@ -1,10 +1,9 @@
 import uuid
-
 from operator import attrgetter
 
 from sqlalchemy.orm import Session
 
-from src.tevira_ai.schemas import ContextRead, NonEmptyString
+from src.tevira_ai.schemas import ContextRead
 from src.tevira_ai.services.progress_notes import get_notes_by_project
 from src.tevira_ai.services.projects import get_project
 from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project

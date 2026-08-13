@@ -1,9 +1,8 @@
 import uuid
 
-from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.repository.projects import Project, ProjectRepository
 from src.tevira_ai.schemas import ProjectCreate, ProjectRead
 
@@ -16,9 +15,9 @@ def get_project(db: Session, project_id: uuid.UUID) -> ProjectRead:
     project_from_db = repository.get_by_id(OWNER_ID, project_id)
 
     if not project_from_db:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Error 404: Project {project_id} does not exist.",
+        raise ResourceNotFoundError(
+            resource_type="Project",
+            resource_id=str(project_id),
         )
 
     return ProjectRead.model_validate(project_from_db)
@@ -63,12 +62,7 @@ def rename_project(
 
 
 def delete_project(db: Session, project_id: uuid.UUID) -> None:
-    try:
-        repository = ProjectRepository(db)
+    get_project(db, project_id)
 
-        repository.delete(OWNER_ID, project_id)
-    except IntegrityError:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Project: {project_id} is currently linked to other resources such as notes or tasks.",
-        )
+    repository = ProjectRepository(db)
+    repository.delete(OWNER_ID, project_id)

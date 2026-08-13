@@ -1,10 +1,9 @@
 import uuid
 
-from fastapi import HTTPException
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import Task
+from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.repository.tasks import TaskRepository
 from src.tevira_ai.schemas import TaskCreate, TaskRead, TaskUpdate
 from src.tevira_ai.services.projects import get_project
@@ -26,8 +25,9 @@ def get_task_by_id(db: Session, task_id: uuid.UUID) -> TaskRead:
     task_from_db = repository.get_by_id(OWNER_ID, task_id)
 
     if not task_from_db:
-        raise HTTPException(
-            status_code=404, detail=f"Error 404: {task_id} does not exist."
+        raise ResourceNotFoundError(
+            resource_type="Task",
+            resource_id=str(task_id),
         )
 
     return TaskRead.model_validate(task_from_db)
@@ -76,15 +76,12 @@ def get_all_tasks(db: Session) -> list[TaskRead]:
 
 def show_tasks(
     db: Session, project_id: uuid.UUID | None = None, task_id: uuid.UUID | None = None
-) -> list[TaskRead]:  # type: ignore
+) -> list[TaskRead]:
     if project_id is None and task_id is None:
         return get_all_tasks(db)
 
     if project_id is not None and task_id is None:
-        if not get_project(db, project_id):
-            raise HTTPException(
-                status_code=404, detail=f"Project '{project_id}' does not exist."
-            )
+        get_project(db, project_id)
         return get_tasks_by_project(db, project_id)
 
     if (
@@ -95,24 +92,28 @@ def show_tasks(
     ):
         return [get_task_by_id(db, task_id)]
 
+    return []
+
 
 def update_task(db: Session, task_id: uuid.UUID, updated_task: TaskUpdate) -> TaskRead:
     if updated_task.project_id:
         get_project(db, updated_task.project_id)
 
     update_data = updated_task.model_dump(exclude_unset=True)
+    repository = TaskRepository(db)
+    task_from_db = repository.update(OWNER_ID, task_id, update_data)
 
-    try:
-        repository = TaskRepository(db)
-
-        task_from_db = repository.update(OWNER_ID, task_id, update_data)
-    except NoResultFound:
-        raise HTTPException(status_code=404, detail=f"Task: {task_id} does not exist.")
+    if not task_from_db:
+        raise ResourceNotFoundError(
+            resource_type="Task",
+            resource_id=str(task_id),
+        )
 
     return TaskRead.model_validate(task_from_db)
 
 
 def delete_task(db: Session, task_id: uuid.UUID) -> None:
-    repository = TaskRepository(db)
+    get_task_by_id(db, task_id)
 
+    repository = TaskRepository(db)
     repository.delete(OWNER_ID, task_id)

@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import Project
+from src.tevira_ai.exceptions import ResourceInUseError
 from src.tevira_ai.schemas import ProjectRead
 
 
@@ -63,4 +64,7 @@ class ProjectRepository:
         except IntegrityError:
             self.session.rollback()
 
-            raise
+            raise ResourceInUseError(
+                resource_type="Project",
+                resource_id=str(project_id),
+            )

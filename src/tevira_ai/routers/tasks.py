@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.database import get_db
@@ -12,7 +12,6 @@ from src.tevira_ai.schemas import (
 from src.tevira_ai.services.tasks import (
     create_task,
     delete_task,
-    get_task_by_id,
     show_tasks,
     update_task,
 )
@@ -44,6 +43,4 @@ def update_task_endpoint(
 
 @router.delete("/{task_id}", status_code=204)
 def delete_task_endpoint(task_id: uuid.UUID, db: Session = Depends(get_db)) -> None:
-    if not get_task_by_id(db, task_id):
-        raise HTTPException(status_code=404, detail=f"Task '{task_id}' does not exist.")
     delete_task(db, task_id)

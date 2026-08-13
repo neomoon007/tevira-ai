@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.database import get_db
@@ -53,6 +53,4 @@ def update_progress_note_endpoint(
 def delete_progress_note_endpoint(
     note_id: uuid.UUID, db: Session = Depends(get_db)
 ) -> None:
-    if not get_progress_note_by_id(db, note_id):
-        raise HTTPException(status_code=404, detail=f"Note '{note_id}' does not exist.")
     delete_progress_note(db, note_id)

@@ -1,10 +1,11 @@
 import uuid
 
 from sqlalchemy import delete, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import ProgressNote
+from src.tevira_ai.exceptions import ResourceInUseError
 
 
 class ProgressNoteRepository:
@@ -50,20 +51,18 @@ class ProgressNoteRepository:
 
         return note_result
 
-    def update(self, owner_id: str, note_id: uuid.UUID, note_obj: dict) -> ProgressNote:
-        try:
-            updated_note = self.session.execute(
-                update(ProgressNote)
-                .where(ProgressNote.owner_id == owner_id, ProgressNote.id == note_id)
-                .values(**note_obj)
-                .returning(ProgressNote)
-            ).scalar_one()
+    def update(
+        self, owner_id: str, note_id: uuid.UUID, note_obj: dict
+    ) -> ProgressNote | None:
+        updated_note = self.session.execute(
+            update(ProgressNote)
+            .where(ProgressNote.owner_id == owner_id, ProgressNote.id == note_id)
+            .values(**note_obj)
+            .returning(ProgressNote)
+        ).scalar_one_or_none()
 
-            self.session.commit()
-            return updated_note
-        except NoResultFound:
-            self.session.rollback()
-            raise
+        self.session.commit()
+        return updated_note
 
     def delete(self, owner_id: str, note_id: uuid.UUID):
         try:
@@ -76,7 +75,7 @@ class ProgressNoteRepository:
         except IntegrityError:
             self.session.rollback()
 
-            raise
+            raise ResourceInUseError(resource_type="Note", resource_id=str(note_id))
 
 
 # TODO: missing except statement for NoResultFound exception, also there is no error handling on the service layer yet!!!

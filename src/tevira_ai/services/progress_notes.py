@@ -1,10 +1,9 @@
 import uuid
 
-from fastapi import HTTPException
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import ProgressNote
+from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.repository.progress_notes import ProgressNoteRepository
 from src.tevira_ai.schemas import (
     ProgressNoteCreate,
@@ -37,8 +36,8 @@ def get_progress_note_by_id(db: Session, note_id: uuid.UUID) -> ProgressNoteRead
     note_from_db = repository.get_by_id(OWNER_ID, note_id)
 
     if not note_from_db:
-        raise HTTPException(
-            status_code=404, detail=f"Error 404: {note_id} does not exist."
+        raise ResourceNotFoundError(
+            resource_type="ProgressNote", resource_id=str(note_id)
         )
 
     return ProgressNoteRead.model_validate(note_from_db)
@@ -46,12 +45,6 @@ def get_progress_note_by_id(db: Session, note_id: uuid.UUID) -> ProgressNoteRead
 
 def get_notes_by_project(db: Session, project_id: uuid.UUID) -> list[ProgressNoteRead]:
     repository = ProgressNoteRepository(db)
-
-    if not project_id:
-        raise HTTPException(
-            status_code=404, detail=f"Error 404: project {project_id} does not exist."
-        )
-
     notes_from_db = repository.get_by_project(OWNER_ID, project_id)
 
     return [ProgressNoteRead.model_validate(note) for note in notes_from_db]
@@ -62,13 +55,12 @@ def update_progress_note(
 ) -> ProgressNoteRead:
     update_data = updated_note.model_dump(exclude_unset=True)
 
-    try:
-        repository = ProgressNoteRepository(db)
+    repository = ProgressNoteRepository(db)
+    note_from_db = repository.update(OWNER_ID, note_id, update_data)
 
-        note_from_db = repository.update(OWNER_ID, note_id, update_data)
-    except NoResultFound:
-        raise HTTPException(
-            status_code=404, detail=f"Error 404: {note_id} does not exist."
+    if not note_from_db:
+        raise ResourceNotFoundError(
+            resource_type="ProgressNote", resource_id=str(note_id)
         )
 
     return ProgressNoteRead.model_validate(note_from_db)
@@ -77,6 +69,7 @@ def update_progress_note(
 def delete_progress_note(
     db: Session, note_id: uuid.UUID
 ) -> None:  # TODO: change the parameter from str type to a validation (similar to Depends(validate_project_id(project_id) or NonEmptyString at least)
-    repository = ProgressNoteRepository(db)
+    get_progress_note_by_id(db, note_id)
 
+    repository = ProgressNoteRepository(db)
     repository.delete(OWNER_ID, note_id)

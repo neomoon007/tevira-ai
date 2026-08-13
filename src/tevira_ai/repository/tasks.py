@@ -1,10 +1,11 @@
 import uuid
 
 from sqlalchemy import delete, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.models import Task
+from src.tevira_ai.exceptions import ResourceInUseError
 
 
 class TaskRepository:
@@ -43,20 +44,16 @@ class TaskRepository:
 
         return task_result
 
-    def update(self, owner_id: str, task_id: uuid.UUID, task_obj: dict) -> Task:
-        try:
-            updated_task = self.session.execute(
-                update(Task)
-                .where(Task.owner_id == owner_id, Task.id == task_id)
-                .values(**task_obj)
-                .returning(Task)
-            ).scalar_one()
+    def update(self, owner_id: str, task_id: uuid.UUID, task_obj: dict) -> Task | None:
+        updated_task = self.session.execute(
+            update(Task)
+            .where(Task.owner_id == owner_id, Task.id == task_id)
+            .values(**task_obj)
+            .returning(Task)
+        ).scalar_one_or_none()
 
-            self.session.commit()
-            return updated_task
-        except NoResultFound:
-            self.session.rollback()
-            raise
+        self.session.commit()
+        return updated_task
 
     def delete(self, owner_id: str, task_id: uuid.UUID):
         try:
@@ -67,7 +64,10 @@ class TaskRepository:
         except IntegrityError:
             self.session.rollback()
 
-            raise
+            raise ResourceInUseError(
+                resource_type="Task",
+                resource_id=str(task_id),
+            )
 
 
 # TODO: missing except statement for NoResultFound exception, also there is no error handling on the service layer yet!!!

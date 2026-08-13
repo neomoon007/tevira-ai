@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+import uuid
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.tevira_ai.db.database import get_db
@@ -28,22 +30,23 @@ def list_projects_endpoint(db: Session = Depends(get_db)) -> list[ProjectRead]:
 
 
 @router.get("/{project_id}")
-def get_project_endpoint(project_id: str, db: Session = Depends(get_db)) -> ProjectRead:
+def get_project_endpoint(
+    project_id: uuid.UUID, db: Session = Depends(get_db)
+) -> ProjectRead:
     return get_project(db, project_id)
 
 
 @router.patch("/{project_id}")
 def rename_project_endpoint(
     new_title: ProjectCreate,
-    project_id: str,
+    project_id: uuid.UUID,
     db: Session = Depends(get_db),
 ) -> ProjectRead:
     return rename_project(db, new_title, project_id)
 
 
 @router.delete("/{project_id}", status_code=204)
-def delete_project_endpoint(project_id: str, db: Session = Depends(get_db)) -> None:
-    if not get_project(db, project_id):
-        raise HTTPException(status_code=404)
-
+def delete_project_endpoint(
+    project_id: uuid.UUID, db: Session = Depends(get_db)
+) -> None:
     delete_project(db, project_id)

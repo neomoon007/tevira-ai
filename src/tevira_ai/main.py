@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
+from src.tevira_ai.exceptions import DomainException
 from src.tevira_ai.routers import (
     actions,
     capture,
@@ -26,3 +28,15 @@ def create_app():
 
 
 app = create_app()
+
+
+@app.exception_handler(DomainException)
+def domain_exception_handler(request: Request, exception: DomainException):
+    return JSONResponse(
+        status_code=exception.status_code,
+        content={
+            "status": "error",
+            "code": exception.error_code,
+            "message": exception.message,
+        },
+    )
