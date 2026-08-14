@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 NonEmptyString = Annotated[str, Field(min_length=1)]
 
@@ -28,22 +28,6 @@ class TaskUpdate(BaseModel):
     due_date: date | None = None
     project_id: uuid.UUID | None = None
     status: Literal["open", "done"] | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def ensure_min_field_count(cls, data: dict) -> dict:
-        has_updatable_data = {
-            item: value
-            for item, value in data.items()
-            if item in cls.model_fields and value is not None
-        }
-
-        if not has_updatable_data:
-            raise ValueError(
-                "At least one updatable field is required to update a task"
-            )
-
-        return data
 
 
 # --- PROJECTS ---
@@ -86,22 +70,6 @@ class ProgressNoteUpdate(BaseModel):
     blockers: list[str] | None = None
     confidence: Literal["low", "medium", "high"] | None = None
     updated_at: datetime | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def ensure_min_field_count(cls, data: dict) -> dict:
-        has_updatable_data = {
-            item: value
-            for item, value in data.items()
-            if item in cls.model_fields and value is not None
-        }
-
-        if not has_updatable_data:
-            raise ValueError(
-                "At least one updatable field is required to update a progress note"
-            )
-
-        return data
 
 
 # --- CONTEXT ---
