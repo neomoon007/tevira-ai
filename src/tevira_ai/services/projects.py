@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.repository.projects import Project, ProjectRepository
@@ -9,10 +9,10 @@ from src.tevira_ai.schemas import ProjectCreate, ProjectRead
 OWNER_ID = "local_user"  # TODO: Change from hardcoded to actual owner_id once authentication exists
 
 
-def get_project(db: Session, project_id: uuid.UUID) -> ProjectRead:
+async def get_project(db: AsyncSession, project_id: uuid.UUID) -> ProjectRead:
     repository = ProjectRepository(db)
 
-    project_from_db = repository.get_by_id(OWNER_ID, project_id)
+    project_from_db = await repository.get_by_id(OWNER_ID, project_id)
 
     if not project_from_db:
         raise ResourceNotFoundError(
@@ -23,7 +23,7 @@ def get_project(db: Session, project_id: uuid.UUID) -> ProjectRead:
     return ProjectRead.model_validate(project_from_db)
 
 
-def create_project(db: Session, project: ProjectCreate) -> ProjectRead:
+async def create_project(db: AsyncSession, project: ProjectCreate) -> ProjectRead:
     repository = ProjectRepository(db)
 
     project_in = Project(
@@ -31,23 +31,23 @@ def create_project(db: Session, project: ProjectCreate) -> ProjectRead:
         owner_id=OWNER_ID,
     )
 
-    project_out = repository.create(project_in)
+    project_out = await repository.create(project_in)
 
     return ProjectRead.model_validate(project_out)
 
 
-def list_projects(db: Session) -> list[ProjectRead]:
+async def list_projects(db: AsyncSession) -> list[ProjectRead]:
     repository = ProjectRepository(db)
 
-    projects_from_db = repository.get_all(OWNER_ID)
+    projects_from_db = await repository.get_all(OWNER_ID)
 
     return [ProjectRead.model_validate(project) for project in projects_from_db]
 
 
-def rename_project(
-    db: Session, new_title: ProjectCreate, project_id: uuid.UUID
+async def rename_project(
+    db: AsyncSession, new_title: ProjectCreate, project_id: uuid.UUID
 ) -> ProjectRead:
-    get_project(db, project_id)
+    await get_project(db, project_id)
 
     renamed_project = ProjectRead(
         **new_title.model_dump(),
@@ -56,13 +56,13 @@ def rename_project(
 
     repository = ProjectRepository(db)
 
-    project_result = repository.rename(OWNER_ID, renamed_project)
+    project_result = await repository.rename(OWNER_ID, renamed_project)
 
     return ProjectRead.model_validate(project_result)
 
 
-def delete_project(db: Session, project_id: uuid.UUID) -> None:
-    get_project(db, project_id)
+async def delete_project(db: AsyncSession, project_id: uuid.UUID) -> None:
+    await get_project(db, project_id)
 
     repository = ProjectRepository(db)
-    repository.delete(OWNER_ID, project_id)
+    await repository.delete(OWNER_ID, project_id)

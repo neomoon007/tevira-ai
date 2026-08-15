@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.database import get_db
 from src.tevira_ai.schemas import (
@@ -22,35 +22,37 @@ router = APIRouter(prefix="/progress-notes", tags=["Progress Notes"])
 
 # -- "/progress-notes" --
 @router.post("", status_code=201)
-def create_progress_note_endpoint(
-    note: ProgressNoteCreate, db: Session = Depends(get_db)
+async def create_progress_note_endpoint(
+    note: ProgressNoteCreate, db: AsyncSession = Depends(get_db)
 ) -> ProgressNoteRead:
-    return create_progress_note(db, note)
+    return await create_progress_note(db, note)
 
 
 @router.get("")
-def get_progress_notes_endpoint(
-    project_id: uuid.UUID, db: Session = Depends(get_db)
+async def get_progress_notes_endpoint(
+    project_id: uuid.UUID, db: AsyncSession = Depends(get_db)
 ) -> list[ProgressNoteRead]:
-    return get_notes_by_project(db, project_id)
+    return await get_notes_by_project(db, project_id)
 
 
 @router.get("/{note_id}")
-def get_progress_note_by_id_endpoint(
-    note_id: uuid.UUID, db: Session = Depends(get_db)
+async def get_progress_note_by_id_endpoint(
+    note_id: uuid.UUID, db: AsyncSession = Depends(get_db)
 ) -> ProgressNoteRead:
-    return get_progress_note_by_id(db, note_id)
+    return await get_progress_note_by_id(db, note_id)
 
 
 @router.patch("/{note_id}")
-def update_progress_note_endpoint(
-    note_id: uuid.UUID, updated_note: ProgressNoteUpdate, db: Session = Depends(get_db)
+async def update_progress_note_endpoint(
+    note_id: uuid.UUID,
+    updated_note: ProgressNoteUpdate,
+    db: AsyncSession = Depends(get_db),
 ) -> ProgressNoteRead:
-    return update_progress_note(db, note_id, updated_note)
+    return await update_progress_note(db, note_id, updated_note)
 
 
 @router.delete("/{note_id}", status_code=204)
-def delete_progress_note_endpoint(
-    note_id: uuid.UUID, db: Session = Depends(get_db)
+async def delete_progress_note_endpoint(
+    note_id: uuid.UUID, db: AsyncSession = Depends(get_db)
 ) -> None:
-    delete_progress_note(db, note_id)
+    await delete_progress_note(db, note_id)

@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.schemas import (
     ApplyActionResponse,
@@ -15,12 +15,12 @@ from src.tevira_ai.services.progress_notes import create_progress_note
 from src.tevira_ai.services.tasks import create_task
 
 
-def apply_action(db: Session, action: ProposedAction) -> ApplyActionResponse:
+async def apply_action(db: AsyncSession, action: ProposedAction) -> ApplyActionResponse:
     if action.type == "create_task":
         due_date = parse_date(action.data.due_date_hint)
         project_id = action.data.project_hint
 
-        task = create_task(
+        task = await create_task(
             db,
             TaskCreate(
                 title=action.data.title, due_date=due_date, project_id=project_id
@@ -41,7 +41,7 @@ def apply_action(db: Session, action: ProposedAction) -> ApplyActionResponse:
         )
 
     elif action.type == "create_progress_note":
-        note = create_progress_note(
+        note = await create_progress_note(
             db,
             ProgressNoteCreate(
                 project_id=action.data.project_hint,

@@ -9,7 +9,7 @@ import os
 import uuid
 
 from dotenv import load_dotenv
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.schemas import ParseNoteRead
 from src.tevira_ai.services.projects import list_projects
@@ -20,8 +20,8 @@ default_project = uuid.UUID(os.getenv("DEFAULT_PROJECT"))
 
 
 # Currently only supports projects that don't have spaces inside of its name, meaning it supports one word names and names separated by -
-def find_project_id_by_name(db: Session, input: str) -> uuid.UUID:
-    projects = list_projects(db)
+async def find_project_id_by_name(db: AsyncSession, input: str) -> uuid.UUID:
+    projects = await list_projects(db)
     input_list = input.split(" ")
 
     for input_item in input_list:
@@ -40,7 +40,7 @@ def find_project_id_by_name(db: Session, input: str) -> uuid.UUID:
     return default_project
 
 
-def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
+async def parse_note(db: AsyncSession, mind_dump_note: str) -> ParseNoteRead:
     next_action_marker = " Next, "
     due_date_marker = " before "
 
@@ -49,7 +49,7 @@ def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
 
     title = title[8:]  # extrart the "Need to" placeholder
 
-    project_hint = find_project_id_by_name(db, title)
+    project_hint = await find_project_id_by_name(db, title)
 
     return ParseNoteRead(
         title=title,

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.database import get_db
 from src.tevira_ai.schemas import (
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/actions", tags=["Actions"])
 
 
 @router.post("/apply", status_code=201)
-def apply_action_endpoint(
-    action: ProposedAction, db: Session = Depends(get_db)
+async def apply_action_endpoint(
+    action: ProposedAction, db: AsyncSession = Depends(get_db)
 ) -> ApplyActionResponse:
-    return apply_action(db, action)
+    return await apply_action(db, action)

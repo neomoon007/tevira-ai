@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.database import get_db
 from src.tevira_ai.schemas import CaptureRead, NonEmptyString
@@ -9,7 +9,7 @@ router = APIRouter(prefix="/capture", tags=["Capture"])
 
 
 @router.post("/text")
-def capture_from_text_endpoint(
-    input: NonEmptyString, db: Session = Depends(get_db)
+async def capture_from_text_endpoint(
+    input: NonEmptyString, db: AsyncSession = Depends(get_db)
 ) -> CaptureRead:
-    return capture_from_text(db, input)
+    return await capture_from_text(db, input)
