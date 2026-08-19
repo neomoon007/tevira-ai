@@ -1,18 +1,12 @@
 from datetime import date
 
-from httpx import AsyncClient
 
-from src.tevira_ai.db.models import Project
-
-
-async def test_actions_accepts_valid_create_task_object(
-    client: AsyncClient, test_project: list[Project]
-):
+def test_actions_accepts_valid_create_task_object(client, test_project):
     title = "finish tests for portfolio project"
     due_date_hint = "today."
-    project_id_hint = str(test_project[0].id)
+    project_id_hint = "project_1"
 
-    response = await client.post(
+    response = client.post(
         "/actions/apply",
         json={
             "type": "create_task",

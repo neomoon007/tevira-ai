@@ -1,64 +1,85 @@
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
+import os
+
+import pytest_asyncio
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+os.environ["POSTGRES_DB"] = "tevira_ai_test"
 
 from src.tevira_ai.db.database import get_db
-from src.tevira_ai.db.models import ProgressNote, Project, Task
-from src.tevira_ai.db.test_database import engine
+from src.tevira_ai.db.models import Base, ProgressNote, Project, Task
 from src.tevira_ai.main import app
 
+test_engine = create_async_engine(
+    f"postgresql+psycopg://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@localhost:5432/{os.getenv('POSTGRES_DB')}",
+    echo=False,
+)
 
-@pytest.fixture
-def db_session():
-    connection = engine.connect()
-    transaction = connection.begin()
 
-    TestSession = sessionmaker(
+@pytest_asyncio.fixture(scope="session", autouse=True, loop_scope="session")
+async def setup_database():
+
+    async with test_engine.begin() as connection:
+        await connection.run_sync(Base.metadata.create_all)
+    yield
+    async with test_engine.begin() as connection:
+        await connection.run_sync(Base.metadata.drop_all)
+
+
+@pytest_asyncio.fixture
+async def db_session():
+    connection = await test_engine.connect()
+    transaction = await connection.begin()
+    TestingSession = async_sessionmaker(
         bind=connection,
-        join_transaction_mode="create_savepoint",
         expire_on_commit=False,
+        join_transaction_mode="create_savepoint",
     )
 
-    session = TestSession()
+    async with TestingSession() as session:
+        yield session
 
-    yield session
-
-    session.close()
-    transaction.rollback()
-    connection.close()
+    await session.close()
+    await transaction.rollback()
+    await connection.close()
 
 
-@pytest.fixture
-def client(db_session):
-    app.dependency_overrides[get_db] = lambda: db_session
+@pytest_asyncio.fixture
+async def client(db_session: AsyncSession):
+    async def _override_get_db():
+        yield db_session
 
-    with TestClient(app) as test_client:
-        yield test_client
-
+    app.dependency_overrides[get_db] = _override_get_db
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        yield client
     app.dependency_overrides.clear()
 
 
 # --- Data dependencies ---
-@pytest.fixture
-def test_project(db_session):
+@pytest_asyncio.fixture
+async def test_project(db_session: AsyncSession) -> list[Project]:
     projects = [
-        Project(title="Test Project 1", id="project_1", owner_id="local_user"),
-        Project(title="Test Project 2", id="project_2", owner_id="local_user"),
+        Project(title="Test Project 1", owner_id="local_user"),
+        Project(title="Test Project 2", owner_id="local_user"),
     ]
 
     db_session.add_all(projects)
-    db_session.commit()
+    await db_session.commit()
 
     return projects
 
 
-@pytest.fixture
-def test_note(db_session):
+@pytest_asyncio.fixture
+async def test_note(
+    db_session: AsyncSession, test_project: list[Project]
+) -> list[ProgressNote]:
     notes = [
         ProgressNote(
             id="note_1",
             owner_id="local_user",
-            project_id="project_1",
+            project_id=test_project[0].id,
             current_state="test state",
             last_session="last session log",
             open_loops=["first open loop", "second open loop"],
@@ -70,7 +91,7 @@ def test_note(db_session):
         ProgressNote(
             id="note_2",
             owner_id="local_user",
-            project_id="project_2",
+            project_id=test_project[1].id,
             current_state="test state",
             last_session="last session log",
             open_loops=["first open loop", "second open loop"],
@@ -81,19 +102,21 @@ def test_note(db_session):
     ]
 
     db_session.add_all(notes)
-    db_session.commit()
+    await db_session.commit()
 
     return notes
 
 
-@pytest.fixture
-def test_task(db_session):
+@pytest_asyncio.fixture
+async def test_task(
+    db_session: AsyncSession, test_project: list[Project]
+) -> list[Task]:
     tasks = [
         Task(
             id="task_1",
             owner_id="local_user",
             title="test task 1",
-            project_id="project_1",
+            project_id=test_project[0].id,
             priority="medium",
             status="open",
         ),
@@ -101,7 +124,7 @@ def test_task(db_session):
             id="task_2",
             owner_id="local_user",
             title="test task 2",
-            project_id="project_1",
+            project_id=test_project[0].id,
             priority="high",
             status="open",
         ),
@@ -109,13 +132,13 @@ def test_task(db_session):
             id="task_3",
             owner_id="local_user",
             title="test task 3",
-            project_id="project_2",
+            project_id=test_project[1].id,
             priority="low",
             status="open",
         ),
     ]
 
     db_session.add_all(tasks)
-    db_session.commit()
+    await db_session.commit()
 
     return tasks
