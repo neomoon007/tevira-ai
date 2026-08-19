@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Project
-from src.tevira_ai.exceptions import ResourceInUseError
+from src.tevira_ai.exceptions import DomainException, ResourceInUseError
 from src.tevira_ai.schemas import ProjectRead
 
 
@@ -69,3 +69,33 @@ class ProjectRepository:
                 resource_type="Project",
                 resource_id=str(project_id),
             )
+
+    async def get_default_project_id(self, owner_id: str) -> uuid.UUID:
+        default_project_id = await self.session.scalar(
+            select(Project.id)
+            .where(Project.owner_id == owner_id)
+            .order_by(Project.id.asc())
+        )
+
+        if not default_project_id:
+            raise DomainException(
+                status_code=404,
+                error_code="NO_DEFAULT_PROJECT",
+                message="No projects in the database to use as default project.",
+            )
+
+        return default_project_id
+
+    async def get_project_id_by_title(
+        self, owner_id: str, title_list: list
+    ) -> uuid.UUID:
+        project_id = await self.session.scalar(
+            select(Project.id).where(
+                Project.owner_id == owner_id, Project.title.in_(title_list)
+            )
+        )
+
+        if project_id:
+            return project_id
+
+        return await self.get_default_project_id(owner_id=owner_id)
