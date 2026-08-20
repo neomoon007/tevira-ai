@@ -1,8 +1,16 @@
-def test_create_progress_note_accepts_valid_note_obj(client, test_project):
-    response = client.post(
+from httpx import AsyncClient
+
+from src.tevira_ai.db.models import ProgressNote, Project
+
+
+async def test_create_progress_note_accepts_valid_note_obj(
+    client: AsyncClient, test_project: list[Project]
+):
+    project_id = str(test_project[0].id)
+    response = await client.post(
         "/progress-notes",
         json={
-            "project_id": "project_1",
+            "project_id": project_id,
             "current_state": "Just created main.py",
             "last_session": "Created github repo",
             "open_loops": ["Create roadmap", "Follow roadmap"],
@@ -16,7 +24,7 @@ def test_create_progress_note_accepts_valid_note_obj(client, test_project):
     assert response.status_code == 201
 
     data = response.json()
-    assert data["project_id"] == "project_1"
+    assert data["project_id"] == project_id
     assert data["current_state"] == "Just created main.py"
     assert data["last_session"] == "Created github repo"
     assert data["open_loops"] == ["Create roadmap", "Follow roadmap"]
@@ -26,17 +34,18 @@ def test_create_progress_note_accepts_valid_note_obj(client, test_project):
     assert data["confidence"] == "high"
 
 
-def test_get_progress_note_returns_existing_note(client, test_project, test_note):
-    note_id = "note_1"
+async def test_get_progress_note_returns_existing_note(
+    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+):
+    note_id = str(test_note[0].id)
+    project_id = str(test_project[0].id)
 
-    response = client.get(f"/progress-notes/{note_id}")
-
+    response = await client.get(f"/progress-notes/{note_id}")
     assert response.status_code == 200
 
     data = response.json()
-
-    assert data["id"] == "note_1"
-    assert data["project_id"] == "project_1"
+    assert data["id"] == note_id
+    assert data["project_id"] == project_id
     assert data["current_state"] == "test state"
     assert data["last_session"] == "last session log"
     assert data["open_loops"] == ["first open loop", "second open loop"]
@@ -46,23 +55,24 @@ def test_get_progress_note_returns_existing_note(client, test_project, test_note
     assert data["confidence"] == "medium"
 
 
-def test_patch_note_router_returns_accepts_valid_input(client, test_project, test_note):
-    note_id = "note_1"
+async def test_patch_note_router_returns_accepts_valid_input(
+    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+):
+    note_id = str(test_note[0].id)
 
-    response = client.patch(
+    response = await client.patch(
         f"/progress-notes/{note_id}", json={"current_state": "new current state"}
     )
-
     assert response.status_code == 200
 
     data = response.json()
-
     assert data["current_state"] == "new current state"
 
 
-def test_delete_note_returns_204_for_existing_note_id(client, test_project, test_note):
-    note_id = "note_1"
+async def test_delete_note_returns_204_for_existing_note_id(
+    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+):
+    note_id = str(test_note[0].id)
 
-    response = client.delete(f"/progress-notes/{note_id}")
-
+    response = await client.delete(f"/progress-notes/{note_id}")
     assert response.status_code == 204

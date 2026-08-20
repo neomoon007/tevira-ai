@@ -1,8 +1,5 @@
-import sys
-
-sys.path.tevira_aiend(".")
-
 import json
+
 from src.tevira_ai.main import app
 
 with open("docs/openai.json", "w") as docs_file:

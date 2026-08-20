@@ -1,12 +1,19 @@
-def test_capture_accepts_valid_input(client):
+from httpx import AsyncClient
+
+from src.tevira_ai.db.models import Project
+
+
+async def test_capture_accepts_valid_input(
+    client: AsyncClient, test_project: list[Project]
+):
     task = "finish tests for portfolio project"
     due_date = "today."
     next_action = "deploy app."
-    project_id = "project_1"
+    project_id = str(test_project[0].id)
 
-    response = client.post(
+    response = await client.post(
         "/capture/text",
-        params={"input": f"Need to {task} before {due_date} Next, {next_action}"},
+        params={"input": f"{task} before {due_date} Next, {next_action}"},
     )
 
     assert response.status_code == 200

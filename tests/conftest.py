@@ -77,7 +77,6 @@ async def test_note(
 ) -> list[ProgressNote]:
     notes = [
         ProgressNote(
-            id="note_1",
             owner_id="local_user",
             project_id=test_project[0].id,
             current_state="test state",
@@ -89,7 +88,6 @@ async def test_note(
             confidence="medium",
         ),
         ProgressNote(
-            id="note_2",
             owner_id="local_user",
             project_id=test_project[1].id,
             current_state="test state",
@@ -113,7 +111,6 @@ async def test_task(
 ) -> list[Task]:
     tasks = [
         Task(
-            id="task_1",
             owner_id="local_user",
             title="test task 1",
             project_id=test_project[0].id,
@@ -121,7 +118,6 @@ async def test_task(
             status="open",
         ),
         Task(
-            id="task_2",
             owner_id="local_user",
             title="test task 2",
             project_id=test_project[0].id,
@@ -129,7 +125,6 @@ async def test_task(
             status="open",
         ),
         Task(
-            id="task_3",
             owner_id="local_user",
             title="test task 3",
             project_id=test_project[1].id,
