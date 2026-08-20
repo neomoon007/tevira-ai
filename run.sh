@@ -35,9 +35,9 @@ done
 log_info "PostgreSQL is ready."
 
 log_info "Running alembic migrations..."
-alembic upgrade head
+poetry run alembic upgrade head
 log_info "Database is up to date."
 
 log_info "Initializing uvicorn server..."
-uvicorn src.tevira_ai.main:app --reload
+poetry run uvicorn src.tevira_ai.main:app --reload
 
