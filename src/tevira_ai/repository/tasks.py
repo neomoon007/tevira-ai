@@ -2,67 +2,65 @@ import uuid
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Task
 from src.tevira_ai.exceptions import ResourceInUseError
 
 
 class TaskRepository:
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self.session = session
 
-    def create(self, task: Task) -> Task:
+    async def create(self, task: Task) -> Task:
         self.session.add(task)
-        self.session.commit()
-        self.session.refresh(task)
+        await self.session.commit()
+        await self.session.refresh(task)
 
         return task
 
-    def get_all(self, owner_id: str) -> list[Task]:
-        tasks_list = list(
-            self.session.scalars(select(Task).where(Task.owner_id == owner_id)).all()
+    async def get_all(self, owner_id: str) -> list[Task]:
+        tasks_list = await self.session.scalars(
+            select(Task).where(Task.owner_id == owner_id)
         )
 
-        return tasks_list
+        return list(tasks_list.all())
 
-    def get_by_project(self, owner_id: str, project_id: uuid.UUID) -> list[Task]:
-        tasks_list = list(
-            self.session.scalars(
-                select(Task).where(
-                    Task.owner_id == owner_id, Task.project_id == project_id
-                )
-            ).all()
+    async def get_by_project(self, owner_id: str, project_id: uuid.UUID) -> list[Task]:
+        tasks_list = await self.session.scalars(
+            select(Task).where(Task.owner_id == owner_id, Task.project_id == project_id)
         )
 
-        return tasks_list
+        return list(tasks_list.all())
 
-    def get_by_id(self, owner_id: str, task_id: uuid.UUID) -> Task | None:
-        task_result = self.session.scalars(
+    async def get_by_id(self, owner_id: str, task_id: uuid.UUID) -> Task | None:
+        task_result = await self.session.scalar(
             select(Task).where(Task.owner_id == owner_id, Task.id == task_id)
-        ).first()
+        )
 
         return task_result
 
-    def update(self, owner_id: str, task_id: uuid.UUID, task_obj: dict) -> Task | None:
-        updated_task = self.session.execute(
+    async def update(
+        self, owner_id: str, task_id: uuid.UUID, task_obj: dict
+    ) -> Task | None:
+        updated_task = await self.session.scalar(
             update(Task)
             .where(Task.owner_id == owner_id, Task.id == task_id)
             .values(**task_obj)
             .returning(Task)
-        ).scalar_one_or_none()
+        )
 
-        self.session.commit()
+        await self.session.commit()
         return updated_task
 
-    def delete(self, owner_id: str, task_id: uuid.UUID):
+    async def delete(self, owner_id: str, task_id: uuid.UUID):
         try:
-            self.session.execute(
+            await self.session.execute(
                 delete(Task).where(Task.owner_id == owner_id, Task.id == task_id)
             )
-            self.session.commit()
+            await self.session.commit()
         except IntegrityError:
-            self.session.rollback()
+            await self.session.rollback()
 
             raise ResourceInUseError(
                 resource_type="Task",

@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Task
 from src.tevira_ai.exceptions import ResourceNotFoundError
@@ -11,18 +11,20 @@ from src.tevira_ai.services.projects import get_project
 OWNER_ID = "local_user"
 
 
-def get_tasks_by_project(db: Session, project_id: uuid.UUID) -> list[TaskRead]:
+async def get_tasks_by_project(
+    db: AsyncSession, project_id: uuid.UUID
+) -> list[TaskRead]:
     repository = TaskRepository(db)
 
-    tasks_from_db = repository.get_by_project(OWNER_ID, project_id)
+    tasks_from_db = await repository.get_by_project(OWNER_ID, project_id)
 
     return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
-def get_task_by_id(db: Session, task_id: uuid.UUID) -> TaskRead:
+async def get_task_by_id(db: AsyncSession, task_id: uuid.UUID) -> TaskRead:
     repository = TaskRepository(db)
 
-    task_from_db = repository.get_by_id(OWNER_ID, task_id)
+    task_from_db = await repository.get_by_id(OWNER_ID, task_id)
 
     if not task_from_db:
         raise ResourceNotFoundError(
@@ -33,8 +35,8 @@ def get_task_by_id(db: Session, task_id: uuid.UUID) -> TaskRead:
     return TaskRead.model_validate(task_from_db)
 
 
-def get_important_task(db: Session, project_id: uuid.UUID) -> TaskRead | str:
-    tasks_db = get_tasks_by_project(db, project_id)
+async def get_important_task(db: AsyncSession, project_id: uuid.UUID) -> TaskRead | str:
+    tasks_db = await get_tasks_by_project(db, project_id)
     priority_list = ["high", "medium", "low"]
     recommended_task: TaskRead | None = None
 
@@ -50,8 +52,8 @@ def get_important_task(db: Session, project_id: uuid.UUID) -> TaskRead | str:
     return "No open next action found."
 
 
-def create_task(db: Session, task: TaskCreate) -> TaskRead:
-    get_project(db, task.project_id)
+async def create_task(db: AsyncSession, task: TaskCreate) -> TaskRead:
+    await get_project(db, task.project_id)
 
     repository = TaskRepository(db)
 
@@ -61,28 +63,30 @@ def create_task(db: Session, task: TaskCreate) -> TaskRead:
         owner_id=OWNER_ID,
     )
 
-    task_out = repository.create(task_in)
+    task_out = await repository.create(task_in)
 
     return TaskRead.model_validate(task_out)
 
 
-def get_all_tasks(db: Session) -> list[TaskRead]:
+async def get_all_tasks(db: AsyncSession) -> list[TaskRead]:
     repository = TaskRepository(db)
 
-    tasks_from_db = repository.get_all(OWNER_ID)
+    tasks_from_db = await repository.get_all(OWNER_ID)
 
     return [TaskRead.model_validate(task) for task in tasks_from_db]
 
 
-def show_tasks(
-    db: Session, project_id: uuid.UUID | None = None, task_id: uuid.UUID | None = None
+async def show_tasks(
+    db: AsyncSession,
+    project_id: uuid.UUID | None = None,
+    task_id: uuid.UUID | None = None,
 ) -> list[TaskRead]:
     if project_id is None and task_id is None:
-        return get_all_tasks(db)
+        return await get_all_tasks(db)
 
     if project_id is not None and task_id is None:
-        get_project(db, project_id)
-        return get_tasks_by_project(db, project_id)
+        await get_project(db, project_id)
+        return await get_tasks_by_project(db, project_id)
 
     if (
         project_id is None
@@ -90,18 +94,20 @@ def show_tasks(
         or project_id is not None
         and task_id is not None
     ):
-        return [get_task_by_id(db, task_id)]
+        return [await get_task_by_id(db, task_id)]
 
     return []
 
 
-def update_task(db: Session, task_id: uuid.UUID, updated_task: TaskUpdate) -> TaskRead:
+async def update_task(
+    db: AsyncSession, task_id: uuid.UUID, updated_task: TaskUpdate
+) -> TaskRead:
     if updated_task.project_id:
-        get_project(db, updated_task.project_id)
+        await get_project(db, updated_task.project_id)
 
     update_data = updated_task.model_dump(exclude_unset=True)
     repository = TaskRepository(db)
-    task_from_db = repository.update(OWNER_ID, task_id, update_data)
+    task_from_db = await repository.update(OWNER_ID, task_id, update_data)
 
     if not task_from_db:
         raise ResourceNotFoundError(
@@ -112,8 +118,8 @@ def update_task(db: Session, task_id: uuid.UUID, updated_task: TaskUpdate) -> Ta
     return TaskRead.model_validate(task_from_db)
 
 
-def delete_task(db: Session, task_id: uuid.UUID) -> None:
-    get_task_by_id(db, task_id)
+async def delete_task(db: AsyncSession, task_id: uuid.UUID) -> None:
+    await get_task_by_id(db, task_id)
 
     repository = TaskRepository(db)
-    repository.delete(OWNER_ID, task_id)
+    await repository.delete(OWNER_ID, task_id)

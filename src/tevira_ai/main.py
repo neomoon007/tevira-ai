@@ -1,6 +1,9 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from src.tevira_ai.db.database import create_engine, create_session, get_db_url
 from src.tevira_ai.exceptions import DomainException
 from src.tevira_ai.routers import (
     actions,
@@ -13,8 +16,19 @@ from src.tevira_ai.routers import (
 )
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.database_url = get_db_url()
+    app.state.engine = create_engine(app.state.database_url)
+    app.state.session_factory = create_session(app.state.engine)
+
+    yield
+
+    await app.state.engine.dispose()
+
+
 def create_app():
-    app = FastAPI(title="Tevira-AI")
+    app = FastAPI(title="Tevira-AI", lifespan=lifespan)
 
     # --- ROUTERS ---
     app.include_router(tasks.router)

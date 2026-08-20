@@ -59,7 +59,8 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid"
                 },
                 {
                   "type": "null"
@@ -75,7 +76,8 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid"
                 },
                 {
                   "type": "null"
@@ -127,6 +129,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Task Id"
             }
           }
@@ -177,6 +180,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Task Id"
             }
           }
@@ -295,6 +299,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Project Id"
             }
           }
@@ -335,6 +340,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Project Id"
             }
           }
@@ -385,6 +391,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Project Id"
             }
           }
@@ -456,10 +463,10 @@
           {
             "name": "project_id",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
-              "default": "",
+              "format": "uuid",
               "title": "Project Id"
             }
           }
@@ -506,6 +513,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Note Id"
             }
           }
@@ -546,6 +554,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Note Id"
             }
           }
@@ -596,6 +605,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Note Id"
             }
           }
@@ -631,6 +641,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid",
               "title": "Project Id"
             }
           }
@@ -935,9 +946,17 @@
               }
             ],
             "title": "Next Action"
+          },
+          "project_hint": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Hint"
           }
         },
         "type": "object",
+        "required": [
+          "project_hint"
+        ],
         "title": "CreateProgressNoteProposal"
       },
       "CreateTaskAction": {
@@ -972,7 +991,7 @@
           },
           "project_hint": {
             "type": "string",
-            "minLength": 1,
+            "format": "uuid",
             "title": "Project Hint"
           }
         },
@@ -1006,7 +1025,7 @@
           },
           "project_id_hint": {
             "type": "string",
-            "minLength": 1,
+            "format": "uuid",
             "title": "Project Id Hint"
           },
           "due_date_hint": {
@@ -1033,6 +1052,7 @@
         "properties": {
           "project_id": {
             "type": "string",
+            "format": "uuid",
             "title": "Project Id"
           },
           "current_state": {
@@ -1118,6 +1138,7 @@
         "properties": {
           "project_id": {
             "type": "string",
+            "format": "uuid",
             "title": "Project Id"
           },
           "current_state": {
@@ -1193,7 +1214,15 @@
             "default": "medium"
           },
           "id": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Id"
           },
           "updated_at": {
@@ -1205,7 +1234,6 @@
         "type": "object",
         "required": [
           "project_id",
-          "id",
           "updated_at"
         ],
         "title": "ProgressNoteRead"
@@ -1215,7 +1243,8 @@
           "project_id": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
@@ -1351,14 +1380,21 @@
             "title": "Title"
           },
           "id": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Id"
           }
         },
         "type": "object",
         "required": [
-          "title",
-          "id"
+          "title"
         ],
         "title": "ProjectRead"
       },
@@ -1392,20 +1428,15 @@
             "title": "Due Date"
           },
           "project_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "type": "string",
+            "format": "uuid",
             "title": "Project Id"
           }
         },
         "type": "object",
         "required": [
-          "title"
+          "title",
+          "project_id"
         ],
         "title": "TaskCreate"
       },
@@ -1439,18 +1470,20 @@
             "title": "Due Date"
           },
           "project_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Project Id"
+          },
+          "id": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Project Id"
-          },
-          "id": {
-            "type": "string",
             "title": "Id"
           },
           "status": {
@@ -1466,7 +1499,7 @@
         "type": "object",
         "required": [
           "title",
-          "id"
+          "project_id"
         ],
         "title": "TaskRead"
       },
@@ -1515,7 +1548,8 @@
           "project_id": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "format": "uuid"
               },
               {
                 "type": "null"

@@ -1,15 +1,22 @@
-def test_restore_context_accepts_valid_project_with_existing_note(
-    client, test_project, test_note
+import uuid
+
+from httpx import AsyncClient
+
+from src.tevira_ai.db.models import ProgressNote, Project, Task
+
+
+async def test_restore_context_accepts_valid_project_with_existing_note(
+    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
 ):
-    lookup_project = "project_1"
-    response = client.get(f"/context/{lookup_project}")
+    lookup_project = str(test_project[0].id)
+    response = await client.get(f"/context/{lookup_project}")
 
     assert response.status_code == 200
 
     data = response.json()
 
     assert data["project"] == {
-        "id": "project_1",
+        "id": lookup_project,
         "title": "Test Project 1",
     }
     assert data["current_state"] == "test state"
@@ -19,25 +26,25 @@ def test_restore_context_accepts_valid_project_with_existing_note(
     assert data["important_context"] == "this is important"
 
 
-def test_restore_context_raises_404_for_non_existent_project(client, test_project):
-    lookup_project = "project_42"
-    response = client.get(f"/context/{lookup_project}")
-
-    assert response.status_code == 404
-
-
-def test_restore_context_raises_404_for_missing_progress_note(client, test_project):
-    lookup_project = "project_42"
-    response = client.get(f"/context/{lookup_project}")
-
-    assert response.status_code == 404
-
-
-def test_restore_context_returns_task_when_missing_next_actions(
-    client, test_project, test_note, test_task
+async def test_restore_context_raises_404_for_non_existent_project(
+    client: AsyncClient, test_project: list[Project]
 ):
-    project_id = "project_2"
-    response = client.get(f"/context/{project_id}")
+    lookup_project = str(uuid.uuid7())
+    response = await client.get(f"/context/{lookup_project}")
+
+    assert response.status_code == 404
+
+
+async def test_restore_context_returns_task_when_missing_next_actions(
+    client: AsyncClient,
+    test_project: list[Project],
+    test_note: list[ProgressNote],
+    test_task: list[Task],
+):
+    project_id = str(test_project[1].id)
+    task_id = str(test_task[2].id)
+
+    response = await client.get(f"/context/{project_id}")
 
     assert response.status_code == 200
 
@@ -48,6 +55,6 @@ def test_restore_context_returns_task_when_missing_next_actions(
         "priority": "low",
         "due_date": None,
         "project_id": project_id,
-        "id": "task_3",
+        "id": task_id,
         "status": "open",
     }

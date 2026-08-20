@@ -68,7 +68,8 @@ dependencies = [
     "uvicorn (==0.48.0)",
     "virtualenv (==21.7.1)",
     "wcwidth (==0.8.2)",
-    "wrapt (==2.3.0)"
+    "wrapt (==2.3.0)",
+    "pytest-asyncio (>=1.4.0,<2.0.0)"
 ]
 
 [build-system]

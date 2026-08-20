@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.database import get_db
 from src.tevira_ai.schemas import ContextRead
@@ -11,7 +11,7 @@ router = APIRouter(prefix="/context", tags=["Context"])
 
 
 @router.get("/{project_id}")
-def restore_context_endpoint(
-    project_id: uuid.UUID, db: Session = Depends(get_db)
+async def restore_context_endpoint(
+    project_id: uuid.UUID, db: AsyncSession = Depends(get_db)
 ) -> ContextRead:
-    return restore_context(db, project_id)
+    return await restore_context(db, project_id)

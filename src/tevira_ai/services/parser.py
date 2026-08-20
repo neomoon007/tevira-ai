@@ -1,59 +1,41 @@
 # --- INPUT STRUCTURE ---
-# "Need to X before Y. Next, Z"
+# "X before Y. Next, Z"
 # Where X is the title, Y is the due_date and Z is the the next_action
 
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
-import os
-import uuid
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from dotenv import load_dotenv
-from sqlalchemy.orm import Session
-
+from src.tevira_ai.exceptions import DomainException
+from src.tevira_ai.repository.projects import ProjectRepository
 from src.tevira_ai.schemas import ParseNoteRead
-from src.tevira_ai.services.projects import list_projects
 
-load_dotenv()
-
-default_project = uuid.UUID(os.getenv("DEFAULT_PROJECT"))
+OWNER_ID = "local_user"
 
 
-# Currently only supports projects that don't have spaces inside of its name, meaning it supports one word names and names separated by -
-def find_project_id_by_name(db: Session, input: str) -> uuid.UUID:
-    projects = list_projects(db)
-    input_list = input.split(" ")
-
-    for input_item in input_list:
-        project_id = next(
-            (
-                project_obj.id
-                for project_obj in projects
-                if project_obj.title == input_item
-            ),
-            None,
-        )
-
-        if project_id is not None:
-            return project_id
-
-    return default_project
-
-
-def parse_note(db: Session, mind_dump_note: str) -> ParseNoteRead:
+async def parse_note(db: AsyncSession, mind_dump_note: str) -> ParseNoteRead:
     next_action_marker = " Next, "
     due_date_marker = " before "
+    try:
+        raw_title, next_action = mind_dump_note.split(next_action_marker, maxsplit=1)
+        title, due_date = raw_title.split(due_date_marker, maxsplit=1)
+    except ValueError:
+        raise DomainException(
+            status_code=400,
+            error_code="INVALID_NOTE_FORMAT",
+            message=f"Note must contain '{next_action_marker}' and '{due_date_marker}'.",
+        )
 
-    raw_title, next_action = mind_dump_note.split(next_action_marker)
-    title, due_date = raw_title.split(due_date_marker)
-
-    title = title[8:]  # extrart the "Need to" placeholder
-
-    project_hint = find_project_id_by_name(db, title)
+    raw_title_list = mind_dump_note.split(" ")
+    repository = ProjectRepository(db)
+    project_id_hint = await repository.get_project_id_by_title(
+        owner_id=OWNER_ID, title_list=raw_title_list
+    )
 
     return ParseNoteRead(
         title=title,
-        project_id_hint=project_hint,
+        project_id_hint=project_id_hint,
         due_date_hint=due_date,
         next_action_hint=next_action,
     )

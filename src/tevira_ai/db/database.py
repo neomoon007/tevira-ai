@@ -1,43 +1,43 @@
 import os
-from collections.abc import Iterator
+from collections.abc import AsyncGenerator
 
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from fastapi import Request
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 load_dotenv()
 
-DATABASE_URL = (
-    f"postgresql+psycopg://"
-    f"{os.getenv('POSTGRES_USER')}:"
-    f"{os.getenv('POSTGRES_PASSWORD')}"
-    f"@localhost:5432/"
-    f"{os.getenv('POSTGRES_DB')}"
-)
 
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is missing")
+def get_db_url() -> str:
+    return (
+        f"postgresql+psycopg://"
+        f"{os.getenv('POSTGRES_USER')}:"
+        f"{os.getenv('POSTGRES_PASSWORD')}"
+        f"@localhost:5432/"
+        f"{os.getenv('POSTGRES_DB')}"
+    )
 
 
-def create_session(database_url: str):
-    engine = create_engine(database_url, echo=False)
+def create_engine(database_url: str) -> AsyncEngine:
+    engine = create_async_engine(database_url, echo=False)
+    return engine
 
-    SessionLocal = sessionmaker(
+
+def create_session(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+    AsyncSessionLocal = async_sessionmaker(
         bind=engine,
         autoflush=False,
         expire_on_commit=False,
+        class_=AsyncSession,
     )
-
-    return engine, SessionLocal
-
-
-engine, SessionLocal = create_session(DATABASE_URL)
+    return AsyncSessionLocal
 
 
-def get_db() -> Iterator[Session]:
-    db = SessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db(request: Request) -> AsyncGenerator[AsyncSession]:
+    async with request.app.state.session_factory() as session:
+        yield session

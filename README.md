@@ -1,16 +1,13 @@
 # Tevira-AI
 
-![Coverage](https://img.shields.io/badge/Coverage-93%25-brightgreen.svg)
-![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3670A0?style=flat&logo=python&logoColor=ffdd54)
+![Coverage](https://img.shields.io/badge/Coverage-92%25-brightgreen.svg)
+![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-3670A0?style=flat&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-4169E1?style=flat&logo=postgresql&logoColor=white)
 ![SQLAlchemy](https://img.shields.io/badge/sqlalchemy-D71F00?style=flat&logo=sqlalchemy&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-A python API that stores your tasks, notes, projects and restores context for each of your projects so you can switch back to where you left it off without ever feeling lost again.
-
-<video src="https://github.com/user-attachments/assets/8fe6e6c0-2a4d-4d97-80dc-1860a5f800fe" controls="controls" width="100%">
-</video>
+A python async API that stores your tasks, notes, projects and restores context for each of your projects so you can switch back to where you left it off without ever feeling lost again.
 
 ## 📃 Documentation
 You can check the endpoints and schemas by clicking on the badge below:
@@ -25,7 +22,7 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
 {
   "project": {
     "name": "Study for finals",
-    "id": "project_2"
+    "id": "019ff76d-ffbd-750c-b68c-af38a2abda99"
   },
   "current_state": "Already reviewed math and physics. One week away from finals",
   "open_tasks": [
@@ -33,16 +30,16 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
       "title": "Study for English test",
       "priority": "high",
       "due_date": "2026-06-08",
-      "project_id": "project_2",
-      "id": "task_2",
+      "project_id": "019ff76d-ffbd-750c-b68c-af38a2abda99",
+      "id": "019ff787-e040-759e-a742-183ede8a8a45",
       "status": "open"
     },
     {
       "title": "Finish homework assignment for math class",
       "priority": "medium",
       "due_date": "2026-06-10",
-      "project_id": "project_2",
-      "id": "task_3",
+      "project_id": "019ff76d-ffbd-750c-b68c-af38a2abda99",
+      "id": "019ff788-80b8-70b3-a214-5601089595c4",
       "status": "open"
     }
   ],
@@ -53,8 +50,8 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
     "title": "Study for English test",
     "priority": "high",
     "due_date": "2026-06-08",
-    "project_id": "project_2",
-    "id": "task_2",
+    "project_id": "019ff76d-ffbd-750c-b68c-af38a2abda99",
+    "id": "019ff787-e040-759e-a742-183ede8a8a45",
     "status": "open"
   },
   "important_context": "Late assignments will receive 50% less grade"
@@ -69,27 +66,27 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
 
 - `"/health"` - Ping server to check that it is working.
 
-- `"/tasks"` - Full CRUD for tasks working.
+- `"/tasks"` - Full async CRUD for tasks working.
 
-- `"/projects"` - Full CRUD for projects working.
+- `"/projects"` - Full async CRUD for projects working.
 
-- `"/progress-notes"` - Full CRUD for progress-notes working.
+- `"/progress-notes"` - Full async CRUD for progress-notes working.
 
 - `"/context/{project_id}"` - Restores context for the given project. It gathers info from notes and tasks regarding the project and returns them in a structured way. See Schemas for more info.
 
 - `"/capture/text"` - Parses input from user and suggests actions based on the input. 
 
-    > Current valid input: `Need to X before Y. Next, Z` Where X is the task, Y is the due date - has natural language support for dates - and Z is the next action. 
+    > Current valid input: `X before Y. Next, Z` Where X is the task, Y is the due date - has natural language support for dates - and Z is the next action. 
     
-    **Example input:** "Need to finish tests for Tevira-AI before friday. Next, deploy app"
+    **Example input:** "finish tests for Tevira-AI before friday. Next, deploy app"
 
     **Example output:**
     ```
     {
-    "raw_text": "Need to finish tests for Tevira-AI before friday. Next, deploy app",
+    "raw_text": "finish tests for Tevira-AI before friday. Next, deploy app",
     "parsed": {
         "title": "finish tests for Tevira-AI",
-        "project_id_hint": "project_1",
+        "project_id_hint": "019ff76d-ffbd-750c-b68c-af38a2abda99",
         "due_date_hint": "friday.",
         "next_action_hint": "deploy app"
     },
@@ -99,7 +96,7 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
         "data": {
             "title": "finish tests for Tevira-AI",
             "due_date_hint": "friday.",
-            "project_hint": "project_1"
+            "project_hint": "019ff76d-ffbd-750c-b68c-af38a2abda99"
         }
         },
         {
@@ -111,7 +108,7 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
     ]
     }
     ```
-    It suggests a project for the task if it finds a project name inside your task title, if it doesn't find a project it defaults to Inbox, `project_1` is Inbox.
+    It suggests a project for the task if it finds a project name inside your task title, if it doesn't find a project it defaults to the oldest project you own in the database.
 
 - `"/actions/apply"` - This endpoint creates tasks and progress-notes using the suggestions given in `/capture/text`.
     
@@ -122,7 +119,7 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
       "data": {
         "title": "finish tests for Tevira-AI",
         "due_date_hint": "friday.",
-        "project_hint": "project_1"
+        "project_hint": "019ff76d-ffbd-750c-b68c-af38a2abda99"
       }
     }
     ```
@@ -137,22 +134,22 @@ Example of context restauration through `"/context/{project_id}"` endpoint:
         "data": {
         "title": "finish tests for Tevira-AI",
         "due_date_hint": "friday.",
-        "project_hint": "project_1"
+        "project_hint": "019ff76d-ffbd-750c-b68c-af38a2abda99"
         }
     },
     "result": {
         "title": "finish tests for Tevira-AI",
         "priority": "medium",
         "due_date": "2026-07-10",
-        "project_id": "project_1",
-        "id": "task_1",
+        "project_id": "019ff76d-ffbd-750c-b68c-af38a2abda99",
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
         "status": "open"
     }
     }
     ```
 
 ## 🚀 Getting started
-> Make sure you have Python 3.10+ installed and Docker Desktop (With WSL integration if using WSL).
+> Make sure you have Python 3.14+ installed and Docker Desktop (With WSL integration if using WSL).
 > Development is currently supported on Linux/WSL only. The app does not currently support Windows environment.
 
 ### 1 - Clone the repo:
@@ -184,7 +181,7 @@ The app is setup to work even if you don't change the placeholder values in `.en
 
 #### 2.3 - Install python dependencies
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
 
 ### 3. Start the API locally:
@@ -233,7 +230,8 @@ docker compose down
 
 ## 🛣 Next Steps
 I am actively developing Tevira-AI and in the near future it will have more capabilities, some of them may be found below:
-- **Deployment** I plan on deploying my project soon using a docker image in a VPS (Virtual Private Server).
+- **Dockerize the app:** So far only the database is running on docker, next step is to dockerize the whole application in a Dockerfile.
+- **Deployment:** I plan on deploying my project soon using a docker image in a VPS (Virtual Private Server).
 - **Security and Login:** I plan to use OAuth in the future for login and security.
 - **Authentication** I will create a authentication layer to separate each users' data.
 
