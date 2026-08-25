@@ -1,0 +1,37 @@
+# Version Control & Metadata
+.git
+.gitignore
+.envrc*
+.pre-commit-config.yaml
+
+# Virtual Environments & Caches
+.venv
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Test & Coverage Artifacts
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+tests/
+pytest.ini
+
+# Build & Infrastructure Configs
+Dockerfile*
+docker-compose*
+
+# Documentation & Meta
+docs/
+README.md
+LICENSE
+
+# Environment Secrets
+.env
+.env.*
+!.env.example

@@ -26,7 +26,7 @@ docker compose up -d
 log_info "Waiting for PostgreSQL..."
 until docker exec "$CONTAINER_NAME" \
     pg_isready \
-    -U "$POSTGRES_USERNAME" \
+    -U "$POSTGRES_USER" \
     -d "$POSTGRES_DB" \
     >/dev/null 2>&1
 do
