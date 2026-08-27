@@ -19,7 +19,7 @@ class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
-    owner_id: Mapped[str]
+    owner_id: Mapped[uuid.UUID]
     title: Mapped[str]
 
 
@@ -27,7 +27,7 @@ class Task(Base):
     __tablename__ = "tasks"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
-    owner_id: Mapped[str]
+    owner_id: Mapped[uuid.UUID]
     title: Mapped[str]
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"))
     priority: Mapped[Literal["low", "medium", "high"]]
@@ -39,7 +39,7 @@ class ProgressNote(Base):
     __tablename__ = "progress_notes"
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid7)
-    owner_id: Mapped[str]
+    owner_id: Mapped[uuid.UUID]
     project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"))
     current_state: Mapped[str | None]
     last_session: Mapped[str | None]

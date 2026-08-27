@@ -1,5 +1,5 @@
-import uuid
 from operator import attrgetter
+from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,15 +9,17 @@ from src.tevira_ai.services.projects import get_project
 from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project
 
 
-async def restore_context(db: AsyncSession, project_id: uuid.UUID) -> ContextRead:
+async def restore_context(
+    owner_id: UUID, db: AsyncSession, project_id: UUID
+) -> ContextRead:
     # find project
-    project = await get_project(db, project_id)
+    project = await get_project(owner_id, db, project_id)
 
     # find all notes that belong in that project
-    matching_notes = await get_notes_by_project(db, project_id)
+    matching_notes = await get_notes_by_project(owner_id, db, project_id)
 
     # find all tasks that belong to that project_id && status == "open"
-    open_tasks = await get_tasks_by_project(db, project_id)
+    open_tasks = await get_tasks_by_project(owner_id, db, project_id)
 
     # output recommended next action (latest note next actions OR open tasks)
     latest_note = max(matching_notes, key=attrgetter("updated_at"), default=None)
@@ -25,7 +27,7 @@ async def restore_context(db: AsyncSession, project_id: uuid.UUID) -> ContextRea
     next_actions = (
         latest_note.next_actions
         if latest_note and latest_note.next_actions
-        else await get_important_task(db, project_id)
+        else await get_important_task(owner_id, db, project_id)
     )
 
     return ContextRead(

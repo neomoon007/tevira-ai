@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
@@ -19,21 +19,21 @@ class TaskRepository:
 
         return task
 
-    async def get_all(self, owner_id: str) -> list[Task]:
+    async def get_all(self, owner_id: UUID) -> list[Task]:
         tasks_list = await self.session.scalars(
             select(Task).where(Task.owner_id == owner_id)
         )
 
         return list(tasks_list.all())
 
-    async def get_by_project(self, owner_id: str, project_id: uuid.UUID) -> list[Task]:
+    async def get_by_project(self, owner_id: UUID, project_id: UUID) -> list[Task]:
         tasks_list = await self.session.scalars(
             select(Task).where(Task.owner_id == owner_id, Task.project_id == project_id)
         )
 
         return list(tasks_list.all())
 
-    async def get_by_id(self, owner_id: str, task_id: uuid.UUID) -> Task | None:
+    async def get_by_id(self, owner_id: UUID, task_id: UUID) -> Task | None:
         task_result = await self.session.scalar(
             select(Task).where(Task.owner_id == owner_id, Task.id == task_id)
         )
@@ -41,7 +41,7 @@ class TaskRepository:
         return task_result
 
     async def update(
-        self, owner_id: str, task_id: uuid.UUID, task_obj: dict
+        self, owner_id: UUID, task_id: UUID, task_obj: dict
     ) -> Task | None:
         updated_task = await self.session.scalar(
             update(Task)
@@ -53,7 +53,7 @@ class TaskRepository:
         await self.session.commit()
         return updated_task
 
-    async def delete(self, owner_id: str, task_id: uuid.UUID):
+    async def delete(self, owner_id: UUID, task_id: UUID):
         try:
             await self.session.execute(
                 delete(Task).where(Task.owner_id == owner_id, Task.id == task_id)

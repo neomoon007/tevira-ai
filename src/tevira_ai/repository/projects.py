@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
@@ -20,7 +20,7 @@ class ProjectRepository:
 
         return project
 
-    async def get_by_id(self, owner_id: str, project_id: uuid.UUID) -> Project | None:
+    async def get_by_id(self, owner_id: UUID, project_id: UUID) -> Project | None:
         query_result = await self.session.scalar(
             select(Project).where(
                 Project.owner_id == owner_id, Project.id == project_id
@@ -29,7 +29,7 @@ class ProjectRepository:
 
         return query_result
 
-    async def get_all(self, owner_id: str) -> list[Project]:
+    async def get_all(self, owner_id: UUID) -> list[Project]:
         query_result = await self.session.scalars(
             select(Project).where(Project.owner_id == owner_id)
         )
@@ -37,7 +37,7 @@ class ProjectRepository:
         return list(query_result.all())
 
     async def rename(
-        self, owner_id: str, renamed_project: ProjectRead
+        self, owner_id: UUID, renamed_project: ProjectRead
     ) -> Project | None:
         project = await self.session.scalar(
             select(Project).where(
@@ -53,7 +53,7 @@ class ProjectRepository:
 
             return project
 
-    async def delete(self, owner_id: str, project_id: uuid.UUID):
+    async def delete(self, owner_id: UUID, project_id: UUID):
         try:
             await self.session.execute(
                 delete(Project).where(
@@ -70,7 +70,7 @@ class ProjectRepository:
                 resource_id=str(project_id),
             )
 
-    async def get_default_project_id(self, owner_id: str) -> uuid.UUID:
+    async def get_default_project_id(self, owner_id: UUID) -> UUID:
         default_project_id = await self.session.scalar(
             select(Project.id)
             .where(Project.owner_id == owner_id)
@@ -86,9 +86,7 @@ class ProjectRepository:
 
         return default_project_id
 
-    async def get_project_id_by_title(
-        self, owner_id: str, title_list: list
-    ) -> uuid.UUID:
+    async def get_project_id_by_title(self, owner_id: UUID, title_list: list) -> UUID:
         project_id = await self.session.scalar(
             select(Project.id).where(
                 Project.owner_id == owner_id, Project.title.in_(title_list)

@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
@@ -19,7 +19,7 @@ class ProgressNoteRepository:
 
         return note
 
-    async def get_all(self, owner_id: str) -> list[ProgressNote]:
+    async def get_all(self, owner_id: UUID) -> list[ProgressNote]:
         tasks_list = await self.session.scalars(
             select(ProgressNote).where(ProgressNote.owner_id == owner_id)
         )
@@ -27,7 +27,7 @@ class ProgressNoteRepository:
         return list(tasks_list.all())
 
     async def get_by_project(
-        self, owner_id: str, project_id: uuid.UUID
+        self, owner_id: UUID, project_id: UUID
     ) -> list[ProgressNote]:
         notes_list = await self.session.scalars(
             select(ProgressNote).where(
@@ -38,7 +38,7 @@ class ProgressNoteRepository:
 
         return list(notes_list.all())
 
-    async def get_by_id(self, owner_id: str, note_id: uuid.UUID) -> ProgressNote | None:
+    async def get_by_id(self, owner_id: UUID, note_id: UUID) -> ProgressNote | None:
         note_result = await self.session.scalar(
             select(ProgressNote).where(
                 ProgressNote.owner_id == owner_id, ProgressNote.id == note_id
@@ -48,7 +48,7 @@ class ProgressNoteRepository:
         return note_result
 
     async def update(
-        self, owner_id: str, note_id: uuid.UUID, note_obj: dict
+        self, owner_id: UUID, note_id: UUID, note_obj: dict
     ) -> ProgressNote | None:
         updated_note = await self.session.scalar(
             update(ProgressNote)
@@ -60,7 +60,7 @@ class ProgressNoteRepository:
         await self.session.commit()
         return updated_note
 
-    async def delete(self, owner_id: str, note_id: uuid.UUID):
+    async def delete(self, owner_id: UUID, note_id: UUID):
         try:
             await self.session.execute(
                 delete(ProgressNote).where(

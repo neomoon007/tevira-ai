@@ -5,16 +5,18 @@
 # It checks the existing projects to match the project hint
 # If it doesn't find any, it is currently hardcoded to return "Tevira-AI" as default
 
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.exceptions import DomainException
 from src.tevira_ai.repository.projects import ProjectRepository
 from src.tevira_ai.schemas import ParseNoteRead
 
-OWNER_ID = "local_user"
 
-
-async def parse_note(db: AsyncSession, mind_dump_note: str) -> ParseNoteRead:
+async def parse_note(
+    owner_id: UUID, db: AsyncSession, mind_dump_note: str
+) -> ParseNoteRead:
     next_action_marker = " Next, "
     due_date_marker = " before "
     try:
@@ -30,7 +32,7 @@ async def parse_note(db: AsyncSession, mind_dump_note: str) -> ParseNoteRead:
     raw_title_list = mind_dump_note.split(" ")
     repository = ProjectRepository(db)
     project_id_hint = await repository.get_project_id_by_title(
-        owner_id=OWNER_ID, title_list=raw_title_list
+        owner_id=owner_id, title_list=raw_title_list
     )
 
     return ParseNoteRead(

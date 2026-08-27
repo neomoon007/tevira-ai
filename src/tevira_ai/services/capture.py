@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.schemas import (
@@ -11,8 +13,10 @@ from src.tevira_ai.schemas import (
 from src.tevira_ai.services.parser import parse_note
 
 
-async def capture_from_text(db: AsyncSession, raw_input: NonEmptyString) -> CaptureRead:
-    parsed_input = await parse_note(db, raw_input)
+async def capture_from_text(
+    owner_id: UUID, db: AsyncSession, raw_input: NonEmptyString
+) -> CaptureRead:
+    parsed_input = await parse_note(owner_id, db, raw_input)
 
     return CaptureRead(
         raw_text=raw_input,
