@@ -4,7 +4,9 @@
 FROM python:3.14.7-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
@@ -19,7 +21,38 @@ RUN python -m venv /opt/venv \
     && poetry install --only main --no-interaction --no-ansi --no-root
 
 # ---------------------------------------
-# STAGE 2: The Production Runtime
+# STAGE 2.1: The Test Builder
+# ---------------------------------------
+FROM builder AS test-builder
+
+RUN poetry install --only test --no-interaction --no-ansi --no-root
+
+# ---------------------------------------
+# STAGE 2.2: The Test Target
+# ---------------------------------------
+FROM python:3.14.7-slim AS test
+
+# Force the OS to prioritize the virtual environment's binaries
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+
+# Copy ONLY the isolated virtual environment from the builder stage
+COPY --from=test-builder /opt/venv /opt/venv
+
+# Copy the application source code
+COPY /tests /app/tests/
+COPY /src /app/src/
+COPY /alembic /app/alembic/
+COPY alembic.ini pytest.ini /scripts/run.test.sh /app/
+
+CMD ["./run.test.sh"]
+
+
+# ---------------------------------------
+# STAGE 3: The Production Runtime
 # ---------------------------------------
 FROM python:3.14.7-slim
 
@@ -34,6 +67,8 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 
 # Copy the application source code
-COPY . .
+COPY /src /app/src/
+COPY /alembic /app/alembic/
+COPY alembic.ini /scripts/run.sh /app/
 
-CMD ["uvicorn", "src.tevira_ai.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["./run.sh"]

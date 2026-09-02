@@ -5,6 +5,7 @@ from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Project, Task
+from src.tevira_ai.dependencies import get_current_owner_id
 from src.tevira_ai.schemas import TaskRead
 from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project
 
@@ -14,7 +15,9 @@ async def test_get_important_task_returns_highest_priority_task(
 ):
     project_id = test_project[0].id
     task_id = test_task[1].id
-    response = await get_important_task(db_session, project_id)
+    response = await get_important_task(
+        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+    )
 
     assert isinstance(response, TaskRead)
     assert response.id == task_id
@@ -25,7 +28,9 @@ async def test_get_tasks_by_project_returns_only_open_tasks_project_1(
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 2
-    response = await get_tasks_by_project(db_session, project_id)
+    response = await get_tasks_by_project(
+        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+    )
 
     assert isinstance(response, list), "Response is not a list"
     assert len(response) == expected_num_of_tasks
@@ -43,7 +48,9 @@ async def test_get_tasks_by_project_returns_empty_list_for_missing_project_tasks
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 0
-    response = await get_tasks_by_project(db_session, project_id)
+    response = await get_tasks_by_project(
+        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+    )
 
     assert isinstance(response, list), "Response is not a list"
     assert len(response) == expected_num_of_tasks

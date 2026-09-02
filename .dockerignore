@@ -12,6 +12,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*__pycache__*
 
 # Test & Coverage Artifacts
 .coverage
@@ -19,8 +20,6 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 htmlcov/
-tests/
-pytest.ini
 
 # Build & Infrastructure Configs
 Dockerfile*
