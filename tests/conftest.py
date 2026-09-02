@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from alembic import command
 from src.tevira_ai.db.database import get_db
 from src.tevira_ai.db.models import ProgressNote, Project, Task
-from src.tevira_ai.main import app
 from src.tevira_ai.dependencies import get_current_owner_id
+from src.tevira_ai.main import app
 
 alembic_config = Config("/app/alembic.ini")
 
