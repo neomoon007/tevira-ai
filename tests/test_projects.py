@@ -6,13 +6,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Project
-from src.tevira_ai.dependencies import get_current_owner_id
 from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.services.projects import get_project
 
 
-async def test_can_insert_project(db_session: AsyncSession):
-    owner_id = get_current_owner_id()
+async def test_can_insert_project(db_session: AsyncSession, test_owner_id: uuid.UUID):
+    owner_id = test_owner_id
     title = "foo"
 
     project = Project(owner_id=owner_id, title=title)
@@ -31,11 +30,11 @@ async def test_can_insert_project(db_session: AsyncSession):
 
 
 async def test_validate_project_id_accepts_existing_project(
-    db_session: AsyncSession, test_project: list[Project]
+    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
 ):
     project_id = test_project[0].id
     response = await get_project(
-        owner_id=get_current_owner_id(),
+        owner_id=test_owner_id,
         db=db_session,
         project_id=project_id,
     )
@@ -44,13 +43,13 @@ async def test_validate_project_id_accepts_existing_project(
 
 
 async def test_validate_project_id_raises_404_for_non_existing_project(
-    db_session: AsyncSession, test_project: list[Project]
+    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
 ):
     non_existent_id = uuid.uuid7()
 
     with pytest.raises(ResourceNotFoundError) as exception_info:
         await get_project(
-            owner_id=get_current_owner_id(),
+            owner_id=test_owner_id,
             db=db_session,
             project_id=non_existent_id,
         )

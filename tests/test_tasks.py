@@ -5,18 +5,20 @@ from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.db.models import Project, Task
-from src.tevira_ai.dependencies import get_current_owner_id
 from src.tevira_ai.schemas import TaskRead
 from src.tevira_ai.services.tasks import get_important_task, get_tasks_by_project
 
 
 async def test_get_important_task_returns_highest_priority_task(
-    db_session: AsyncSession, test_project: list[Project], test_task: list[Task]
+    db_session: AsyncSession,
+    test_project: list[Project],
+    test_task: list[Task],
+    test_owner_id: uuid.UUID,
 ):
     project_id = test_project[0].id
     task_id = test_task[1].id
     response = await get_important_task(
-        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+        owner_id=test_owner_id, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, TaskRead)
@@ -24,12 +26,15 @@ async def test_get_important_task_returns_highest_priority_task(
 
 
 async def test_get_tasks_by_project_returns_only_open_tasks_project_1(
-    db_session: AsyncSession, test_project: list[Project], test_task: list[Task]
+    db_session: AsyncSession,
+    test_project: list[Project],
+    test_task: list[Task],
+    test_owner_id: uuid.UUID,
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 2
     response = await get_tasks_by_project(
-        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+        owner_id=test_owner_id, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, list), "Response is not a list"
@@ -44,12 +49,12 @@ async def test_get_tasks_by_project_returns_only_open_tasks_project_1(
 
 
 async def test_get_tasks_by_project_returns_empty_list_for_missing_project_tasks(
-    db_session: AsyncSession, test_project: list[Project]
+    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 0
     response = await get_tasks_by_project(
-        owner_id=get_current_owner_id(), db=db_session, project_id=project_id
+        owner_id=test_owner_id, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, list), "Response is not a list"
