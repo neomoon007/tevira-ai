@@ -31,7 +31,7 @@ async def as_owner_a():
 
 @pytest_asyncio.fixture
 async def as_owner_b():
-    owner_id = UUID("00000000-0000-0000-0000-000000000002")
+    owner_id = UUID("00000000-0000-0000-0000-000000000020")
 
     app.dependency_overrides[get_current_owner_id] = lambda: owner_id
     yield owner_id

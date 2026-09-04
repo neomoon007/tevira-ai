@@ -253,3 +253,17 @@ async def test_delete_task_raises_404_for_non_existent_task(
     response = await client.delete(f"/tasks/{task_id}")
 
     assert response.status_code == 404
+
+
+async def test_raises_404_for_creating_task_with_inaccessible_project(
+    client: AsyncClient,
+    test_project: list[Project],
+    as_owner_b: uuid.UUID,
+):
+    project_id = str(test_project[0].id)
+    response = await client.post(
+        "/tasks",
+        json={"title": "My new task!", "priority": "high", "project_id": project_id},
+    )
+
+    assert response.status_code == 404

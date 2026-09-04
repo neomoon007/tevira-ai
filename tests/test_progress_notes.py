@@ -87,3 +87,24 @@ async def test_delete_note_returns_204_for_existing_note_id(
 
     response = await client.delete(f"/progress-notes/{note_id}")
     assert response.status_code == 204
+
+
+async def test_raises_404_for_creating_note_with_inaccessible_project(
+    client: AsyncClient, test_project: list[Project], as_owner_b: UUID
+):
+    project_id = str(test_project[0].id)
+    response = await client.post(
+        "/progress-notes",
+        json={
+            "project_id": project_id,
+            "current_state": "Just created main.py",
+            "last_session": "Created github repo",
+            "open_loops": ["Create roadmap", "Follow roadmap"],
+            "next_actions": "Create fastapi instance",
+            "important_context": "Read documentation",
+            "blockers": ["Nothing"],
+            "confidence": "high",
+        },
+    )
+
+    assert response.status_code == 404
