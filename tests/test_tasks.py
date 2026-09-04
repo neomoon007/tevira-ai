@@ -13,12 +13,12 @@ async def test_get_important_task_returns_highest_priority_task(
     db_session: AsyncSession,
     test_project: list[Project],
     test_task: list[Task],
-    test_owner_id: uuid.UUID,
+    as_owner_a: uuid.UUID,
 ):
     project_id = test_project[0].id
     task_id = test_task[1].id
     response = await get_important_task(
-        owner_id=test_owner_id, db=db_session, project_id=project_id
+        owner_id=as_owner_a, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, TaskRead)
@@ -29,12 +29,12 @@ async def test_get_tasks_by_project_returns_only_open_tasks_project_1(
     db_session: AsyncSession,
     test_project: list[Project],
     test_task: list[Task],
-    test_owner_id: uuid.UUID,
+    as_owner_a: uuid.UUID,
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 2
     response = await get_tasks_by_project(
-        owner_id=test_owner_id, db=db_session, project_id=project_id
+        owner_id=as_owner_a, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, list), "Response is not a list"
@@ -49,12 +49,12 @@ async def test_get_tasks_by_project_returns_only_open_tasks_project_1(
 
 
 async def test_get_tasks_by_project_returns_empty_list_for_missing_project_tasks(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = test_project[0].id
     expected_num_of_tasks = 0
     response = await get_tasks_by_project(
-        owner_id=test_owner_id, db=db_session, project_id=project_id
+        owner_id=as_owner_a, db=db_session, project_id=project_id
     )
 
     assert isinstance(response, list), "Response is not a list"
@@ -62,7 +62,7 @@ async def test_get_tasks_by_project_returns_empty_list_for_missing_project_tasks
 
 
 async def test_create_task_accepts_valid_task_object(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = str(test_project[0].id)
     response = await client.post(
@@ -80,7 +80,10 @@ async def test_create_task_accepts_valid_task_object(
 
 
 async def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     expected_num_of_tasks = 3
     response = await client.get("/tasks")
@@ -93,7 +96,10 @@ async def test_show_tasks_returns_all_tasks_when_no_query_parameter_is_passed(
 
 
 async def test_show_tasks_with_project_id_returns_all_project_tasks(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     project_id = str(test_project[0].id)
     expected_num_of_tasks = 2
@@ -109,7 +115,10 @@ async def test_show_tasks_with_project_id_returns_all_project_tasks(
 
 
 async def test_show_tasks_with_non_existent_project_raises_404(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     non_existent_project_id = str(uuid.uuid7())
     query_parameters = {"project_id": non_existent_project_id}
@@ -119,7 +128,10 @@ async def test_show_tasks_with_non_existent_project_raises_404(
 
 
 async def test_show_tasks_with_task_id_returns_only_one_task(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     task_id = test_task[0].id
     project_id = test_project[0].id
@@ -143,7 +155,10 @@ async def test_show_tasks_with_task_id_returns_only_one_task(
 
 
 async def test_show_tasks_with_missing_task_raises_404(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     non_existent_task_id = str(uuid.uuid7())
     query_parameters = {"task_id": non_existent_task_id}
@@ -153,7 +168,10 @@ async def test_show_tasks_with_missing_task_raises_404(
 
 
 async def test_show_tasks_with_project_and_task_id_returns_one_task(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     project_id = test_project[0].id
     task_id = test_task[0].id
@@ -177,7 +195,10 @@ async def test_show_tasks_with_project_and_task_id_returns_one_task(
 
 
 async def test_update_task_accepts_valid_task_object(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     task_id = test_task[0].id
     project_id = test_project[0].id
@@ -199,7 +220,10 @@ async def test_update_task_accepts_valid_task_object(
 
 
 async def test_update_task_raises_404_for_non_existent_task(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     task_id = uuid.uuid7()
     response = await client.patch(f"/tasks/{task_id}", json={"priority": "low"})
@@ -208,7 +232,10 @@ async def test_update_task_raises_404_for_non_existent_task(
 
 
 async def test_delete_task_returns_204(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     task_id = test_task[0].id
     response = await client.delete(f"/tasks/{task_id}")
@@ -217,7 +244,10 @@ async def test_delete_task_returns_204(
 
 
 async def test_delete_task_raises_404_for_non_existent_task(
-    client: AsyncClient, test_project: list[Project], test_task: list[Task]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     task_id = uuid.uuid7()
     response = await client.delete(f"/tasks/{task_id}")

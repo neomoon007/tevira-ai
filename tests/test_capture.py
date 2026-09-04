@@ -1,10 +1,12 @@
+from uuid import UUID
+
 from httpx import AsyncClient
 
 from src.tevira_ai.db.models import Project
 
 
 async def test_capture_accepts_valid_input(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: UUID
 ):
     task = "finish tests for portfolio project"
     due_date = "today."

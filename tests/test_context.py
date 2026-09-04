@@ -6,7 +6,10 @@ from src.tevira_ai.db.models import ProgressNote, Project, Task
 
 
 async def test_restore_context_accepts_valid_project_with_existing_note(
-    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_note: list[ProgressNote],
+    as_owner_a: uuid.UUID,
 ):
     lookup_project = str(test_project[0].id)
     response = await client.get(f"/context/{lookup_project}")
@@ -27,7 +30,7 @@ async def test_restore_context_accepts_valid_project_with_existing_note(
 
 
 async def test_restore_context_raises_404_for_non_existent_project(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     lookup_project = str(uuid.uuid7())
     response = await client.get(f"/context/{lookup_project}")
@@ -40,6 +43,7 @@ async def test_restore_context_returns_task_when_missing_next_actions(
     test_project: list[Project],
     test_note: list[ProgressNote],
     test_task: list[Task],
+    as_owner_a: uuid.UUID,
 ):
     project_id = str(test_project[1].id)
     task_id = str(test_task[2].id)

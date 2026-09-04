@@ -1,4 +1,5 @@
 from datetime import date
+from uuid import UUID
 
 from httpx import AsyncClient
 
@@ -6,7 +7,7 @@ from src.tevira_ai.db.models import Project
 
 
 async def test_actions_accepts_valid_create_task_object(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: UUID
 ):
     title = "finish tests for portfolio project"
     due_date_hint = "today."

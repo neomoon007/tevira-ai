@@ -7,7 +7,7 @@ from src.tevira_ai.services.parser import parse_note
 
 
 async def test_parse_note_accepts_valid_input(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: UUID
 ):
     title = "finish the README for tevira-ai"
     project_id_hint = test_project[0].id
@@ -16,7 +16,7 @@ async def test_parse_note_accepts_valid_input(
     messy_note = f"{title} before {due_date_hint} Next, {next_action_hint}"
 
     response = await parse_note(
-        owner_id=test_owner_id, db=db_session, mind_dump_note=messy_note
+        owner_id=as_owner_a, db=db_session, mind_dump_note=messy_note
     )
 
     assert response.title == title

@@ -10,8 +10,8 @@ from src.tevira_ai.exceptions import ResourceNotFoundError
 from src.tevira_ai.services.projects import get_project
 
 
-async def test_can_insert_project(db_session: AsyncSession, test_owner_id: uuid.UUID):
-    owner_id = test_owner_id
+async def test_can_insert_project(db_session: AsyncSession, as_owner_a: uuid.UUID):
+    owner_id = as_owner_a
     title = "foo"
 
     project = Project(owner_id=owner_id, title=title)
@@ -30,11 +30,11 @@ async def test_can_insert_project(db_session: AsyncSession, test_owner_id: uuid.
 
 
 async def test_validate_project_id_accepts_existing_project(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = test_project[0].id
     response = await get_project(
-        owner_id=test_owner_id,
+        owner_id=as_owner_a,
         db=db_session,
         project_id=project_id,
     )
@@ -43,13 +43,13 @@ async def test_validate_project_id_accepts_existing_project(
 
 
 async def test_validate_project_id_raises_404_for_non_existing_project(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: uuid.UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     non_existent_id = uuid.uuid7()
 
     with pytest.raises(ResourceNotFoundError) as exception_info:
         await get_project(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             db=db_session,
             project_id=non_existent_id,
         )
@@ -57,7 +57,9 @@ async def test_validate_project_id_raises_404_for_non_existing_project(
     assert exception_info.value.status_code == 404
 
 
-async def test_create_project_accepts_valid_project_object(client: AsyncClient):
+async def test_create_project_accepts_valid_project_object(
+    client: AsyncClient, as_owner_a: uuid.UUID
+):
     response = await client.post("/projects", json={"title": "Magnum Opus"})
     assert response.status_code == 201
 
@@ -66,7 +68,7 @@ async def test_create_project_accepts_valid_project_object(client: AsyncClient):
 
 
 async def test_show_project_returns_200_for_existing_project(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = str(test_project[0].id)
     response = await client.get(f"/projects/{project_id}")
@@ -75,7 +77,7 @@ async def test_show_project_returns_200_for_existing_project(
 
 
 async def test_show_project_returns_404_for_non_existing_project(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     non_existent_id = uuid.uuid7()
     response = await client.get(f"/projects/{non_existent_id}")
@@ -84,7 +86,7 @@ async def test_show_project_returns_404_for_non_existing_project(
 
 
 async def test_rename_project_returns_200_for_valid_request(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = str(test_project[0].id)
     response = await client.patch(
@@ -99,7 +101,7 @@ async def test_rename_project_returns_200_for_valid_request(
 
 
 async def test_delete_project_returns_204(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = str(test_project[0].id)
     response = await client.delete(f"/projects/{project_id}")
@@ -108,7 +110,7 @@ async def test_delete_project_returns_204(
 
 
 async def test_delete_project_returns_404_for_non_existing_project(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: uuid.UUID
 ):
     project_id = str(uuid.uuid7())
     response = await client.delete(f"/projects/{project_id}")

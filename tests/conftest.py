@@ -21,8 +21,21 @@ test_engine = create_async_engine(
 
 
 @pytest_asyncio.fixture
-async def test_owner_id() -> UUID:
-    return UUID("00000000-0000-0000-0000-000000000002")
+async def as_owner_a():
+    owner_id = UUID("00000000-0000-0000-0000-000000000002")
+
+    app.dependency_overrides[get_current_owner_id] = lambda: owner_id
+    yield owner_id
+    app.dependency_overrides.pop(get_current_owner_id, None)
+
+
+@pytest_asyncio.fixture
+async def as_owner_b():
+    owner_id = UUID("00000000-0000-0000-0000-000000000002")
+
+    app.dependency_overrides[get_current_owner_id] = lambda: owner_id
+    yield owner_id
+    app.dependency_overrides.pop(get_current_owner_id, None)
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True, loop_scope="session")
@@ -68,15 +81,11 @@ async def db_session():
 
 
 @pytest_asyncio.fixture
-async def client(db_session: AsyncSession, test_owner_id: UUID):
+async def client(db_session: AsyncSession):
     async def _override_get_db():
         yield db_session
 
-    async def _override_get_current_owner_id():
-        yield test_owner_id
-
     app.dependency_overrides[get_db] = _override_get_db
-    app.dependency_overrides[get_current_owner_id] = _override_get_current_owner_id
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
@@ -86,10 +95,10 @@ async def client(db_session: AsyncSession, test_owner_id: UUID):
 
 # --- Data dependencies ---
 @pytest_asyncio.fixture
-async def test_project(db_session: AsyncSession, test_owner_id: UUID) -> list[Project]:
+async def test_project(db_session: AsyncSession, as_owner_a: UUID) -> list[Project]:
     projects = [
-        Project(title="Test Project 1", owner_id=test_owner_id),
-        Project(title="Test Project 2", owner_id=test_owner_id),
+        Project(title="Test Project 1", owner_id=as_owner_a),
+        Project(title="Test Project 2", owner_id=as_owner_a),
     ]
 
     db_session.add_all(projects)
@@ -100,11 +109,11 @@ async def test_project(db_session: AsyncSession, test_owner_id: UUID) -> list[Pr
 
 @pytest_asyncio.fixture
 async def test_note(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: UUID
 ) -> list[ProgressNote]:
     notes = [
         ProgressNote(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             project_id=test_project[0].id,
             current_state="test state",
             last_session="last session log",
@@ -115,7 +124,7 @@ async def test_note(
             confidence="medium",
         ),
         ProgressNote(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             project_id=test_project[1].id,
             current_state="test state",
             last_session="last session log",
@@ -134,25 +143,25 @@ async def test_note(
 
 @pytest_asyncio.fixture
 async def test_task(
-    db_session: AsyncSession, test_project: list[Project], test_owner_id: UUID
+    db_session: AsyncSession, test_project: list[Project], as_owner_a: UUID
 ) -> list[Task]:
     tasks = [
         Task(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             title="test task 1",
             project_id=test_project[0].id,
             priority="medium",
             status="open",
         ),
         Task(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             title="test task 2",
             project_id=test_project[0].id,
             priority="high",
             status="open",
         ),
         Task(
-            owner_id=test_owner_id,
+            owner_id=as_owner_a,
             title="test task 3",
             project_id=test_project[1].id,
             priority="low",

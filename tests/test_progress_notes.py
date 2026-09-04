@@ -1,10 +1,12 @@
+from uuid import UUID
+
 from httpx import AsyncClient
 
 from src.tevira_ai.db.models import ProgressNote, Project
 
 
 async def test_create_progress_note_accepts_valid_note_obj(
-    client: AsyncClient, test_project: list[Project]
+    client: AsyncClient, test_project: list[Project], as_owner_a: UUID
 ):
     project_id = str(test_project[0].id)
     response = await client.post(
@@ -35,7 +37,10 @@ async def test_create_progress_note_accepts_valid_note_obj(
 
 
 async def test_get_progress_note_returns_existing_note(
-    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_note: list[ProgressNote],
+    as_owner_a: UUID,
 ):
     note_id = str(test_note[0].id)
     project_id = str(test_project[0].id)
@@ -56,7 +61,10 @@ async def test_get_progress_note_returns_existing_note(
 
 
 async def test_patch_note_router_returns_accepts_valid_input(
-    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_note: list[ProgressNote],
+    as_owner_a: UUID,
 ):
     note_id = str(test_note[0].id)
 
@@ -70,7 +78,10 @@ async def test_patch_note_router_returns_accepts_valid_input(
 
 
 async def test_delete_note_returns_204_for_existing_note_id(
-    client: AsyncClient, test_project: list[Project], test_note: list[ProgressNote]
+    client: AsyncClient,
+    test_project: list[Project],
+    test_note: list[ProgressNote],
+    as_owner_a: UUID,
 ):
     note_id = str(test_note[0].id)
 
