@@ -4,13 +4,30 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
-    container_name: tevira_dev
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "8000:8000"
+    env_file:
+      - .env.dev
+    depends_on:
+      dev-migrate:
+        condition: service_completed_successfully
+    networks:
+      - tevira_net
+
+  dev-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: migration_service
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    command: alembic upgrade head
     env_file:
       - .env.dev
     depends_on:

@@ -16,9 +16,5 @@ log_info() { echo -e "${GREEN}INFO${RESET_COLOR}:     $*"; }
 # log_error() { echo -e "${RED}ERROR${RESET_COLOR}:     $*"; }
 
 
-log_info "Running alembic migrations..."
-alembic upgrade head
-log_info "Database is up to date."
-
 log_info "Running test suite..."
 pytest
