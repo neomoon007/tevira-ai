@@ -52,7 +52,34 @@ CMD ["./run.test.sh"]
 
 
 # ---------------------------------------
-# STAGE 3: The Production Runtime
+# STAGE 3.1: The Development Builder
+# ---------------------------------------
+FROM builder AS dev-builder
+
+RUN poetry install --all-groups --no-interaction --no-ansi --no-root
+
+# ---------------------------------------
+# STAGE 3.2: The Development Target
+# ---------------------------------------
+FROM python:3.14.7-slim AS dev
+
+# Force the OS to prioritize the virtual environment's binaries
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+WORKDIR /app
+
+# Copy ONLY the isolated virtual environment from the builder stage
+COPY --from=dev-builder /opt/venv /opt/venv
+
+# Copy the source code
+COPY . .
+
+CMD ["./scripts/run.sh"]
+
+# ---------------------------------------
+# STAGE 4: The Production Runtime
 # ---------------------------------------
 FROM python:3.14.7-slim
 
