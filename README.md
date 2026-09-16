@@ -160,59 +160,16 @@ cd tevira-ai
 
 ### 2 - Setup environment:
 
-#### 2.1a - Through setup script (does all the manual steps below at once)
-```bash
-source setup.sh
-```
-
-Or if you wanna do it manually... Follow the steps below.
-
-#### 2.1b - Create and activate python's virtual environment
-```bash
-python3 -m venv .venv 
-source .venv/bin/activate
-```
-
-#### 2.2 - Setup the .env file
 ```bash
 cp .env.example .env
 ```
 The app is setup to work even if you don't change the placeholder values in `.env.example`, but it's recommended that you change the variables before running the app.
 
-#### 2.3 - Install python dependencies
-```bash
-poetry install
-```
-
 ### 3. Start the API locally:
 > Before starting the application make sure that Docker engine is running. If you are using WSL enable WSL integration through Docker Desktop>Settings>Resources>WSL Integration and check the box for "Enable integration with my default WSL distro".
 
-#### 3.1a - Run the script below to start the application
-```bash
-./run.sh
-```
-
-Again, if you wanna do it manually anyways... Follow the steps below.
-
-#### 3.1b - Initialize the docker containers
 ```bash
 docker compose up -d
-```
-
-#### 3.2 - Check that PostgreSQL is ready
-```bash
-docker exec your-container pg_isready -U your_username -d your_database
-```
-Do not move to the next step until PostgreSQL is ready.
-
-#### 3.3 - Run Alembic migrations
-```bash
-alembic upgrade head
-```
-
-#### 3.4 - Start Uvicorn server
-```bash
-uvicorn src.tevira_ai.main:app --reload
 ```
 
 ### 4. Test the application:
@@ -224,7 +181,6 @@ http://127.0.0.1:8000/docs
 ### 5. Stop the application
 On your terminal inside the repo directory run
 ```
-<Ctrl+C> # This stops the uvicorn application
 docker compose down
 ```
 
