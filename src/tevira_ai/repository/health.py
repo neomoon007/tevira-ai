@@ -6,6 +6,8 @@ class HealthRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def check(self):
+    async def check(self) -> str:
         query_result = await self.session.scalar(select(func.version()))
-        return query_result
+        if isinstance(query_result, str):
+            return query_result
+        raise TypeError

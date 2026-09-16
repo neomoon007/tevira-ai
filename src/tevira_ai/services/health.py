@@ -1,13 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.tevira_ai.repository.health import HealthRepository
+from src.tevira_ai.schemas import HealthResponse
 
 
-async def check_health(db: AsyncSession):
+async def check_health(db: AsyncSession) -> HealthResponse:
     repository = HealthRepository(db)
 
-    try:
-        health_status_from_db = await repository.check()
-        return health_status_from_db
-    except Exception as e:
-        return f"DB NOT WORKING: {e}"
+    await repository.check()
+    return HealthResponse()

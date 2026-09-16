@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from sqlalchemy.exc import OperationalError
+
 from src.tevira_ai.db.database import create_engine, create_session, get_db_url
 from src.tevira_ai.exceptions import DomainException
 from src.tevira_ai.routers import (
@@ -52,5 +54,17 @@ def domain_exception_handler(request: Request, exception: DomainException):
             "status": "error",
             "code": exception.error_code,
             "message": exception.message,
+        },
+    )
+
+
+@app.exception_handler(OperationalError)
+def operational_exception_handler(request: Request, exception: OperationalError):
+    return JSONResponse(
+        status_code=503,
+        content={
+            "status": "503",
+            "code": "DB_NOT_WORKING",
+            "message": "Database is either unreachable or not working.",
         },
     )

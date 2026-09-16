@@ -126,3 +126,9 @@ class ApplyActionResponse(BaseModel):
     status: Literal["applied"]
     action: ProposedAction
     result: TaskRead | ProgressNoteRead
+
+
+# -- HEALTH ---
+class HealthResponse(BaseModel):
+    status: Literal["ok"] = "ok"
+    service: Literal["tevira-ai"] = "tevira-ai"
