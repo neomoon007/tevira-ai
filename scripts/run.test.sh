@@ -16,6 +16,10 @@ log_info() { echo -e "${GREEN}INFO${RESET_COLOR}:     $*"; }
 # log_error() { echo -e "${RED}ERROR${RESET_COLOR}:     $*"; }
 
 
-log_info "Running test suite..."
+log_info "Running alembic migrations..."
 alembic upgrade head
+log_info "Checking migrations against the database..."
+alembic check
+
+log_info "Running test suite..."
 pytest --cov=/app/src --cov-fail-under=80
