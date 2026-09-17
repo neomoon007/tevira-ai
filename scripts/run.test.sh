@@ -17,4 +17,5 @@ log_info() { echo -e "${GREEN}INFO${RESET_COLOR}:     $*"; }
 
 
 log_info "Running test suite..."
+alembic upgrade head
 pytest --cov=/app/src --cov-fail-under=80
