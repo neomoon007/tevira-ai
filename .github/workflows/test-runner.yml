@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test-runner:
@@ -10,4 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: mv .env.example .env
-      - run: docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test --build
+      - run: docker compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from test_container
