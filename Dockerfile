@@ -81,7 +81,7 @@ CMD ["./scripts/run.sh"]
 # ---------------------------------------
 # STAGE 4: The Production Runtime
 # ---------------------------------------
-FROM python:3.14.7-slim
+FROM python:3.14.7-slim AS runtime
 
 # Force the OS to prioritize the virtual environment's binaries
 ENV PYTHONDONTWRITEBYTECODE=1 \
