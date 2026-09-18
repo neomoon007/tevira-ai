@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Copy the Dummy Environment Files
-        run: mv .env.example .env &&
+        run: mv .env.example .env
 
       - name: Run the Test Suite
         run: docker compose -f docker-compose.test.yml up --build --exit-code-from test
