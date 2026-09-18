@@ -11,6 +11,12 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "python", "-c", "\"from urllib.request import urlopen; print(urlopen('http://127.0.0.1:8000/health'))\""]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+      start_period: 3s
     depends_on:
       migrate:
         condition: service_completed_successfully
