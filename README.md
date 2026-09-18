@@ -1,5 +1,6 @@
 # Tevira-AI
 
+[![CI Pipeline](https://github.com/neomoon007/tevira-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/neomoon007/tevira-ai/actions/workflows/ci.yml)
 ![Coverage](https://img.shields.io/badge/Coverage-92%25-brightgreen.svg)
 ![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-3670A0?style=flat&logo=python&logoColor=ffdd54)
 ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)
